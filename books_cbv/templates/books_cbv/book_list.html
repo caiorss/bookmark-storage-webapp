@@ -2,15 +2,20 @@
 
 <h2><a href="{% url 'books_cbv:book_list' %}">Books CBV</a></h2>
 
+<a href="{% url 'books_cbv:book_new' %}">New</a>
+
 <ul>
-    {% for book in object_list %}
-    <li>{{ book.name }}  ({{ book.pages }} Pages)
-    <a href="{% url 'books_cbv:book_edit' book.id %}">edit</a>
-    <a href="{% url 'books_cbv:book_delete' book.id %}">delete</a>
+    {% for bookmark in object_list %}
+    <!-- <li>{{ bookmark.name }} {{ bookmark.url }} ({{ bookmark.pages }} Pages) -->
+    <li>
+        <a href="{{ bookmark.url }}"> {{ bookmark.name }} </a>        
+        - <a href="{% url 'books_cbv:book_edit' bookmark.id %}">edit</a>
+        - <a href="{% url 'books_cbv:book_delete' bookmark.id %}">delete</a>
+
+        <p> {{ bookmark.brief }} </p>
     </li>
     {% endfor %}
 </ul>
 
-<a href="{% url 'books_cbv:book_new' %}">New</a>
 
 {% endblock %}

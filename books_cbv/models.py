@@ -3,10 +3,10 @@ from django.urls import reverse
 
 
 class SiteBookmark(models.Model):
-    name = models.CharField(max_length= 8000)    
-    pages = models.IntegerField()
     # Max URL size has 3000 bytes
-    url   = models.CharField(max_length=3000)
+    url   = models.CharField(max_length=4000)
+    name = models.CharField(max_length= 8000, blank = True, null = True)    
+    brief = models.TextField(blank = True, null = True)
 
     def __str__(self):
         return self.name
