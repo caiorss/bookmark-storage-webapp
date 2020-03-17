@@ -9,9 +9,10 @@
     {% for bookmark in object_list %}
 
     <li>
-        <a href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
-        - <a href="{% url 'books_cbv:book_edit' bookmark.id %}">edit</a>
-        - <a href="{% url 'books_cbv:book_delete' bookmark.id %}">delete</a>       
+        <a target='_blank' href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
+        starred = {{ bookmark.starred }}
+        ; <a href="{% url 'books_cbv:book_edit' bookmark.id %}">edit</a>
+        ; <a href="{% url 'books_cbv:book_delete' bookmark.id %}">delete</a>       
     </li>
     <p> {{ bookmark.brief }} </p>
 

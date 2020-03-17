@@ -14,13 +14,13 @@ class BookList(ListView):
 class BookCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['name', 'url', 'brief']
+    fields = ['name', 'url', 'starred', 'brief']
     success_url = reverse_lazy('books_cbv:book_list')
 
 class BookUpdate(UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['name', 'url', 'brief']
+    fields = ['name', 'url', 'starred', 'brief']
     success_url = reverse_lazy('books_cbv:book_list')
 
 class BookDelete(DeleteView):
