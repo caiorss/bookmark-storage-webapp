@@ -1,14 +1,17 @@
 {% block content %}
 <h1>Bookmarks Storage</h1>
 
-<a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
+  <a href="/">List all</a>
+; <a href="/starred">Starred</a>
+; <a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
+
 
 <ul>
     {% for bookmark in object_list %}
 
     <li>
         <a target='_blank' href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
-        starred = {{ bookmark.starred }} ; Domain = {{ bookmark.hostname }}
+        ; starred = {{ bookmark.starred }} ; Domain = {{ bookmark.hostname }}
         ; <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
         ; <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>       
     </li>

@@ -11,6 +11,15 @@ class BookmarkList(ListView):
     template_name = "books_cbv/book_list.html"
     model = SiteBookmark
 
+
+class BookmarkStarred(ListView):
+    template_name = "books_cbv/book_list.html"
+    # model = SiteBookmark
+
+    def get_queryset(self):
+        lst = SiteBookmark.objects.filter(starred = True)
+        return lst 
+
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark

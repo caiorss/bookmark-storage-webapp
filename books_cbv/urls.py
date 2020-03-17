@@ -7,6 +7,9 @@ app_name = 'books_cbv'
 urlpatterns = [
   path(''
   , views.BookmarkList.as_view(), name='bookmark_list'),
+
+  path('starred'
+  , views.BookmarkStarred.as_view(), name='bookmark_starred'),
   
   path('new'
   , views.BookmarkCreate.as_view(), name='bookmark_new'),
