@@ -124,6 +124,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Allow connection from any hosts
+ALLOWED_HOSTS = [ "*"]
+
 STATICFILES_DIRS = [
 
     os.path.join(BASE_DIR, 'static'),
