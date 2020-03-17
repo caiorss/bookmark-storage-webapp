@@ -1,4 +1,4 @@
 from django.contrib import admin
-from books_cbv.models import Book
+from books_cbv.models import SiteBookmark
 
-admin.site.register(Book)
+admin.site.register(SiteBookmark)
