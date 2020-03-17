@@ -2,9 +2,11 @@ from django.db import models
 from django.urls import reverse
 
 
-class Book(models.Model):
-    name = models.CharField(max_length=200)
+class SiteBookmark(models.Model):
+    name = models.CharField(max_length= 8000)    
     pages = models.IntegerField()
+    # Max URL size has 3000 bytes
+    url   = models.CharField(max_length=3000)
 
     def __str__(self):
         return self.name
