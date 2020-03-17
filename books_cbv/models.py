@@ -19,3 +19,7 @@ class SiteBookmark(models.Model):
     def hostname(self):        
         u = urlparse(self.url)
         return u.hostname
+
+    def isVideo(self):
+        hostname = urlparse(self.url).hostname
+        return "youtube.com" in hostname 
