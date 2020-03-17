@@ -7,23 +7,23 @@ from books_cbv.models import SiteBookmark
 
 tpl_forms = "books_cbv/form.html"
 
-class BookList(ListView):
+class BookmarkList(ListView):
     template_name = "books_cbv/book_list.html"
     model = SiteBookmark
 
-class BookCreate(CreateView):
+class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['name', 'url', 'starred', 'brief']
     success_url = reverse_lazy('books_cbv:book_list')
 
-class BookUpdate(UpdateView):
+class BookmarkUpdate(UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['name', 'url', 'starred', 'brief']
     success_url = reverse_lazy('books_cbv:book_list')
 
-class BookDelete(DeleteView):
+class BookmarkDelete(DeleteView):
     template_name = "books_cbv/book_confirm_delete.html"
     model = SiteBookmark
     success_url = reverse_lazy('books_cbv:book_list')
