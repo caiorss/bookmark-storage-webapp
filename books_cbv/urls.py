@@ -6,14 +6,14 @@ app_name = 'books_cbv'
 
 urlpatterns = [
   path(''
-  , views.BookmarkList.as_view(), name='book_list'),
+  , views.BookmarkList.as_view(), name='bookmark_list'),
   
   path('new'
-  , views.BookmarkCreate.as_view(), name='book_new'),
+  , views.BookmarkCreate.as_view(), name='bookmark_new'),
   
   path('edit/<int:pk>'
-  , views.BookmarkUpdate.as_view(), name='book_edit'),
+  , views.BookmarkUpdate.as_view(), name='bookmark_edit'),
   
   path('delete/<int:pk>'
-  , views.BookmarkDelete.as_view(), name='book_delete'),
+  , views.BookmarkDelete.as_view(), name='bookmark_delete'),
 ]

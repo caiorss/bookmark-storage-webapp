@@ -15,15 +15,15 @@ class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['name', 'url', 'starred', 'brief']
-    success_url = reverse_lazy('books_cbv:book_list')
+    success_url = reverse_lazy('books_cbv:bookmark_list')
 
 class BookmarkUpdate(UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['name', 'url', 'starred', 'brief']
-    success_url = reverse_lazy('books_cbv:book_list')
+    success_url = reverse_lazy('books_cbv:bookmark_list')
 
 class BookmarkDelete(DeleteView):
     template_name = "books_cbv/book_confirm_delete.html"
     model = SiteBookmark
-    success_url = reverse_lazy('books_cbv:book_list')
+    success_url = reverse_lazy('books_cbv:bookmark_list')
