@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
+from urllib.parse import urlparse 
 
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
@@ -14,3 +15,7 @@ class SiteBookmark(models.Model):
 
     def get_absolute_url(self):
         return reverse('books_cbv:book_edit', kwargs={'pk': self.pk})
+
+    def hostname(self):        
+        u = urlparse(self.url)
+        return u.hostname
