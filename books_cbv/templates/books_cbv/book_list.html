@@ -10,7 +10,7 @@
 
     <li>
         <a target='_blank' href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
-        starred = {{ bookmark.starred }}
+        starred = {{ bookmark.starred }} ; Domain = {{ bookmark.hostname }}
         ; <a href="{% url 'books_cbv:book_edit' bookmark.id %}">edit</a>
         ; <a href="{% url 'books_cbv:book_delete' bookmark.id %}">delete</a>       
     </li>
