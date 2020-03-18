@@ -35,7 +35,7 @@ class BookmarkList(ListView):
                                             | Q(url__contains = query2) )
         
         #print(" [BookmarkList] kwargs = " + str(self.kwargs))
-        return self.model.objects.all()
+        return self.model.objects.all().order_by("id").reverse()
 
 
 class BookmarkStarred(ListView):
