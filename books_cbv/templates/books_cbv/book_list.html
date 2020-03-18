@@ -15,7 +15,7 @@
 <div class='content'>    
     {% for bookmark in object_list %}
         <div class = "item">   
-            <h5> <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
+            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
             <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
             </br> <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>                           
             </br> starred = {{ bookmark.starred }} 
