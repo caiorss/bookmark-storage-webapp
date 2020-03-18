@@ -20,7 +20,7 @@ class BookmarkList(ListView):
         view = self.request.GET.get("view")
         
         if view and view == "latest":               
-            return self.model.objects.all().order_by("id").reverse()
+            return self.model.objects.all().order_by("id")
 
         if view and view == "starred":               
             return self.model.objects.filter(starred = True)
