@@ -18,7 +18,7 @@ docker-run:
 	docker run --detach --rm -p 8000:8000 --name django-container django-crud 
 
 docker-log: 
-	docker logs -f django-container 			
+	docker logs  django-container 			
 
 exe: 
 	pyinstaller --name=bookmark-django ./manage.py
