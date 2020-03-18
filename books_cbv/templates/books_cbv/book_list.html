@@ -1,33 +1,48 @@
-{% block content %}
-<h1>Bookmarks Storage</h1>
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<div class="top">
-        <a href="/">List all</a>
-        ; <a href="/?view=latest">Latest</a>
-        ; <a href="/?view=starred">Starred</a>
-        ; <a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
-        
-        <form method='GET'>
-                <input type='text' name='search' value='{{ request.GET.search }}'>
-                <input class="button" type='submit' value="Search">
-        </form>       
-</div>
-
-<div class='content'>    
-    {% for bookmark in object_list %}
-        <div class = "item">   
-            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
-            <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
-            </br> <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>                           
-            </br> starred = {{ bookmark.starred }} 
-            </br> Domain = {{ bookmark.hostname }}
-                        
-            <p> {{ bookmark.brief }} </p>
-
-        </div>                            
-    {% endfor %}
-    
-
-</div>
-
-{% endblock %}
+        <!-- Bootstrap CSS -->
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+       <title> Bookmark Manager</title>        
+       
+    </head>
+    <body>
+            {% block content %}
+            <h1>Bookmarks Storage</h1>
+            
+            <div class="top">
+                    <a href="/">List all</a>
+                    ; <a href="/?view=latest">Latest</a>
+                    ; <a href="/?view=starred">Starred</a>
+                    ; <a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
+                    
+                    <form method='GET'>
+                            <input type='text' name='search' value='{{ request.GET.search }}'>
+                            <input class="button" type='submit' value="Search">
+                    </form>       
+            </div>
+            
+            <div class='content'>    
+                {% for bookmark in object_list %}
+                    <div class = "item">   
+                        <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
+                        <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
+                        </br> <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>                           
+                        </br> starred = {{ bookmark.starred }} 
+                        </br> Domain = {{ bookmark.hostname }}
+                                    
+                        <p> {{ bookmark.brief }} </p>
+            
+                    </div>                            
+                {% endfor %}
+                
+            
+            </div>
+            
+            {% endblock %}
+    </body>
+</html>
