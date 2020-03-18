@@ -23,7 +23,7 @@ class BookmarkList(ListView):
             return self.model.objects.all().order_by("id")
 
         if view and view == "starred":               
-            return self.model.objects.filter(starred = True)
+            return self.model.objects.filter(starred = True).order_by("id").reverse()
 
         domain = self.request.GET.get("domain")            
         if domain:
