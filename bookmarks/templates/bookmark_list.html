@@ -25,7 +25,7 @@
 
                     ; <a class="btn btn-info" href="/?view=starred" 
                         title="List only starred items">Starred</a>
-                        
+
                     ; <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
             </div>
 
@@ -43,7 +43,9 @@
                               <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">edit</a>
                               <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">delete</a>                           
                         </br> starred = {{ bookmark.starred }} 
-                        </br> Domain = {{ bookmark.hostname }}
+                        </br> Domain = <a href="/?domain={{ bookmark.hostname }}"
+                                          title="Filter by domain {{ bookmark.hostname }}"
+                                        > {{ bookmark.hostname }} </a>
                                     
                         <p class = "well"> {{ bookmark.brief }} </p>
             
