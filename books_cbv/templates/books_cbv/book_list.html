@@ -5,16 +5,21 @@
 ; <a href="/starred">Starred</a>
 ; <a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
 
+<form method='GET'>
+        <input type='text' name='search' value='{{ request.GET.search }}'>
+        <input class="button" type='submit' value="Search">
+      </form>
 
 <ul>
     {% for bookmark in object_list %}
 
     <li>
-        <a target='_blank' href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
+        <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a>        
         ; starred = {{ bookmark.starred }} ; Domain = {{ bookmark.hostname }}
         ; <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
         ; <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>       
     </li>
+    
     <p> {{ bookmark.brief }} </p>
 
     {% endfor %}
