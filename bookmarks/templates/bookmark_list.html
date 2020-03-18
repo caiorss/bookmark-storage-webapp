@@ -14,28 +14,30 @@
             {% block content %}
             <h1>Bookmarks Storage</h1>
             
-            <div class="top">
-                    <a href="/">List all</a>
-                    ; <a href="/?view=latest">Latest</a>
-                    ; <a href="/?view=starred">Starred</a>
-                    ; <a href="{% url 'books_cbv:bookmark_new' %}">Add new entry</a>
-                    
-                    <form method='GET'>
-                            <input type='text' name='search' value='{{ request.GET.search }}'>
-                            <input class="button" type='submit' value="Search">
-                    </form>       
+            <div id="top" class="btn-group btn-group-sm">
+                      <a class="btn btn-primary" href="/">List all</a>
+                    ; <a class="btn btn-info" href="/?view=latest">Latest</a>
+                    ; <a class="btn btn-info" href="/?view=starred">Starred</a>
+                    ; <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
+            </div>
+
+            <div>
+                <form method='GET' class="form-group">
+                    <input type='text' name='search' value='{{ request.GET.search }}'>
+                    <input class="btn btn-info" type='submit' value="Search">
+                </form> 
             </div>
             
-            <div class='content'>    
+            <div class="container">    
                 {% for bookmark in object_list %}
-                    <div class = "item">   
+                    <div class = "well ">   
                         <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
-                        <a href="{% url 'books_cbv:bookmark_edit' bookmark.id %}">edit</a>
-                        </br> <a href="{% url 'books_cbv:bookmark_delete' bookmark.id %}">delete</a>                           
+                              <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">edit</a>
+                              <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">delete</a>                           
                         </br> starred = {{ bookmark.starred }} 
                         </br> Domain = {{ bookmark.hostname }}
                                     
-                        <p> {{ bookmark.brief }} </p>
+                        <p class = "well"> {{ bookmark.brief }} </p>
             
                     </div>                            
                 {% endfor %}

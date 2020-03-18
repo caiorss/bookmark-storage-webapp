@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #'theme',
-    'books_cbv',
+    'bookmarks',
     #'books_fbv',
     #'books_fbv_user',    
 ]

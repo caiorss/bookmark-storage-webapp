@@ -22,7 +22,7 @@ class SiteBookmark(models.Model):
         return "name = {name} ; url = {url}".format(name = self.name, url = self.url)
 
     def get_absolute_url(self):
-        return reverse('books_cbv:book_edit', kwargs={'pk': self.pk})
+        return reverse('bookmarks:book_edit', kwargs={'pk': self.pk})
 
     def hostname(self):        
         u = urlparse(self.url)

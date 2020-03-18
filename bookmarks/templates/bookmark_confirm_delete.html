@@ -1,6 +1,6 @@
 {% block content %}
 
-<h2><a href="{% url 'books_cbv:bookmark_list' %}">Bookmarks</a>: Delete?</h2>
+<h2><a href="{% url 'bookmarks:bookmark_list' %}">Bookmarks</a>: Delete?</h2>
 
 <form method="post">{% csrf_token %}
     Are you sure you want to delete "{{ object }}" ?<br>
