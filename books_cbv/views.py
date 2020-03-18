@@ -15,10 +15,19 @@ class BookmarkList(ListView):
     model = SiteBookmark
 
     def get_queryset(self):
-        query = self.request.GET.get('search')
-        if query:
-            return self.model.objects.filter( Q(name__contains = query) 
-                                            | Q(url__contains = query) )
+
+        view = self.request.GET.get("view")
+        
+        if view and view == "latest":               
+            return self.model.objects.all().order_by("id").reverse()
+
+        if view and view == "starred":               
+            return self.model.objects.filter(starred = True)
+
+        query2 = self.request.GET.get('search')
+        if query2:
+            return self.model.objects.filter( Q(name__contains = query2) 
+                                            | Q(url__contains = query2) )
         
         #print(" [BookmarkList] kwargs = " + str(self.kwargs))
         return self.model.objects.all()
