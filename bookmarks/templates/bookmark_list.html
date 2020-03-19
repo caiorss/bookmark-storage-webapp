@@ -13,10 +13,28 @@
                     background-color: black; 
                     color:            greenyellow;
                 }
-            a { color: cyan }
-            
+            a { color: lightskyblue }
+
             p { color: white; }
             
+            h1 { color: white }
+            h2 { color: white }
+            h3 { color: white }
+            h4 { color: white }
+            h5 { color: white }
+
+            .item { 
+                display: block;
+                position: relative;
+                border: 8px solid #666;
+                border-radius: 30px;
+                margin-top: 1%;
+                max-width: 95%;
+                background-color: #3f3f3f;
+                border-color: #F2F2F2;
+                padding: 2%                
+            }
+
         </style>
 
        <title> Bookmark Manager</title>        
@@ -50,7 +68,7 @@
             
             <div class="container">    
                 {% for bookmark in object_list %}
-                    <div class = "well ">   
+                    <div class = "well item ">   
                         <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
                               <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">edit</a>
                               <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">delete</a>                           
@@ -59,7 +77,7 @@
                                           title="Filter by domain {{ bookmark.hostname }}"
                                         > {{ bookmark.hostname }} </a>
                                     
-                        <p class = "well"> {{ bookmark.brief }} </p>
+                        <p class = ""> {{ bookmark.brief }} </p>
             
                     </div>                            
                 {% endfor %}
