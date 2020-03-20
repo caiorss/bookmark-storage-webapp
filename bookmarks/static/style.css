@@ -14,15 +14,63 @@ h4 { color: white }
 h5 { color: white }
 
 .item { 
-background-color: #2f2f2f;
-display: block;
-position: relative;
-border: 8px solid #666;
-border-radius: 30px;
-margin-top: 1%;
-max-width: 95%;
-background-color: #3f3f3f;
-/* border-color: black; */
-border: 1px solid #607D8B;
-padding: 2%                
+    background-color: #2f2f2f;
+    display: block;
+    position: relative;
+    border: 8px solid #666;
+    border-radius: 30px;
+    margin-top: 1%;
+    max-width: 95%;
+    background-color: #3f3f3f;
+    /* border-color: black; */
+    border: 1px solid #607D8B;
+    padding: 2%                
 }
+
+#top-panel{
+    background: #4e4e50;
+    border-radius: 25px;
+}
+
+  /** =============== Mobile-specific Style ================ */
+  @media only screen and (max-width: 960px) {
+
+
+  }
+
+   /** =============== Desktop-specific Style ================ */
+   @media only screen and (min-width: 960px) {
+
+    html { width: 800px; }
+
+    .header {
+       font-size: 12pt;
+       width: 100%;
+    }
+
+    .content {
+      font-size:  12pt;
+      width: 100%;
+      margin: 200px 50px;
+    }
+
+    #top-panel{
+        width: 60%;
+        position:      fixed;
+        display:       block;        
+        margin-bottom: 100px;
+        z-index:       999999;
+        top: 0;
+    }
+
+    #bookmark-list{
+        margin-top: 160px;
+        position: relative;
+    }
+
+
+ } /* End of Desktop style */
+
+
+
+
