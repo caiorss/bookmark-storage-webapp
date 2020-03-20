@@ -34,8 +34,8 @@
     {% for bookmark in object_list %}
         <div class = "well item ">   
             <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.name | default:bookmark.url }} </a></h5>
-                  <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">edit</a>
-                  <a class="btn btn-primary" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">delete</a>                           
+                  <a class="btn btn-primary" title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">Edit</a>
+                  <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
             </br> starred = {{ bookmark.starred }} 
             </br> Domain = <a href="/?domain={{ bookmark.hostname }}"
                               title="Filter by domain {{ bookmark.hostname }}"
