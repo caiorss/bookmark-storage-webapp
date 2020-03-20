@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-
 {% block content %}
 
-<h1> Edit/Create Book Entry </h1>
+<div class="container">
+        <h1> Edit/Create Book Entry </h1>
 
-<!-- <h2><a href="{% url 'bookmarks:bookmark_list' %}">Web Site Bookmark</a>: Edit</h2> -->
-
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit" />
-</form>
+        <!-- <h2><a href="{% url 'bookmarks:bookmark_list' %}">Web Site Bookmark</a>: Edit</h2> -->
+        
+        <form method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Submit" />
+        </form>        
+</div>
 
 {% endblock %}
