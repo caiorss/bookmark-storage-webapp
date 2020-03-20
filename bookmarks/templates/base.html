@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <style type = text/css>
+            body { 
+                    background-color: #3c3c3c; 
+                    color:            white;
+                }
+            a { color: lightskyblue }
+
+            p { color: white; }
+            
+            h1 { color: white }
+            h2 { color: white }
+            h3 { color: white }
+            h4 { color: white }
+            h5 { color: white }
+
+            .item { 
+                background-color: #2f2f2f;
+                display: block;
+                position: relative;
+                border: 8px solid #666;
+                border-radius: 30px;
+                margin-top: 1%;
+                max-width: 95%;
+                background-color: #3f3f3f;
+                border-color: black;
+                padding: 2%                
+            }
+
+        </style>
+
+       <title> Bookmark Manager</title>        
+       
+    </head>
+
+<body>
+   
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div><!-- content -->
+</body>
+</html>
