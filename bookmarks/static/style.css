@@ -1,0 +1,28 @@
+body { 
+    background-color: #3c3c3c; 
+    color:            white;
+    font-family: 'Lato', sans-serif;
+}
+a { color: lightskyblue }
+
+p { color: white; }
+
+h1 { color: white }
+h2 { color: white }
+h3 { color: white }
+h4 { color: white }
+h5 { color: white }
+
+.item { 
+background-color: #2f2f2f;
+display: block;
+position: relative;
+border: 8px solid #666;
+border-radius: 30px;
+margin-top: 1%;
+max-width: 95%;
+background-color: #3f3f3f;
+/* border-color: black; */
+border: 1px solid #607D8B;
+padding: 2%                
+}
