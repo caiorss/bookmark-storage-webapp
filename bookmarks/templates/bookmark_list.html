@@ -4,26 +4,30 @@
 {% block content %}
 <h1>Bookmarks Storage</h1>
 
-<div id="top" class="btn-group btn-group-sm">
-          <a class="btn btn-primary" 
-             href="/" 
-             title="List all items ordered by the latest">List all</a>
-        
-          ; <a class="btn btn-info" 
-            href="/?view=latest" 
-            title="Order by oldest">Oldest</a>
+<div class="container">
+    <div id="" class="btn-group btn-group-sm">
+        <a class="btn btn-primary" 
+           href="/" 
+           title="List all items ordered by the latest">List all</a>
+      
+        ; <a class="btn btn-info" 
+          href="/?view=latest" 
+          title="Order by oldest">Oldest</a>
 
-        ; <a class="btn btn-info" href="/?view=starred" 
-            title="List only starred items">Starred</a>
+      ; <a class="btn btn-info" href="/?view=starred" 
+          title="List only starred items">Starred</a>
 
-        ; <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
+      ; <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
 </div>
 
-<div>
-    <form method='GET' class="form-group">
-        <input type='text' name='search' value='{{ request.GET.search }}'>
-        <input class="btn btn-info" type='submit' value="Search">
-    </form> 
+<div class="">
+  <form method='GET' class="form-group">
+      <input type='text' name='search' value='{{ request.GET.search }}'>
+      <input class="btn btn-info" type='submit' value="Search">
+  </form> 
+</div>
+
+
 </div>
 
 <div class="container">    
