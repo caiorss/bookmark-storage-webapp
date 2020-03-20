@@ -13,10 +13,10 @@ class Tag(models.Model):
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
     #url   = models.CharField(max_length=4000)
-    url     = models.URLField(unique = True)
-    name    = models.CharField(max_length= 8000, blank = True, null = True)    
-    starred = models.BooleanField(blank = True)
-    brief   = models.TextField(blank = True, null = True)
+    url     = models.URLField(unique = True, help_text = "Enter bookmark URL (Required)")
+    name    = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Enter web site title")    
+    starred = models.BooleanField(blank = True, help_text = "Check this box to mark this bookmark as favourite")
+    brief   = models.TextField(blank = True, null = True, help_text="Short web site description")
     tags    = models.ManyToManyField(Tag, blank = True)
 
     def __str__(self):
