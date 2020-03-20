@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 class Tag(models.Model):
     name = models.CharField(max_length=300, unique = True)
+    # brief = models.CharField(max_length = 5000)
 
     def __str__(self):
         return self.name 
@@ -12,11 +13,11 @@ class Tag(models.Model):
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
     #url   = models.CharField(max_length=4000)
-    url = models.URLField()
-    name = models.CharField(max_length= 8000, blank = True, null = True)    
+    url     = models.URLField(unique = True)
+    name    = models.CharField(max_length= 8000, blank = True, null = True)    
     starred = models.BooleanField(blank = True)
-    brief = models.TextField(blank = True, null = True)
-    tags = models.ManyToManyField(Tag, blank = True)
+    brief   = models.TextField(blank = True, null = True)
+    tags    = models.ManyToManyField(Tag, blank = True)
 
     def __str__(self):
         return "name = {name} ; url = {url}".format(name = self.name, url = self.url)
