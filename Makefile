@@ -10,6 +10,10 @@ db:
 	${PYTHON} manage.py makemigrations
 	${PYTHON} manage.py migrate 
 
+# Database backup 
+db-back:
+	cp db.sqlite3 db.sqlit3-back
+
 # Build Docker Image 
 docker-build: 
 	docker build . -t django-crud
