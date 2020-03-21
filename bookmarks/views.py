@@ -36,7 +36,7 @@ class BookmarkList(ListView):
 
         query2 = self.request.GET.get('search')
         if query2:
-            return self.model.objects.filter( Q(name__contains = query2) 
+            return self.model.objects.filter( Q(title__contains = query2) 
                                             | Q(url__contains = query2) ).order_by("id").reverse()
         
         #print(" [BookmarkList] kwargs = " + str(self.kwargs))
