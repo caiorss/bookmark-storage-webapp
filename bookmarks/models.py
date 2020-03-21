@@ -25,13 +25,19 @@ class SiteBookmark(models.Model):
     brief   = models.TextField(blank = True, null = True, help_text="Short web site description")
     tags    = models.ManyToManyField(Tag, blank = True)
 
-    deleted = models.BooleanField(blank = True, default = False, null = True, editable = False)
+    deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
 
     # Set field only when instance is created
     created = models.DateField(editable = False, auto_now_add = True, null = True)
     # Set field only when instance is changed
     updated = models.DateField(editable = False, auto_now = True, null = True)
 
+    # Override deleted behavior, mark field delete to True instead of elininate
+    # this database row. See: https://stackoverflow.com/questions/52767988
+    def delete(self):
+        self.deleted = True 
+        self.starred = False 
+        self.save()
 
     def __str__(self):
         return "title = {title} ; url = {url}".format(title = self.title, url = self.url)
