@@ -8,7 +8,10 @@
         <!-- <h2><a href="{% url 'bookmarks:bookmark_list' %}">Web Site Bookmark</a>: Edit</h2> -->
         
         <form method="post">{% csrf_token %}
-            {{ form.as_p }}
+            <table biorder="1"> 
+                    <!-- {{ form.as_p }} -->
+                    {{ form.as_table }}
+            </table>            
             <input type="submit" value="Submit" />
         </form>        
 </div>

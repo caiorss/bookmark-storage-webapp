@@ -27,7 +27,7 @@ class BookmarkList(ListView):
 
         domain = self.request.GET.get("domain")            
         if domain:
-            d = domain.strip("www.").strip("m.").strip("old.")
+            d = domain.strip("www.").strip("m.").strip("old.").strip("mobile.")
             return self.model.objects.filter(url__contains = d).order_by("id").reverse()
 
         tag = self.request.GET.get("tag")
