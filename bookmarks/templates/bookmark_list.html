@@ -39,6 +39,7 @@
                   <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
             </br> Created  = {{ bookmark.created }} ; Modified = {{ bookmark.updated }}                  
             </br> starred = {{ bookmark.starred }} 
+            </br> Deleted = {{ bookmark.deleted }}
             </br> Domain = <a href="/?domain={{ bookmark.hostname }}"
                               title="Filter by domain {{ bookmark.hostname }}"
                             > {{ bookmark.hostname }} </a>

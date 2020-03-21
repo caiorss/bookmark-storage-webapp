@@ -20,10 +20,10 @@ class BookmarkList(ListView):
         view = self.request.GET.get("view")
         
         if view and view == "latest":               
-            return self.model.objects.all().order_by("id")
+            return self.model.objects.filter(deleted = False).order_by("id")
 
         if view and view == "starred":               
-            return self.model.objects.filter(starred = True).order_by("id").reverse()
+            return self.model.objects.filter(starred = True).filter(deleted = False).order_by("id").reverse()
 
         domain = self.request.GET.get("domain")            
         if domain:
@@ -36,11 +36,12 @@ class BookmarkList(ListView):
 
         query2 = self.request.GET.get('search')
         if query2:
-            return self.model.objects.filter( Q(title__contains = query2) 
-                                            | Q(url__contains = query2) ).order_by("id").reverse()
+            return self.model.objects.filter( Q(deleted = False) 
+                                             & ( Q(title__contains = query2) | Q(url__contains = query2)              
+                                               ) ).order_by("id").reverse()
         
         #print(" [BookmarkList] kwargs = " + str(self.kwargs))
-        return self.model.objects.all().order_by("id").reverse()
+        return self.model.objects.filter(deleted = False).order_by("id").reverse()
 
 
 class BookmarkStarred(ListView):
@@ -54,13 +55,13 @@ class BookmarkStarred(ListView):
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['title', 'url', 'starred', 'brief', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
     success_url = reverse_lazy('bookmarks:bookmark_list')
 
 class BookmarkUpdate(UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['title', 'url', 'starred', 'brief', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
     success_url = reverse_lazy('bookmarks:bookmark_list')
 
 class BookmarkDelete(DeleteView):
