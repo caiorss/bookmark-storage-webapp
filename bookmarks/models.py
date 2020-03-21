@@ -15,6 +15,20 @@ class Tag(models.Model):
     def __str__(self):
         return self.name 
 
+class SavedSearch(models.Model):
+    search = models.CharField(max_length=5000, help_text="")
+    description = models.CharField(max_length = 5000, null = True, blank=True, help_text = "Tag description")
+    deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
+    
+    # Set field only when instance is created
+    created = models.DateField(editable = False, auto_now_add = True)
+    # Set field only when instance is changed
+    updated = models.DateField(editable = False, auto_now = True)
+
+    def __str__(self):
+        return self.search  
+
+
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
     #url   = models.CharField(max_length=4000)
