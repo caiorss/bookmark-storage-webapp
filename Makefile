@@ -7,8 +7,8 @@ run:
 # Update Database 
 db:
 	cp db.sqlite3 db.sqlite3.back
-	${PYTHON} manage.py makemigrations
-	${PYTHON} manage.py migrate 
+	${PYTHON} manage.py makemigrations bookmarks
+	${PYTHON} manage.py migrate --run-syncdb
 
 # Database backup 
 db-back:
