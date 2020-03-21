@@ -54,13 +54,13 @@ class BookmarkStarred(ListView):
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['name', 'url', 'starred', 'brief', 'tags']
+    fields = ['title', 'url', 'starred', 'brief', 'tags']
     success_url = reverse_lazy('bookmarks:bookmark_list')
 
 class BookmarkUpdate(UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['name', 'url', 'starred', 'brief', 'tags']
+    fields = ['title', 'url', 'starred', 'brief', 'tags']
     success_url = reverse_lazy('bookmarks:bookmark_list')
 
 class BookmarkDelete(DeleteView):
