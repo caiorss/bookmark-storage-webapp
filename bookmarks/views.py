@@ -19,6 +19,9 @@ class BookmarkList(ListView):
 
         view = self.request.GET.get("view")
         
+        if view and view == "removed":
+            return self.model.objects.filter(deleted = True).order_by("id").reverse()
+
         if view and view == "latest":               
             return self.model.objects.filter(deleted = False).order_by("id")
 
