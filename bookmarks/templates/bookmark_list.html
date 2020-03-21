@@ -39,10 +39,13 @@
         <div class = "well item ">   
             <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
                   <a class="btn btn-primary" title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">Edit</a>
-                  <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
+
+                    {% if bookmark.deleted != True  %}
+                        <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
+                    {% endif %}
+
             </br> Created  = {{ bookmark.created }} ; Modified = {{ bookmark.updated }}                  
             </br> starred = {{ bookmark.starred }} 
-            </br> Deleted = {{ bookmark.deleted }}
             </br> Domain = <a href="/?domain={{ bookmark.hostname }}"
                               title="Filter by domain {{ bookmark.hostname }}"
                             > {{ bookmark.hostname }} </a>
