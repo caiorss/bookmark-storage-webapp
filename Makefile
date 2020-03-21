@@ -6,13 +6,25 @@ run:
 
 # Update Database 
 db:
-	cp db.sqlite3 db.sqlite3.back
+	mkdir -p back/
+	cp -a db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
 	${PYTHON} manage.py makemigrations bookmarks
 	${PYTHON} manage.py migrate --run-syncdb
 
 # Database backup 
 db-back:
-	cp db.sqlite3 db.sqlit3-back
+	mkdir -p back/
+	cp -v db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
+
+# Reset dabase
+db-reset:
+	mkdir -p back/
+	cp -a db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
+	rm -rf db.sqlite3 
+	${PYTHON} manage.py makemigrations bookmarks
+	${PYTHON} manage.py migrate --run-syncdb
+	${PYTHON} manage.py createsuperuser
+
 
 # Build Docker Image 
 docker-build: 
