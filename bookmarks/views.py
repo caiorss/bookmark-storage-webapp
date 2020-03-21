@@ -26,7 +26,7 @@ class BookmarkList(ListView):
             return self.model.objects.filter(deleted = False).order_by("id")
 
         if view and view == "starred":               
-            return self.model.objects.filter(starred = True).filter(deleted = False).order_by("id").reverse()
+            return self.model.objects.filter(starred = True).exclude(deleted = True).order_by("id").reverse()
 
         domain = self.request.GET.get("domain")            
         if domain:
@@ -39,9 +39,8 @@ class BookmarkList(ListView):
 
         query2 = self.request.GET.get('search')
         if query2:
-            return self.model.objects.filter( Q(deleted = False) 
-                                             & ( Q(title__contains = query2) | Q(url__contains = query2)              
-                                               ) ).order_by("id").reverse()
+            q = Q(title__contains = query2) | Q(url__contains = query2)       
+            return self.model.objects.filter(q).exclude( deleted = True ).order_by("id").reverse()
         
         #print(" [BookmarkList] kwargs = " + str(self.kwargs))
         return self.model.objects.filter(deleted = False).order_by("id").reverse()
