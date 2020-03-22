@@ -19,4 +19,14 @@ urlpatterns = [
   
   path('delete/<int:pk>'
   , views.BookmarkDelete.as_view(), name='bookmark_delete'),
+
+  # ----------------------------------------------------#
+
+  path('savedsearch_list'
+  , views.SavedSearchList.as_view(), name='bookmark_savedsearch_list'),
+
+  path('savedsearch_new'
+  , views.SavedSearchCreate.as_view(), name='bookmark_savedsearch_new'),
+ 
+
 ]
