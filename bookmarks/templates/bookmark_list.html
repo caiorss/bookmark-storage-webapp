@@ -37,7 +37,37 @@
 
 </div>
 
-<div id="bookmark-list" class="container">    
+<div id="bookmark-list" class="container">   
+    
+  
+
+    {% if object_list.has_other_pages %}
+    
+       <ul class="pagination">
+            {% if object_list.has_previous %}
+              <li><a class="btn btn-primary" href="?page={{ object_list.previous_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }}  ">&laquo;</a></li>
+            {% else %}
+              <li  class="btn btn-primary" class="disabled"><span>&laquo;</span></li>
+            {% endif %}            
+            
+            {% for i in object_list.paginator.page_range %}
+              {% if object_list.number == i %}
+                <li class="active btn btn-info"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+              {% else %}
+                <li><a class = "btn btn-primary" href="?page={{ i }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }} ">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if object_list.has_next %}
+              <li><a class="btn btn-primary" href="?page={{ object_list.next_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }} ">&raquo;</a></li>
+            {% else %}
+              <li class="btn btn-primary disabled"><span>&raquo;</span></li>
+            {% endif %}
+          </ul>
+     
+    {% endif %}
+
+    
+
     {% for bookmark in object_list %}
         <div class = "well item ">   
             <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
