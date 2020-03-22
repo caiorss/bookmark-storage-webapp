@@ -100,10 +100,10 @@ class SavedSearchCreate(CreateView):
     template_name = tpl_forms
     model = SavedSearch 
     fields = ['search', 'description']
-    success_url = reverse_lazy('bookmarks:bookmark_list')
+    success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
 class SavedSearchUpdate(UpdateView):
     template_name = tpl_forms
     model = SavedSearch 
     fields = ['search', 'description']
-    success_url = reverse_lazy('bookmarks:bookmark_list')
+    success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
