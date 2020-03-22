@@ -42,7 +42,7 @@ class BookmarkList(ListView):
             return self.model.objects.filter(deleted = True).order_by("id").reverse()
 
         if view and view == "latest":               
-            return self.model.objects.filter(deleted = False).order_by("id")
+            return self.model.objects.exclude(deleted = True).order_by("id")
 
         if view and view == "starred":               
             return self.model.objects.filter(starred = True).exclude(deleted = True).order_by("id").reverse()
@@ -50,7 +50,7 @@ class BookmarkList(ListView):
         domain = self.request.GET.get("domain")            
         if domain:
             d = domain.strip("www.").strip("m.").strip("old.").strip("mobile.")
-            return self.model.objects.filter(url__contains = d).order_by("id").reverse()
+            return self.model.objects.filter(url__contains = d).exclude(deleted = True) .order_by("id").reverse()
 
         tag = self.request.GET.get("tag")
         if tag:
@@ -60,8 +60,8 @@ class BookmarkList(ListView):
         if query2:
             q = Q(title__contains = query2) | Q(url__contains = query2)       
             return self.model.objects.filter(q).exclude( deleted = True ).order_by("id").reverse()
-        
-        return self.model.objects.filter(deleted = False).order_by("id").reverse()
+
+        return self.model.objects.exclude(deleted = True).order_by("id").reverse()
 
 
 class BookmarkStarred(ListView):
