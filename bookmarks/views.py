@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.db.models import Q 
 
 from bookmarks.models import SiteBookmark, SavedSearch
+import django.core.paginator as pag 
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -14,10 +15,28 @@ tpl_confirm_delete = "bookmark_confirm_delete.html"
 class BookmarkList(ListView):
     template_name = tpl_main
     model = SiteBookmark
+    pagination_size = 20
 
     def get_queryset(self):
+        page = self.request.GET.get("page", 1)        
+        items_list = self.process_query()
+        return self.paginate(page, items_list)                        
 
-        view = self.request.GET.get("view")
+    # Helper method for paginating output 
+    # Reference: https://simpleisbetterthancomplex.com/tutorial/2016/08/03/how-to-paginate-with-django.html
+    def paginate(self, page, items_list):
+        # Show 10 items at a time 
+        paginator = pag.Paginator(items_list, self.pagination_size)
+        try: 
+            items = paginator.page(page)
+        except pag.PageNotAnInteger:
+            items = paginator.page(1)
+        except pag.EmptyPage:
+            items = paginator.page(paginator.num_pages)      
+        return items   
+
+    def process_query(self):
+        view = self.request.GET.get("view")        
         
         if view and view == "removed":
             return self.model.objects.filter(deleted = True).order_by("id").reverse()
@@ -42,7 +61,6 @@ class BookmarkList(ListView):
             q = Q(title__contains = query2) | Q(url__contains = query2)       
             return self.model.objects.filter(q).exclude( deleted = True ).order_by("id").reverse()
         
-        #print(" [BookmarkList] kwargs = " + str(self.kwargs))
         return self.model.objects.filter(deleted = False).order_by("id").reverse()
 
 
