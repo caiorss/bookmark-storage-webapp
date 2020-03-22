@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q 
 
-from bookmarks.models import SiteBookmark
+from bookmarks.models import SiteBookmark, SavedSearch
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -69,4 +69,23 @@ class BookmarkUpdate(UpdateView):
 class BookmarkDelete(DeleteView):
     template_name = tpl_confirm_delete 
     model = SiteBookmark
+    success_url = reverse_lazy('bookmarks:bookmark_list')
+
+
+# ------------ Saved Search ------------------------#
+
+class SavedSearchList(ListView):
+    template_name = "savedsearch_list.html"
+    model = SavedSearch
+
+class SavedSearchCreate(CreateView):
+    template_name = tpl_forms
+    model = SavedSearch 
+    fields = ['search', 'description']
+    success_url = reverse_lazy('bookmarks:bookmark_list')
+
+class SavedSearchUpdate(UpdateView):
+    template_name = tpl_forms
+    model = SavedSearch 
+    fields = ['search', 'description']
     success_url = reverse_lazy('bookmarks:bookmark_list')
