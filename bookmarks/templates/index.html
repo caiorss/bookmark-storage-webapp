@@ -1,24 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
 
-
 <h1> Index </h1>
 
 <h2> Items </h2>
 
-</br> <a href='/items'>All items ordered by last created</a>
-
-</br> <a href='/items?view=latest'>All items ordered by creation time</a>
-
-</br> <a href='/items?view=removed'>Removed items</a>
-
-</br> <a href='/items/starred'>Starred Items</a>
-
-</br> <a href='/items/new'>Add item</a>
-
+<ul>
+    <li>  <a href='/items'>All items ordered by last created</a> </li>
+    <li>  <a href='/items?view=latest'>All items ordered by creation time</a> </li>
+    <li>  <a href='/items?view=removed'>Removed items</a> </li>
+    <li>  <a href='/items/starred'>Starred Items</a>  </li>
+    <li>   <a href='/items/new'>Add item</a> </li>
+</ul>
 
 <h2> Saved Search </h2>
 
-</br> <a href='/search/list'>Saved searches</a>
+<ul>    
+    <li> <a href='/search/list'>Saved searches</a> </li>
+    <li> <a href='/search/new'>Add new saved search</a> </li>
+</ul>
+
+<h2> Collection </h2>
+
+<ul>    
+    <li> <a href='/collection/list'>List collections</a> </li>
+    <li> <a href='/collection/new'>Add new collection</a> </li>
+</ul>
+
 
 {% endblock %}
