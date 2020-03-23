@@ -66,3 +66,24 @@ class SiteBookmark(models.Model):
     def isVideo(self):
         hostname = urlparse(self.url).hostname
         return "youtube.com" in hostname 
+
+
+class Collection(models.Model):
+    title = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")
+    description = models.TextField(blank = True)
+    item = models.ManyToManyField(SiteBookmark, blank = True)
+
+    starred = models.BooleanField(blank = True, default = False, help_text = "Mark this collection as favourite")
+    deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
+    # Set field only when instance is created
+    created = models.DateField(editable = False, auto_now_add = True, null = True)
+    # Set field only when instance is changed
+    updated = models.DateField(editable = False, auto_now = True, null = True)
+    
+    def __str__(self):
+        return " title = {title} ".format(title = self.title)
+
+    def delete(self):
+        self.deleted = True 
+        self.starred = False 
+        self.save()
