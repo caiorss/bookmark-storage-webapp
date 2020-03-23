@@ -36,6 +36,6 @@ urlpatterns = [
  
   #----------------------------------------------------#
 
-  path('collection_new', views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
+  path('collection/new', views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
 ]
