@@ -1,6 +1,12 @@
 from django.contrib import admin
-from bookmarks.models import SiteBookmark, Tag, SavedSearch
+import bookmarks.models as bm 
 
-admin.site.register(SiteBookmark)
-admin.site.register(Tag)
-admin.site.register(SavedSearch)
+class CollectionAdmin(admin.ModelAdmin):
+    model = bm.Collection
+    filter_horizontal = ('item', )
+
+admin.site.register(bm.SiteBookmark)
+admin.site.register(bm.Tag)
+admin.site.register(bm.SavedSearch)
+admin.site.register(bm.Collection, CollectionAdmin)
+
