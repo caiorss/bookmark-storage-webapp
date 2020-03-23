@@ -38,12 +38,12 @@
 
 
 <div id="bookmark-list" class="container">    
-    <a class="btn btn-info" href="/savedsearch_new"  title="Saved search">Add saved search</a>
+    <a class="btn btn-info" href="/search/new"  title="Saved search">Add saved search</a>
 
     {% for savedsearch in object_list %}
     
     <div class = "well item ">   
-        <a href="/?search={{ savedsearch.search }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
+        <a href="/items?search={{ savedsearch.search }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
         <p> {{ savedsearch.description }} </p>
     </div>                            
     {% endfor %}
