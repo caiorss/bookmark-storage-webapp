@@ -28,5 +28,8 @@ urlpatterns = [
   path('savedsearch_new'
   , views.SavedSearchCreate.as_view(), name='bookmark_savedsearch_new'),
  
+  #----------------------------------------------------#
+
+  path('collection_new', views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
 ]
