@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<h1> Index </h1>
+
+<h2> Items </h2>
+
+</br> <a href='/items'>All items ordered by last created</a>
+
+</br> <a href='/items?view=latest'>All items ordered by creation time</a>
+
+</br> <a href='/items?view=removed'>Removed items</a>
+
+</br> <a href='/items/starred'>Starred Items</a>
+
+</br> <a href='/items/new'>Add item</a>
+
+
+<h2> Saved Search </h2>
+
+</br> <a href='/search/list'>Saved searches</a>
+
+{% endblock %}
