@@ -3,6 +3,7 @@ from django.views.generic import TemplateView,ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q 
+import django.shortcuts as ds 
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection
 import django.core.paginator as pag 
@@ -46,6 +47,13 @@ class BookmarkList(ListView):
 
         if view and view == "starred":               
             return self.model.objects.filter(starred = True).exclude(deleted = True).order_by("id").reverse()
+
+        coll = self.request.GET.get("collection")
+        if coll:
+            c: Collection = ds.get_object_or_404(Collection, id = coll)
+            # 'url', 'title', 'starred', 'brief', 'tags', 'deleted', 'created', 'updated')
+            q = c.item.all()
+            return q 
 
         domain = self.request.GET.get("domain")            
         if domain:
