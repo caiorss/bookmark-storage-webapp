@@ -1,31 +1,37 @@
 from django.urls import path
+import django.views.generic.base as dvgb
 
 from . import views
 
 app_name = 'bookmarks'
 
 urlpatterns = [
-  path(''
+
+  # Redirect straight to template 
+  # see: https://stackoverflow.com/questions/3402708/
+  path('', dvgb.TemplateView.as_view(template_name = 'index.html'), name = 'home'),
+
+  path('items'
   , views.BookmarkList.as_view(), name='bookmark_list'),
 
-  path('starred'
+  path('items/starred'
   , views.BookmarkStarred.as_view(), name='bookmark_starred'),
   
-  path('new'
+  path('items/new'
   , views.BookmarkCreate.as_view(), name='bookmark_new'),
   
-  path('edit/<int:pk>'
+  path('items/edit/<int:pk>'
   , views.BookmarkUpdate.as_view(), name='bookmark_edit'),
   
-  path('delete/<int:pk>'
+  path('items/delete/<int:pk>'
   , views.BookmarkDelete.as_view(), name='bookmark_delete'),
 
   # ----------------------------------------------------#
 
-  path('savedsearch_list'
+  path('search/list'
   , views.SavedSearchList.as_view(), name='bookmark_savedsearch_list'),
 
-  path('savedsearch_new'
+  path('search/new'
   , views.SavedSearchCreate.as_view(), name='bookmark_savedsearch_new'),
  
   #----------------------------------------------------#
