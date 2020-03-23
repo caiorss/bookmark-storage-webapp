@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q 
 
-from bookmarks.models import SiteBookmark, SavedSearch
+from bookmarks.models import SiteBookmark, SavedSearch, Collection
 import django.core.paginator as pag 
 
 # Template files 
@@ -107,3 +107,12 @@ class SavedSearchUpdate(UpdateView):
     model = SavedSearch 
     fields = ['search', 'description']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
+
+#------------ Collection Listing -------------------#
+
+class CollectionCreate(CreateView):
+    template_name = tpl_forms
+    model = Collection
+    fields = ['title', 'description', 'item', 'starred', 'deleted']
+    success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
+
