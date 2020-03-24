@@ -20,6 +20,16 @@
     <li> <a href='/search/new'>Add new saved search</a> </li>
 </ul>
 
+Search Items:
+
+<div class="">
+        <form method='GET' action="/items" class="form-group">
+            <input type='text' name='search' value='{{ request.GET.search }}'>
+            <input class="btn btn-info" type='submit' value="Search">
+        </form> 
+</div>      
+
+
 <h2> Collection </h2>
 
 <ul>    
