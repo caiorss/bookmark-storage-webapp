@@ -66,6 +66,12 @@ class SiteBookmark(models.Model):
     def isVideo(self):
         hostname = urlparse(self.url).hostname
         return "youtube.com" in hostname 
+    
+    def modifiedUrl(self):
+        if self.url.endswith(".pdf"):
+            # print(" [TRACE] File is PDF url = {url} ".format(url = self.url))
+            return "https://docs.google.com/viewer?url=" + self.url
+        return self.url
 
 
 class Collection(models.Model):

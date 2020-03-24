@@ -71,7 +71,7 @@
 
     {% for bookmark in object_list %}
         <div class = "well item ">   
-            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
+            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.modifiedUrl }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
                   <a class="btn btn-primary" title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">Edit</a>
 
                     {% if bookmark.deleted != True  %}
