@@ -118,6 +118,10 @@ class SavedSearchUpdate(UpdateView):
 
 #------------ Collection Listing -------------------#
 
+class CollectionList(ListView):
+    template_name = "collection_list.html"
+    model = Collection
+
 class CollectionCreate(CreateView):
     template_name = tpl_forms
     model = Collection
