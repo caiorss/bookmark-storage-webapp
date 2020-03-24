@@ -4,3 +4,6 @@ __pycache__
 /venv
 /.vscode
 *.back
+migrations/*
+bookmarks/migrations/*
+back/*
