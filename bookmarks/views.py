@@ -7,11 +7,86 @@ import django.shortcuts as ds
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection
 import django.core.paginator as pag 
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models.query import QuerySet
+from django.core.paginator import Page
+
 
 # Template files 
 tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
+
+
+def paginate_queryset(queryset: QuerySet, page: int, size: int, width: int = 10):
+    paginator = pag.Paginator(queryset, size)       
+    try: 
+        items = paginator.page(page)
+    except pag.PageNotAnInteger:
+        items = paginator.page(1)
+    except pag.EmptyPage:
+        items = paginator.page(paginator.num_pages)      
+    # return items      
+    pmin: int = ((page - 1) // width) * width + 1 if page % width == 0 else (page // width) * width + 1
+
+    if page % width != 0:
+        k = (page // width + 1) * width + 1
+    else:
+        k = ((page - 1) // width + 1) * width + 1
+    pmax: int =  min( k, paginator.num_pages + 1) 
+    # print(" [INFO] page = {page} ; pmin = {pmin} ; pmax = {pmax}".format(page = page, pmin = pmin, pmax = pmax))
+    # print(" [INFO] paginator.num_pages = {}".format(paginator.num_pages))
+    # print(" [INFO] page_range = {}".format(items.paginator.page_range))
+    return items, range(pmin, pmax)
+
+
+def bookmark_list_process(request: WSGIRequest):
+    view = request.GET.get("view")
+    model = SiteBookmark        
+
+    if view and view == "latest":               
+        return model.objects.exclude(deleted = True).order_by("id")
+
+    if view and view == "starred":
+        return model.objects.filter(starred = True).exclude(deleted = True).order_by("id").reverse()    
+
+    if view and view == "removed":
+        return model.objects.filter(deleted = True).order_by("id").reverse()    
+
+    # Domain filtering
+    domain = request.GET.get("domain")            
+    if domain:
+        d = domain.strip("www.").strip("m.").strip("old.").strip("mobile.")
+        return model.objects.filter(url__contains = d).exclude(deleted = True) .order_by("id").reverse()
+
+    # Collection filtering
+    coll = request.GET.get("collection")
+    if coll:
+        c: Collection = ds.get_object_or_404(Collection, id = coll)    
+        return c.item.exclude(deleted = True)
+
+    # Tag filtering
+    tag = request.GET.get("tag")
+    if tag:
+        return self.model.objects.filter(tags__name = tag)
+
+    # Search filtering 
+    query2 = request.GET.get('search')
+    if query2:
+        q = Q(title__contains = query2) | Q(url__contains = query2)       
+        return model.objects.filter(q).exclude( deleted = True ).order_by("id").reverse()
+
+    # Default selection 
+    return model.objects.exclude(deleted = True).order_by("id").reverse()
+
+def bookmark_list_view(request: WSGIRequest):
+    queryset = bookmark_list_process(request)
+    #--------- Paginate ------------------------#       
+    p:    str = request.GET.get("page")
+    page: int = int(p) if p is not None and p.isnumeric() else 1
+    items, page_range = paginate_queryset(queryset, page, 20, 5)
+    return ds.render(request, tpl_main, {'object_list': items, "page_range": page_range })
+
 
 class BookmarkList(ListView):
     template_name = tpl_main
@@ -27,13 +102,18 @@ class BookmarkList(ListView):
     # Reference: https://simpleisbetterthancomplex.com/tutorial/2016/08/03/how-to-paginate-with-django.html
     def paginate(self, page, items_list):
         # Show 10 items at a time 
-        paginator = pag.Paginator(items_list, self.pagination_size)
+        paginator = pag.Paginator(items_list, self.pagination_size)        
+
         try: 
             items = paginator.page(page)
         except pag.PageNotAnInteger:
             items = paginator.page(1)
         except pag.EmptyPage:
-            items = paginator.page(paginator.num_pages)      
+            items = paginator.page(paginator.num_pages)  
+        print(" type(paginator) = {}".format(type(paginator)))    
+        print(" type(items_list) = {}".format(type(items_list)))
+        print(" type(page) = {}".format(type(page)))
+        print(" type(items) = {}".format(type(items)))
         return items   
 
     def process_query(self):
