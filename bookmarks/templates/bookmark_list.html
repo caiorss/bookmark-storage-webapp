@@ -51,7 +51,7 @@
               <li  class="btn btn-primary" class="disabled"><span>&laquo;</span></li>
             {% endif %}            
             
-            {% for i in object_list.paginator.page_range %}
+            {% for i in page_range %}
               {% if object_list.number == i %}
                 <li class="active btn btn-info"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
               {% else %}
