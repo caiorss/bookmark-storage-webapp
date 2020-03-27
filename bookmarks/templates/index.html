@@ -9,8 +9,8 @@
     <li>  <a href='/items'>All items ordered by last created</a> </li>
     <li>  <a href='/items?view=latest'>All items ordered by creation time</a> </li>
     <li>  <a href='/items?view=removed'>Removed items</a> </li>
-    <li>  <a href='/items/starred'>Starred Items</a>  </li>
-    <li>   <a href='/items/new'>Add item</a> </li>
+    <li>  <a href='/items?view=starred'>Starred Items</a>  </li>
+    <li>  <a href='/items/new'>Add item</a> </li>
 </ul>
 
 <h2> Saved Search </h2>
@@ -37,5 +37,17 @@ Search Items:
     <li> <a href='/collection/new'>Add new collection</a> </li>
 </ul>
 
+<h2> Bookmarklet </h2>
+
+<ul>    
+    <li> <a href="javascript:(function()%7Bvar%20baseUrl%20%3D%20%22http%3A%2F%2Flocalhost%3A8000%2Fitems%2Fadd%3F%22%3B%0Awindow.location.href%20%3D%20baseUrl%20%2B%20%22title%3D%22%20%2B%20document.title%20%2B%20%22%26url%3D%22%20%2B%20document.URL%3B%7D)()%3B">Save bookmark to pybm (localhost)</a> </li>
+</ul>
+
+Bookmarklet Code: 
+
+<pre>
+    var baseUrl = "http://localhost:8000/items/add?";
+    window.location.href = baseUrl + "title=" + document.title + "&url=" + document.URL;
+</pre>
 
 {% endblock %}

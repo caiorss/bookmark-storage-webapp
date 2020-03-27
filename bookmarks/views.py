@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q 
 import django.shortcuts as ds 
+import django.core.exceptions
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection
 import django.core.paginator as pag 
@@ -87,6 +88,17 @@ def bookmark_list_view(request: WSGIRequest):
     items, page_range = paginate_queryset(queryset, page, 20, 5)
     return ds.render(request, tpl_main, {'object_list': items, "page_range": page_range })
 
+# URL route for adding item through bookmarklet 
+def bookmark_add_item_bookmarklet(request: WSGIRequest):
+    url   = request.GET.get("url")
+    title = request.GET.get("title")
+    if not title or title == "":
+        return django.http.HttpResponseBadRequest("Error: title cannot be empty")
+    if not url or url == "":
+        return django.http.HttpResponseBadRequest("Error: url cannot be empty")
+    b = SiteBookmark(url = url, title = title)
+    b.save()
+    return ds.redirect("/items")    
 
 class BookmarkStarred(ListView):
     template_name = tpl_main

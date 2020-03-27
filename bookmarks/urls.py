@@ -12,12 +12,13 @@ urlpatterns = [
    path('', dvgb.TemplateView.as_view(template_name = 'index.html'), name = 'home')
   
   ,path('items', views.bookmark_list_view, name='bookmark_list')
-  
-  ,path('items/starred', views.BookmarkStarred.as_view(), name='bookmark_starred') 
   ,path('items/new', views.BookmarkCreate.as_view(), name='bookmark_new')
   ,path('items/edit/<int:pk>', views.BookmarkUpdate.as_view(), name='bookmark_edit')  
   ,path('items/delete/<int:pk>', views.BookmarkDelete.as_view(), name='bookmark_delete')
 
+  # Bookmarklet URL route for making easier to add new items 
+  # through bookmarklet Javascript 
+  ,path("items/add", views.bookmark_add_item_bookmarklet)
   # ----------------------------------------------------#
 
   ,path('search/list', views.SavedSearchList.as_view(), name='bookmark_savedsearch_list')
