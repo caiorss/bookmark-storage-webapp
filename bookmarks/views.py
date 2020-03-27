@@ -98,10 +98,12 @@ def bookmark_add_item_bookmarklet(request: WSGIRequest):
         return django.http.HttpResponseBadRequest("Error: url cannot be empty")
     
     # Check whether URL is alredy in the database 
-    # If that is the case, this function returns an error. 
-    u = SiteBookmark.objects.get(url = url)
-    if u is not None:
-        return django.http.HttpResponseBadRequest("Error: url already exists")
+    # If that is the case, this function returns an error.     
+    try:
+        u = SiteBookmark.objects.get(url = url)    
+        return django.http.HttpResponseBadRequest("Error: url already exists")        
+    except SiteBookmark.DoesNotExist:
+        pass
 
     b = SiteBookmark(url = url, title = title)
     b.save()
