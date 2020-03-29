@@ -46,7 +46,7 @@
     
        <ul class="pagination">
             {% if object_list.has_previous %}
-              <li><a class="btn btn-primary" href="?page={{ object_list.previous_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }}  ">&laquo;</a></li>
+              <li><a class="btn btn-primary" href="?page={{ object_list.previous_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search | urlencode }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }}  ">&laquo;</a></li>
             {% else %}
               <li  class="btn btn-primary" class="disabled"><span>&laquo;</span></li>
             {% endif %}            
@@ -55,11 +55,11 @@
               {% if object_list.number == i %}
                 <li class="active btn btn-info"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
               {% else %}
-                <li><a class = "btn btn-primary" href="?page={{ i }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }} ">{{ i }}</a></li>
+                <li><a class = "btn btn-primary" href="?page={{ i }}&view={{ request.GET.view }}&search={{ request.GET.search | urlencode }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }} ">{{ i }}</a></li>
               {% endif %}
             {% endfor %}
             {% if object_list.has_next %}
-              <li><a class="btn btn-primary" href="?page={{ object_list.next_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }} ">&raquo;</a></li>
+              <li><a class="btn btn-primary" href="?page={{ object_list.next_page_number }}&view={{ request.GET.view }}&search={{ request.GET.search | urlencode }}&domain={{ request.GET.domain }}&collection={{ request.GET.collection }} ">&raquo;</a></li>
             {% else %}
               <li class="btn btn-primary disabled"><span>&raquo;</span></li>
             {% endif %}
