@@ -6,7 +6,6 @@ from . import views
 app_name = 'bookmarks'
 
 urlpatterns = [
-
   # Redirect straight to template 
   # see: https://stackoverflow.com/questions/3402708/
    path('', dvgb.TemplateView.as_view(template_name = 'index.html'), name = 'home')
@@ -19,6 +18,9 @@ urlpatterns = [
   # Bookmarklet URL route for making easier to add new items 
   # through bookmarklet Javascript 
   ,path("items/add", views.bookmark_add_item_bookmarklet)
+
+
+  ,path('options/video_toggle', views.video_toggle, name='options_video_toggle')
   # ----------------------------------------------------#
 
   ,path('search/list', views.SavedSearchList.as_view(), name='bookmark_savedsearch_list')

@@ -12,6 +12,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
 from django.core.paginator import Page
 import django.utils.http
+from django.contrib.sessions.backends.db import SessionStore
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -115,6 +116,17 @@ def bookmark_add_item_bookmarklet(request: WSGIRequest):
     b = SiteBookmark(url = url, title = title)
     b.save()
     return ds.redirect("/items")    
+
+# Toggle embeddeing of Youtube video 
+# Url route: /options/video_toggle 
+def video_toggle(request: WSGIRequest):
+    # print("type(request.session) = {}".format(type(request.session)))
+    session: SessionStore = request.session
+    redirect_url = request.GET.get("url") or "/"
+    video_toggle = session.get("video_toggle", False)
+    session["video_toggle"] = not video_toggle    
+    return ds.redirect( redirect_url ) 
+
 
 class BookmarkStarred(ListView):
     template_name = tpl_main

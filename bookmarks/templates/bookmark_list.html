@@ -26,6 +26,14 @@
       ; <a class="btn btn-info" href="/" 
       title="Go to home page or index">Index</a>
 
+      <br/>
+
+ <!--      {% if request.session.video_toggle %}
+        <a class="btn btn-info" title="Disable Youtube Video Embedding" href="/options/video_toggle?url={{ request.get_full_path | urlencode}}">Disable Video</a> </li>    
+      {% else %}
+        <a class="btn btn-info" title="Enable Youtube Video Embedding" href="/options/video_toggle?url={{ request.get_full_path | urlencode }}">Enable Video</a> </li>    
+      {% endif %} -->
+
 </div>
 
 <div class="">
@@ -65,6 +73,8 @@
      
     {% endif %}    
 
+    
+
     {% for bookmark in object_list %}
         <div class = "well item ">   
             <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
@@ -86,8 +96,11 @@
               <li> starred = {{ bookmark.starred }} </li>            
             </ul>          
 
-            <p class = ""> {{ bookmark.brief }} </p>
+            <p class = ""> {{ bookmark.brief|default:"" }} </p>
 
+            {% if bookmark.is_youtube_video and request.session.video_toggle  %}
+              <iframe src="https://www.youtube.com/embed/{{ bookmark.youtube_id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            {% endif %}
         </div>                            
     {% endfor %}
     

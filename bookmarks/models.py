@@ -63,9 +63,14 @@ class SiteBookmark(models.Model):
         u = urlparse(self.url)
         return u.hostname
 
-    def isVideo(self):
-        hostname = urlparse(self.url).hostname
-        return "youtube.com" in hostname 
+    def is_youtube_video(self):
+        return self.url.startswith("https://www.youtube.com/watch?v=") \
+            or self.url.startswith("https://m.youtube.com/watch?v=") 
+
+    """ Returns Youtube ID if Hyperlink is a video."""
+    def youtube_id(self):
+        return self.url.strip("https://www.youtube.com/watch?v=").strip("https://m.youtube.com/watch?v=")
+
     
     def isDocumentFile(self):
         doclist = ['.pdf', '.docx', 'doc', '.ppt', '.pptx', '.ps']
