@@ -19,6 +19,7 @@ urlpatterns = [
   # through bookmarklet Javascript 
   ,path("items/add", views.bookmark_add_item_bookmarklet)
 
+  ,path("items/extract_metadata", views.extract_metadata)
 
   ,path('options/video_toggle', views.video_toggle, name='options_video_toggle')
   # ----------------------------------------------------#

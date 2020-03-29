@@ -14,6 +14,9 @@ from django.core.paginator import Page
 import django.utils.http
 from django.contrib.sessions.backends.db import SessionStore
 
+import bs4 
+import urllib
+
 # Template files 
 tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
@@ -127,6 +130,45 @@ def video_toggle(request: WSGIRequest):
     session["video_toggle"] = not video_toggle    
     return ds.redirect( redirect_url ) 
 
+def extract_metadata(request: WSGIRequest):
+    back_url = request.GET.get("url")
+    if back_url is None or back_url == "":
+        return django.http.HttpResponseBadRequest("Error: invalid request.")        
+
+    id_str: str = request.GET.get("id")
+    item_id: int = int(id_str) if id_str is not None else -1
+    if item_id < 0:
+        return django.http.HttpResponseBadRequest("Error: invalid item ID.")        
+    
+    b: SiteBookmark = SiteBookmark.objects.get(id = item_id)
+    if b is None:
+        return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")        
+    
+    try:
+        req = urllib.request.Request(
+            b.url, 
+            data=None, 
+            headers={
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        })
+        page = urllib.request.urlopen(req)
+        #page = urllib.request.urlopen(b.url)
+    except urllib.error.URLError as ex:          
+        return django.http.HttpResponseBadRequest("Error: urrlib Exception = {}".format(ex))        
+
+    soup = bs4.BeautifulSoup(page, features = "lxml")
+
+    # title <- soup.find("title").text if soup is not None, otherwise
+    # , it is set to "" (empty string)
+    title: str = getattr( soup.find("title"), "text", "")
+    
+    m = soup.find("meta", attrs={'name': 'description'})             
+    brief: str = m["content"] if m is not None else ""
+
+    b.title = title 
+    b.brief = brief 
+    b.save()
+    return ds.redirect(back_url)
 
 class BookmarkStarred(ListView):
     template_name = tpl_main

@@ -86,6 +86,9 @@
                         <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
                     {% endif %}
 
+                    <a class="btn btn-primary" title="Fetch bookmark metdata automatically" 
+                        href="/items/extract_metadata?id={{ bookmark.id }}&url={{  request.get_full_path | urlencode }}">Get metadata</a>
+
                     {%if bookmark.isDocumentFile %}
                         <a target="_blank" href="{{ bookmark.modifiedURL }}" title="Open document in GoogleDriver viewer" > <img src="{% static "document-icon_36x36.png" %}"> </a>
                     {% endif %}
