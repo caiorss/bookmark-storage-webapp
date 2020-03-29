@@ -74,11 +74,11 @@
     {% endif %}    
 
     
-
     {% for bookmark in object_list %}
         <div class = "well item ">   
-            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.title | default:bookmark.url }} </a></h5>
-                  <br/>
+            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.modified_title | default:bookmark.url }} </a></h5>
+            
+            <br/>
 
                     <a class="btn btn-primary" title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}">Edit</a>
 
@@ -90,7 +90,9 @@
                         <a target="_blank" href="{{ bookmark.modifiedURL }}" title="Open document in GoogleDriver viewer" > <img src="{% static "document-icon_36x36.png" %}"> </a>
                     {% endif %}
 
+                    <br/>                    
             <ul>
+              <li> keywords: {{ bookmark.keywords }} </li>
               <li> Domain = <a href="items?domain={{ bookmark.hostname }}" title="Fliter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </li>              
               <li> Created  = {{ bookmark.created }} ; Modified = {{ bookmark.updated }} </li>
               <li> starred = {{ bookmark.starred }} </li>            

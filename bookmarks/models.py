@@ -82,6 +82,11 @@ class SiteBookmark(models.Model):
             return "https://docs.google.com/viewer?url=" + self.url
         return self.url
 
+    def modified_title(self):
+        return (self.title or self.url).split(";")[0]
+
+    def keywords(self):
+        return "; ".join((self.title or "").split(";")[1:])
 
 class Collection(models.Model):
     title = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")
