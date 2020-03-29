@@ -11,7 +11,7 @@ import django.core.paginator as pag
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
 from django.core.paginator import Page
-
+import django.utils.http
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -86,7 +86,14 @@ def bookmark_list_view(request: WSGIRequest):
     p:    str = request.GET.get("page")
     page: int = int(p) if p is not None and p.isnumeric() else 1
     items, page_range = paginate_queryset(queryset, page, 20, 5)
-    return ds.render(request, tpl_main, {'object_list': items, "page_range": page_range })
+
+    url_state = "view={view}&search={search}&domain={domain}&collection={collection}"\
+        .format( view   = request.GET.get("view") or ""
+                ,search = django.utils.http.urlquote(request.GET.get("search") or "") #django.utils.http.urlencode(request.GET.get("search") or "", doseq=True)
+                ,domain = request.GET.get("domain") or ""
+                ,collection = request.GET.get("collection") or ""                
+        )
+    return ds.render(request, tpl_main, {'object_list': items, "page_range": page_range, 'url_state': url_state })
 
 # URL route for adding item through bookmarklet 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):
