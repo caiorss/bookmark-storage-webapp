@@ -17,6 +17,8 @@ from django.contrib.sessions.backends.db import SessionStore
 import bs4 
 import urllib
 
+import typing as ty
+
 # Template files 
 tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
@@ -85,7 +87,7 @@ def bookmark_list_process(request: WSGIRequest):
     return model.objects.exclude(deleted = True).order_by("id").reverse()
 
 def bookmark_list_view(request: WSGIRequest):
-    queryset = bookmark_list_process(request)
+    queryset: QuerySet = bookmark_list_process(request)
     #--------- Paginate ------------------------#       
     p:    str = request.GET.get("page")
     page: int = int(p) if p is not None and p.isnumeric() else 1
@@ -97,7 +99,11 @@ def bookmark_list_view(request: WSGIRequest):
                 ,domain = request.GET.get("domain") or ""
                 ,collection = request.GET.get("collection") or ""                
         )
-    return ds.render(request, tpl_main, {'object_list': items, "page_range": page_range, 'url_state': url_state })
+    count: int = queryset.count()
+    return ds.render(request, tpl_main, { 'object_list': items
+                                        , "page_range": page_range
+                                        , 'url_state': url_state
+                                        , 'count': count})
 
 # URL route for adding item through bookmarklet 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):
@@ -131,7 +137,7 @@ def video_toggle(request: WSGIRequest):
     return ds.redirect( redirect_url ) 
 
 def extract_metadata(request: WSGIRequest):
-    back_url = request.GET.get("url")
+    back_url: str = request.GET.get("url")
     if back_url is None or back_url == "":
         return django.http.HttpResponseBadRequest("Error: invalid request.")        
 

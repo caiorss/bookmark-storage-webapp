@@ -47,7 +47,7 @@
 </div>
 
 <div id="bookmark-list" class="container">     
-
+    
     {% if object_list.has_other_pages %}
     
        <ul class="pagination">
@@ -73,6 +73,7 @@
      
     {% endif %}    
 
+    Found {{count}} results.
     
     {% for bookmark in object_list %}
         <div class = "well item ">   
