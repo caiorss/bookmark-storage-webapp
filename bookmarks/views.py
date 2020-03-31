@@ -89,7 +89,7 @@ def bookmark_list_view(request: WSGIRequest):
     #--------- Paginate ------------------------#       
     p:    str = request.GET.get("page")
     page: int = int(p) if p is not None and p.isnumeric() else 1
-    items, page_range = paginate_queryset(queryset, page, 20, 5)
+    items, page_range = paginate_queryset(queryset, page, 10, 5)
 
     url_state = "view={view}&search={search}&domain={domain}&collection={collection}"\
         .format( view   = request.GET.get("view") or ""
