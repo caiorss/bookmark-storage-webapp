@@ -13,6 +13,7 @@ from django.db.models.query import QuerySet
 from django.core.paginator import Page
 import django.utils.http
 from django.contrib.sessions.backends.db import SessionStore
+from django.db.models.functions import Lower
 
 import bs4 
 import urllib
@@ -200,7 +201,10 @@ class BookmarkDelete(DeleteView):
 
 class SavedSearchList(ListView):
     template_name = "savedsearch_list.html"
-    model = SavedSearch
+    #model = SavedSearch
+    queryset = SavedSearch.objects.order_by(Lower("search"))
+    # paginate_by = 4
+
 
 class SavedSearchCreate(CreateView):
     template_name = tpl_forms
@@ -219,6 +223,7 @@ class SavedSearchUpdate(UpdateView):
 class CollectionList(ListView):
     template_name = "collection_list.html"
     model = Collection
+    # queryset = Collection.objects.order_by("title")
 
 class CollectionCreate(CreateView):
     template_name = tpl_forms
