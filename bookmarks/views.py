@@ -170,13 +170,7 @@ def extract_metadata(request: WSGIRequest):
     b.save()
     return ds.redirect(back_url)
 
-class BookmarkStarred(ListView):
-    template_name = tpl_main
-    # model = SiteBookmark
 
-    def get_queryset(self):
-        lst = SiteBookmark.objects.filter(starred = True)
-        return lst 
 
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
