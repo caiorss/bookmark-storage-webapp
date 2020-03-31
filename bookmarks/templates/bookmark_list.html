@@ -92,7 +92,7 @@
                         href="/items/extract_metadata?id={{ bookmark.id }}&url={{  request.get_full_path | urlencode }}">Get metadata</a>
 
                     {%if bookmark.isDocumentFile %}
-                        <a target="_blank" href="{{ bookmark.modifiedURL }}" title="Open document in GoogleDriver viewer" > <img src="{% static "document-icon_36x36.png" %}"> </a>
+                        <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > <img src="{% static "gdriver.png" %}"> </a>
                     {% endif %}
 
                     <br/>                    
