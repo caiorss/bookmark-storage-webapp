@@ -1,3 +1,9 @@
+@font-face {
+    font-family: medieval_old_english;
+    src: url(/static/OldeEnglish.ttf);
+  }
+  
+
 body { 
     background-color: #3c3c3c; 
     color:            white;
@@ -7,8 +13,13 @@ a { color: lightskyblue }
 
 p { color: white; }
 
-h1 { color: white }
-h2 { color: white }
+h1 { 
+    color: white; 
+    font-family: medieval_old_english; 
+}
+h2 { color: white; 
+    font-family: medieval_old_english; 
+}
 h3 { color: white }
 h4 { color: white }
 h5 { color: white }
