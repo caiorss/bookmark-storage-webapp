@@ -1,15 +1,21 @@
 @font-face {
     font-family: medieval_old_english;
-    src: url(/static/OldeEnglish.ttf);
+    /* src: url(/static/OldeEnglish.ttf); */
+    src: url(/static/SktMedieval.ttf);
+   
   }
   
 
 body { 
     background-color: #3c3c3c; 
     color:            white;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Lato', sans-serif; 
 }
 a { color: lightskyblue }
+
+.item_div a {
+    font-weight: bold;
+}
 
 p { color: white; }
 
