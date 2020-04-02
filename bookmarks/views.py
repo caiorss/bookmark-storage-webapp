@@ -123,8 +123,9 @@ def bookmark_add_item_bookmarklet(request: WSGIRequest):
     except SiteBookmark.DoesNotExist:
         pass
 
-    b = SiteBookmark(url = url, title = title)
+    b: SiteBookmark = SiteBookmark(url = url, title = title)
     b.save()
+    update_item_from_metadata(b.id)
     return ds.redirect("/items")    
 
 # Toggle embeddeing of Youtube video 
@@ -137,20 +138,10 @@ def video_toggle(request: WSGIRequest):
     session["video_toggle"] = not video_toggle    
     return ds.redirect( redirect_url ) 
 
-def extract_metadata(request: WSGIRequest):
-    back_url: str = request.GET.get("url")
-    if back_url is None or back_url == "":
-        return django.http.HttpResponseBadRequest("Error: invalid request.")        
-
-    id_str: str = request.GET.get("id")
-    item_id: int = int(id_str) if id_str is not None else -1
-    if item_id < 0:
-        return django.http.HttpResponseBadRequest("Error: invalid item ID.")        
-    
-    b: SiteBookmark = SiteBookmark.objects.get(id = item_id)
+def update_item_from_metadata(itemID: int):  
+    b: SiteBookmark = SiteBookmark.objects.get(id = itemID)
     if b is None:
-        return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")        
-    
+        return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     try:
         req = urllib.request.Request(
             b.url, 
@@ -175,8 +166,17 @@ def extract_metadata(request: WSGIRequest):
     b.title = title 
     b.brief = brief 
     b.save()
-    return ds.redirect(back_url)
 
+def extract_metadata(request: WSGIRequest):
+    back_url: str = request.GET.get("url")    
+    if back_url is None or back_url == "":
+        return django.http.HttpResponseBadRequest("Error: invalid request.")            
+    id_str: str = request.GET.get("id")
+    item_id: int = int(id_str) if id_str is not None else -1
+    if item_id < 0:
+        return django.http.HttpResponseBadRequest("Error: invalid item ID.")                
+    update_item_from_metadata(item_id)
+    return ds.redirect(back_url)
 
 
 class BookmarkCreate(CreateView):
