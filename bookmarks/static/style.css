@@ -4,12 +4,18 @@
     src: url(/static/SktMedieval.ttf);
    
   }
-  
+
+ @font-face {
+    font-family: unknown_font;
+    src: url(/static/CoolFont.woff);
+   
+  }
+
 
 body { 
     background-color: #3c3c3c; 
     color:            white;
-    font-family: 'Lato', sans-serif; 
+    font-family:     'Lato', sans-serif;  
 }
 a { color: lightskyblue }
 
@@ -17,7 +23,13 @@ a { color: lightskyblue }
     font-weight: bold;
 }
 
-p { color: white; }
+p { 
+    color:      white; 
+    font-family: unknown_font;
+    font-size: 10pt;
+    font-weight: 400;
+    line-height: 1.5;
+}
 
 h1 { 
     color: white; 
