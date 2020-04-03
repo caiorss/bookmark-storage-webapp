@@ -19,6 +19,7 @@ import bs4
 import urllib
 
 import typing as ty
+from functools import reduce 
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -79,10 +80,20 @@ def bookmark_list_process(request: WSGIRequest):
         return self.model.objects.filter(tags__name = tag)
 
     # Search filtering 
-    query2 = request.GET.get('search')
-    if query2:
-        q = Q(title__contains = query2) | Q(url__contains = query2)       
-        return model.objects.filter(q).exclude( deleted = True ).order_by("id").reverse()
+    search = request.GET.get('search')
+    mode = request.GET.get('mode', "")
+
+    if  search:
+        words = search.split(' ')        
+        lam = lambda x, y: x | y
+        if  mode == "OR":
+            lam = lambda x, y: x | y
+        if mode == "AND":
+            lam = lambda x, y: x & y
+        # q = Q(title__contains =   search) | Q(url__contains =  search)       
+        q1 = reduce(lam, [ Q(url__contains=w) for w in words])
+        q2 = reduce(lam, [ Q(title__contains=w) for w in words])
+        return model.objects.filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
 
     # Default selection 
     return model.objects.exclude(deleted = True).order_by("id").reverse()
@@ -94,10 +105,11 @@ def bookmark_list_view(request: WSGIRequest):
     page: int = int(p) if p is not None and p.isnumeric() else 1
     items, page_range = paginate_queryset(queryset, page, 10, 5)
 
-    url_state = "view={view}&search={search}&domain={domain}&collection={collection}"\
-        .format( view   = request.GET.get("view") or ""
-                ,search = django.utils.http.urlquote(request.GET.get("search") or "") #django.utils.http.urlencode(request.GET.get("search") or "", doseq=True)
-                ,domain = request.GET.get("domain") or ""
+    url_state = "view={view}&search={search}&mode={mode}&domain={domain}&collection={collection}"\
+        .format( view       = request.GET.get("view") or ""
+                ,search     = django.utils.http.urlquote(request.GET.get("search") or "") 
+                ,mode       = request.GET.get("mode") or ""
+                ,domain     = request.GET.get("domain") or ""
                 ,collection = request.GET.get("collection") or ""                
         )
     count: int = queryset.count()

@@ -41,6 +41,12 @@
   <form method='GET' class="form-group">
       <input type='text' name='search' value='{{ request.GET.search }}'>
       <input class="btn btn-info" type='submit' value="Search">
+
+      <!-- Set search mode  -->
+      <select name="mode" title="Select search mode.">
+          <option value="OR">OR</option>
+          <option value="AND">AND</option>
+        </select>        
   </form> 
 </div>
 
@@ -77,7 +83,8 @@
     Found {{count}} results.
 
     {% for bookmark in object_list %}
-        <div class = "well item ">   
+        <div class = "well item item_div">   
+
             <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.modified_title | default:bookmark.url }} </a></h5>
             
             <br/>
