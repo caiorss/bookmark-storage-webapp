@@ -197,7 +197,7 @@ import hashlib
 import os 
 from urllib.parse import urlparse
 
-def download_itemsnapshot(request: WSGIRequest):
+def fetch_itemsnapshot(request: WSGIRequest):
     url: str = request.GET.get("url")
 
     if url is None or url == "":
