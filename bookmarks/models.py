@@ -88,10 +88,16 @@ class SiteBookmark(models.Model):
     def keywords(self):
         return "; ".join((self.title or "").split(";")[1:])
 
-    def snapshot_info(self):
-        sn = self.itemsnapshot_set.first()
+    def snapshot_exists(self):
+        return self.itemsnapshot_set.exists()
+
+    def snapshot_file(self):
+        # print(" =>>> Here ")
+        sn: ManyRelatedManager = self.itemsnapshot_set.first()        
         if sn is not None: 
-            return {'id': str(sn.id), 'file': sn.fileName}
+            s = str(sn.id) + "/" + sn.fileName
+            # print(" snapshot = " + s)
+            return  s 
         return None 
 
 class Collection(models.Model):
