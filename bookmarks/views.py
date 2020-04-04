@@ -17,6 +17,7 @@ from django.db.models.functions import Lower
 
 import bs4 
 import urllib
+import shlex 
 
 import typing as ty
 from functools import reduce 
@@ -83,8 +84,8 @@ def bookmark_list_process(request: WSGIRequest):
     search = request.GET.get('search')
     mode = request.GET.get('mode', "")
 
-    if  search:
-        words = search.split(' ')        
+    if search:
+        words = shlex.split(search)
         lam = lambda x, y: x | y
         if  mode == "OR":
             lam = lambda x, y: x | y
