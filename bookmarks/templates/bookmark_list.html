@@ -96,7 +96,13 @@
                     {% endif %}
 
                     <a class="btn btn-primary" title="Fetch bookmark metdata automatically" 
-                        href="/items/extract_metadata?id={{ bookmark.id }}&url={{  request.get_full_path | urlencode }}">Get metadata</a>
+                        href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Get metadata</a>
+
+                  {% if bookmark.snapshot_exists %}
+                       <a class="btn btn-primary" target="_blank" title="Download snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}" >Download</a>                           
+                  {% else %}
+                       <a class="btn btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive</a>                           
+                  {% endif %}
 
                     {%if bookmark.isDocumentFile %}
                         <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > <img src="{% static "gdriver.png" %}"> </a>
