@@ -6,7 +6,7 @@ from django.db.models import Q
 import django.shortcuts as ds 
 import django.core.exceptions
 
-from bookmarks.models import SiteBookmark, SavedSearch, Collection
+from bookmarks.models import SiteBookmark, SavedSearch, Collection, ItemSnapshot
 import django.core.paginator as pag 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
@@ -191,6 +191,54 @@ def extract_metadata(request: WSGIRequest):
     update_item_from_metadata(item_id)
     return ds.redirect(back_url)
 
+import urllib.request 
+from urllib.parse import urlparse
+import hashlib
+import os 
+from urllib.parse import urlparse
+
+def download_itemsnapshot(request: WSGIRequest):
+    url: str = request.GET.get("url")
+
+    if url is None or url == "":
+        return django.http.HttpResponseBadRequest("Error: invalid redirection URL.")
+
+    itemID_str: str = request.GET.get("id")
+
+    if itemID_str is None or not itemID_str.isnumeric(): 
+        return django.http.HttpResponseBadRequest("Error: invalid Item ID.")
+
+    itemID: int = int(itemID)
+    item: SiteBookmark = ds.get_object_or_404(itemID = itemID)    
+
+    try:
+        url: str    = item.url 
+        u           = urllib.request.urlopen(url)
+        f_data: bytes = u.read()
+        f_name: str = os.path.basename(urlparse(url).path)
+        f_hash: str = hashlib.md5(data).hexdigest()
+        f_mime      = u.getheader("Content-Type", "application/octet-stream")
+
+        sn = ItemSnapshot(fileName     = f_name
+                        , fileHash     = f_hash
+                        , fileMimeType = f_mime
+                        , fileData     = f_data)
+        sn.save()
+        sn.item.add(item)   
+        sn.save()                                
+    except urllib.error.URLError as ex:          
+        return django.http.HttpResponseBadRequest("Error: urrlib Exception = {}".format(ex))        
+    
+    return ds.redirect(url)
+
+def get_snapshot_file(request: WSGIRequest, fileID, fileName):
+    sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)    
+    response  = HttpResponse()
+    # force browser to download file
+    response['Content-Type'] = sn.fileMimeType
+    response['Content-Disposition'] = 'attachment; filename=%s' % sn.fileName
+    response.write(sn.fileData)
+    return response        
 
 class BookmarkCreate(CreateView):
     template_name = tpl_forms

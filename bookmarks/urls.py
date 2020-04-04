@@ -21,6 +21,10 @@ urlpatterns = [
 
   ,path("items/extract_metadata", views.extract_metadata)
 
+  ,path("snapshot/get", views.download_itemsnapshot)
+  
+  ,path("snapshot/file/<fileID>/<fileName>", views.get_snapshot_file)
+
   ,path('options/video_toggle', views.video_toggle, name='options_video_toggle')
   # ----------------------------------------------------#
 
