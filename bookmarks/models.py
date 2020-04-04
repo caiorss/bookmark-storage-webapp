@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from urllib.parse import urlparse 
 import datetime
+import uuid
 
 class Tag(models.Model):
     name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")
@@ -27,7 +28,6 @@ class SavedSearch(models.Model):
 
     def __str__(self):
         return self.search  
-
 
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
@@ -88,6 +88,12 @@ class SiteBookmark(models.Model):
     def keywords(self):
         return "; ".join((self.title or "").split(";")[1:])
 
+    def snapshot_info(self):
+        sn = self.itemsnapshot_set.first()
+        if sn is not None: 
+            return {'id': str(sn.id), 'file': sn.fileName}
+        return None 
+
 class Collection(models.Model):
     title = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")
     description = models.TextField(blank = True)
@@ -107,3 +113,33 @@ class Collection(models.Model):
         self.deleted = True 
         self.starred = False 
         self.save()
+
+class ItemSnapshot(models.Model):
+    """Store file related to the URL in the database."""
+    # UUID 
+    id = models.UUIDField(primary_key  = True
+                        , editable     = False
+                        , auto_created = True
+                        , default      = uuid.uuid4)
+
+   # Set field only when instance is created
+    created = models.DateField(editable = False, auto_now_add = True, null = True)
+    # Set field only when instance is changed
+    updated = models.DateField(editable = False, auto_now = True, null = True)
+
+    item = models.ManyToManyField(SiteBookmark)
+    # File name 
+    fileName = models.CharField(max_length=5000)
+    # File hash = > Contains crypto-hash signature MD5SUM 
+    fileHash = models.CharField(max_length=100, unique = True)
+    # Contains file media type 
+    fileMimeType = models.CharField(max_length=100)
+    # Contains the file content 
+    fileData = models.BinaryField()
+
+    def __str__(self):
+        return " file = {file} ; id = {id} ; hash = {h} ".format(
+              file = self.fileName
+            , id = self.id
+            , h = self.fileHash )
+ 
