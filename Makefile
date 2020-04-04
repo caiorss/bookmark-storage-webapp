@@ -4,6 +4,10 @@ PYTHON=/home/archbox/opt/bin/python
 run:
 	${PYTHON} manage.py runserver 0.0.0.0:8000
 
+# Open Django's interactive console for interacting with the database (aka model)
+shell: 
+	${PYTHON} manage.py shell 
+
 # Update Database 
 db:
 	mkdir -p back/
