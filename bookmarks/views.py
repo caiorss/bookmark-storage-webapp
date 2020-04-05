@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+
+from django.http import HttpResponse, FileResponse, Http404
 from django.views.generic import TemplateView,ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -224,12 +225,10 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     """Download bookmark's file snapshot (attachment) from the database. """
     # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
-    response  = HttpResponse()
-    response['Content-Type'] = sn.fileMimeType
-    # response['Content-Disposition'] = 'attachment; filename=%s' % sn.fileName
-    data: bytes = sn.readFile()
-    response.write(data)
-    return response        
+    try:
+        return FileResponse(open(sn.getFilePath(), 'rb'), content_type=sn.fileMimeType)
+    except FileNotFoundError as err:
+        raise Http404("Error: file not found => {}".format(err))
 
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
