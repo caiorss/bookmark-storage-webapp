@@ -6,7 +6,7 @@ from django.db.models import Q
 import django.shortcuts as ds 
 import django.core.exceptions
 
-from bookmarks.models import SiteBookmark, SavedSearch, Collection, ItemSnapshot
+from bookmarks.models import SiteBookmark, SavedSearch, Collection, ItemSnapshot, FileSnapshot
 import django.core.paginator as pag 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
@@ -212,27 +212,7 @@ def fetch_itemsnapshot(request: WSGIRequest):
     item: SiteBookmark = ds.get_object_or_404(SiteBookmark, id = itemID)    
 
     try:
-        url: str    = item.url 
-        req = urllib.request.Request(
-            url, 
-            data=None, 
-            headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-        })
-        u = urllib.request.urlopen(req)
-        #req           = urllib.request.urlopen(url)
-        f_data: bytes = u.read()
-        f_name: str = os.path.basename(urlparse(url).path)
-        f_hash: str = hashlib.md5(f_data).hexdigest()
-        f_mime      = u.getheader("Content-Type", "application/octet-stream")
-
-        sn = ItemSnapshot(fileName     = f_name
-                        , fileHash     = f_hash
-                        , fileMimeType = f_mime
-                        , fileData     = f_data)
-        sn.save()
-        sn.item.add(item)   
-        sn.save()                                
+        FileSnapshot.createSnapshot(item.id, item.url)
     except urllib.error.URLError as ex:          
         return django.http.HttpResponseBadRequest("Error: urrlib Exception = {}".format(ex))        
     
