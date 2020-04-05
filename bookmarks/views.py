@@ -6,7 +6,9 @@ from django.db.models import Q
 import django.shortcuts as ds 
 import django.core.exceptions
 
-from bookmarks.models import SiteBookmark, SavedSearch, Collection, ItemSnapshot, FileSnapshot
+from bookmarks.models import SiteBookmark, SavedSearch, Collection \
+    , FileSnapshot
+
 import django.core.paginator as pag 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet

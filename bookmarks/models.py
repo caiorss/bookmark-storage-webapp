@@ -130,37 +130,6 @@ class Collection(models.Model):
         self.starred = False 
         self.save()
 
-class ItemSnapshot(models.Model):
-    """Store file related to the URL in the database."""
-    # UUID 
-    id = models.UUIDField(primary_key  = True
-                        , editable     = False
-                        , auto_created = True
-                        , default      = uuid.uuid4)
-
-   # Set field only when instance is created
-    created = models.DateField(editable = False, auto_now_add = True, null = True)
-    # Set field only when instance is changed
-    updated = models.DateField(editable = False, auto_now = True, null = True)
-
-    item = models.ManyToManyField(SiteBookmark)
-    # File name 
-    fileName = models.CharField(max_length=5000)
-    # File hash = > Contains crypto-hash signature MD5SUM 
-    fileHash = models.CharField(max_length=100, unique = True)
-    # Contains file media type 
-    fileMimeType = models.CharField(max_length=100)
-    # Contains the file content 
-    fileData = models.BinaryField()
-
-    def __str__(self):
-        return " file = {file} ; id = {id} ; hash = {h} ".format(
-              file = self.fileName
-            , id = self.id
-            , h = self.fileHash )
- 
-
- 
 class FileSnapshot(models.Model):
     """Store file related to the URL in the database."""
     # UUID 
