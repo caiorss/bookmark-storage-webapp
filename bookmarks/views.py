@@ -220,11 +220,13 @@ def fetch_itemsnapshot(request: WSGIRequest):
 
 def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     """Download bookmark's file snapshot (attachment) from the database. """
-    sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)    
+    # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
+    sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
     response  = HttpResponse()
     response['Content-Type'] = sn.fileMimeType
     # response['Content-Disposition'] = 'attachment; filename=%s' % sn.fileName
-    response.write(sn.fileData)
+    data: bytes = sn.readFile()
+    response.write(data)
     return response        
 
 class BookmarkCreate(CreateView):
