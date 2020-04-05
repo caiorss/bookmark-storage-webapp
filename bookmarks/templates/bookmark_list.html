@@ -99,9 +99,9 @@
                         href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Get metadata</a>
 
                   {% if bookmark.snapshot_exists %}
-                       <a class="btn btn-primary" target="_blank" title="Download snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}" >Download</a>                           
+                       <a class="btn btn-primary" target="_blank" title="Open file snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}">Open snapshot</a>                           
                   {% else %}
-                       <a class="btn btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive</a>                           
+                       <a class="btn btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive snapshot</a>                           
                   {% endif %}
 
                     {%if bookmark.isDocumentFile %}
