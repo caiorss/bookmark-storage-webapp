@@ -1,4 +1,3 @@
-
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.generic import TemplateView,ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -19,6 +18,8 @@ import django.utils.http
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models.functions import Lower
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 import bs4 
 import urllib
@@ -245,13 +246,13 @@ def document_viewer(request: WSGIRequest, itemID: int):
     return ds.render(request, "viewer.html", { "item": item
                                            , "file_url": "/snapshot/file/" + path})
 
-class BookmarkCreate(CreateView):
+class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')    
 
-class BookmarkUpdate(UpdateView):
+class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
     fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
@@ -261,7 +262,7 @@ class BookmarkUpdate(UpdateView):
     def get_success_url(self):
         return self.request.GET.get("url") or self.success_url
 
-class BookmarkDelete(DeleteView):
+class BookmarkDelete(LoginRequiredMixin, DeleteView):
     template_name = tpl_confirm_delete 
     model = SiteBookmark
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')
@@ -269,20 +270,20 @@ class BookmarkDelete(DeleteView):
 
 # ------------ Saved Search ------------------------#
 
-class SavedSearchList(ListView):
+class SavedSearchList(LoginRequiredMixin, ListView):
     template_name = "savedsearch_list.html"
     #model = SavedSearch
     queryset = SavedSearch.objects.order_by(Lower("search"))
     # paginate_by = 4
 
 
-class SavedSearchCreate(CreateView):
+class SavedSearchCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SavedSearch 
     fields = ['search', 'description']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
-class SavedSearchUpdate(UpdateView):
+class SavedSearchUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SavedSearch 
     fields = ['search', 'description']
@@ -290,12 +291,12 @@ class SavedSearchUpdate(UpdateView):
 
 #------------ Collection Listing -------------------#
 
-class CollectionList(ListView):
+class CollectionList(LoginRequiredMixin, ListView):
     template_name = "collection_list.html"
     model = Collection
     # queryset = Collection.objects.order_by("title")
 
-class CollectionCreate(CreateView):
+class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = Collection
     fields = ['title', 'description', 'item', 'starred', 'deleted']
