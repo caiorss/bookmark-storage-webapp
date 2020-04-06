@@ -14,9 +14,11 @@ import django.core.paginator as pag
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
 from django.core.paginator import Page
+
 import django.utils.http
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models.functions import Lower
+from django.contrib.auth.decorators import login_required
 
 import bs4 
 import urllib
@@ -52,7 +54,7 @@ def paginate_queryset(queryset: QuerySet, page: int, size: int, width: int = 10)
     # print(" [INFO] page_range = {}".format(items.paginator.page_range))
     return items, range(pmin, pmax)
 
-
+@login_required
 def bookmark_list_process(request: WSGIRequest):
     view = request.GET.get("view")
     model = SiteBookmark        
@@ -102,6 +104,7 @@ def bookmark_list_process(request: WSGIRequest):
     # Default selection 
     return model.objects.exclude(deleted = True).order_by("id").reverse()
 
+@login_required
 def bookmark_list_view(request: WSGIRequest):
     queryset: QuerySet = bookmark_list_process(request)
     #--------- Paginate ------------------------#       
@@ -123,6 +126,7 @@ def bookmark_list_view(request: WSGIRequest):
                                         , 'count': count})
 
 # URL route for adding item through bookmarklet 
+@login_required 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):
     url   = request.GET.get("url")
     title = request.GET.get("title")
@@ -183,6 +187,7 @@ def update_item_from_metadata(itemID: int):
     b.brief = brief 
     b.save()
 
+@login_required
 def extract_metadata(request: WSGIRequest):
     back_url: str = request.GET.get("url")    
     if back_url is None or back_url == "":
@@ -200,6 +205,7 @@ import hashlib
 import os 
 from urllib.parse import urlparse
 
+@login_required
 def fetch_itemsnapshot(request: WSGIRequest):
     """ Download file snaphot from bookmark URL and insert it in the database as a blob. """
     redirect_url: str = request.GET.get("url")
@@ -221,6 +227,7 @@ def fetch_itemsnapshot(request: WSGIRequest):
     
     return ds.redirect(redirect_url)
 
+@login_required
 def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     """Download bookmark's file snapshot (attachment) from the database. """
     # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
