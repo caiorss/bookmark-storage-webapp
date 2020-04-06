@@ -230,6 +230,14 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     except FileNotFoundError as err:
         raise Http404("Error: file not found => {}".format(err))
 
+def document_viewer(request: WSGIRequest, itemID: int):
+    item: SiteBookmark = ds.get_object_or_404(SiteBookmark, id = itemID)
+    path = item.snapshot_file()
+    if path is None:
+        return Http404("Error: item[id = {id}] does not have any attachment.".format(id = itemID))
+    return ds.render(request, "viewer.html", { "item": item
+                                           , "file_url": "/snapshot/file/" + path})
+
 class BookmarkCreate(CreateView):
     template_name = tpl_forms
     model = SiteBookmark

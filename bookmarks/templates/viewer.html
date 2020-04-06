@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h4>Document: {{ item.title }} </h4>
+
+Description:
+<p> {{ item.brief }} </p>
+
+<div id="file-viewer">
+
+    <!-- #toolbar=0&navpanes=0&scrollbar=0 -->
+<!--     <iframe src="{{ file_url }}" 
+          frameborder="1" scrolling="auto"
+          style="border:1px solid #666CCC"
+          width="100%" 
+          height="500px" >
+    </iframe>
+ -->
+
+      <div>
+        <button id="prev">Previous</button>
+        <button id="next">Next</button>
+        <button id="zoom-plus">( + )</button>
+        <button id="zoom-minus">( - )</button>
+        &nbsp; &nbsp;
+        <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+      </div>
+
+    <canvas id="the-canvas"></canvas>
+
+</div>
+
+<script>
+    
+    // https://stackoverflow.com/questions/25701083/how-to-add-callback-after-dynamically-loading-javascript-file
+    function require(url, callback) 
+    {
+        var e = document.createElement("script");
+        e.src = url;
+        e.type="text/javascript";
+        e.addEventListener('load', callback);
+        document.getElementsByTagName("head")[0].appendChild(e);
+    }
+
+    // If absolute URL from the remote server is provided, configure the CORS
+    // header on that server.
+    /// var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+    url = "{{ file_url }}"
+
+    require("//mozilla.github.io/pdf.js/build/pdf.js", function(){
+            // Loaded via <script> tag, create shortcut to access PDF.js exports.
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+            // The workerSrc property shall be specified.
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+            var pdfDoc = null,
+                pageNum = 1,
+                pageRendering = false,
+                pageNumPending = null,
+                scale = 1.5,
+                canvas = document.getElementById('the-canvas'),
+                ctx = canvas.getContext('2d');
+
+            /**
+            * Get page info from document, resize canvas accordingly, and render page.
+            * @param num Page number.
+            */
+            function renderPage(num) {
+                pageRendering = true;
+
+                // Using promise to fetch the page
+                pdfDoc.getPage(num).then(function(page) {
+                    
+                /*  var unscaledViewport = page.getViewport(1);
+                    var scale = Math.min((canvas.height / unscaledViewport.height), (canvas.width / unscaledViewport.width));
+                    var viewport = page.getViewport(scale);
+                    */
+                    /* var viewport = page.getViewport(canvas.width / page.getViewport(1.0).width); */
+                    var viewport = page.getViewport({scale: scale});
+                    
+                    canvas.height = viewport.height;
+                    canvas.width =  viewport.width;
+
+                    // Render PDF page into canvas context
+                    var renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    var renderTask = page.render(renderContext);
+
+                    // Wait for rendering to finish
+                    renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                    });
+                });
+
+                // Update page counters
+                document.getElementById('page_num').textContent = num;
+            }
+
+            /**
+            * If another page rendering in progress, waits until the rendering is
+            * finised. Otherwise, executes rendering immediately.
+            */
+            function queueRenderPage(num) {
+                if (pageRendering) {
+                    pageNumPending = num;
+                } else {
+                    renderPage(num);
+                }
+            }
+
+            /**
+            * Displays previous page.
+            */
+            function onPrevPage() {
+                if (pageNum <= 1) {
+                    return;
+                }
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('prev').addEventListener('click', onPrevPage);
+
+            /**
+            * Displays next page.
+            */
+            function onNextPage() {
+                if (pageNum >= pdfDoc.numPages) {
+                    return;
+                }
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('next').addEventListener('click', onNextPage);
+
+            function onZoomPlus(){
+                scale = scale + 0.5;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('zoom-plus').addEventListener('click', onZoomPlus);
+
+            function onZoomMinus(){
+                scale = scale - 0.5;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('zoom-minus').addEventListener('click', onZoomMinus);
+
+
+            /**
+            * Asynchronously downloads PDF.
+            */
+            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+                // Initial/first page rendering
+                renderPage(pageNum);
+            });
+    });
+ 
+</script>
+
+{% endblock %}

@@ -20,6 +20,7 @@ urlpatterns = [
   ,path("items/add", views.bookmark_add_item_bookmarklet)
 
   ,path("items/extract_metadata", views.extract_metadata)
+  ,path("items/view/<int:itemID>", views.document_viewer)
 
   ,path("snapshot/get", views.fetch_itemsnapshot)
   

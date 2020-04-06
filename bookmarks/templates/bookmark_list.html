@@ -44,8 +44,8 @@
 
       <!-- Set search mode  -->
       <select name="mode" title="Select search mode.">
-          <option value="OR">OR</option>
           <option value="AND">AND</option>
+          <option value="OR">OR</option>
         </select>        
   </form> 
 </div>
@@ -111,9 +111,15 @@
                     <br/>                    
             <ul>
               <li> keywords: {{ bookmark.keywords }} </li>
-              <li> Domain = <a href="items?domain={{ bookmark.hostname }}" title="Fliter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </li>              
+              <li> Domain = <a href="items?domain={{ bookmark.hostname }}" title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </li>              
               <li> Created  = {{ bookmark.created }} ; Modified = {{ bookmark.updated }} </li>
-              <li> starred = {{ bookmark.starred }} </li>            
+              <li> starred = {{ bookmark.starred }} </li>     
+              
+              {% if bookmark.snapshot_exists %}
+                <li>  <a class="btn btn-primary" target="_blank" title="Open file snapshot file" 
+                        href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
+                </li>
+              {% endif %}
             </ul>          
 
             <p class = ""> {{ bookmark.brief|default:"" }} </p>
