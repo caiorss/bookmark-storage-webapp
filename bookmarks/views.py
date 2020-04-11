@@ -130,10 +130,10 @@ def bookmark_list_view(request: WSGIRequest):
 # URL route for adding item through bookmarklet 
 @login_required 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):
-    url   = request.GET.get("url")
-    title = request.GET.get("title")
-    if not title or title == "":
-        return django.http.HttpResponseBadRequest("Error: title cannot be empty")
+    url: str   = request.GET.get("url")
+    title: str = request.GET.get("title", "")
+    #if not title or title == "":
+    #    return django.http.HttpResponseBadRequest("Error: title cannot be empty")
     if not url or url == "":
         return django.http.HttpResponseBadRequest("Error: url cannot be empty")
     
@@ -147,7 +147,7 @@ def bookmark_add_item_bookmarklet(request: WSGIRequest):
 
     b: SiteBookmark = SiteBookmark(url = url, title = title)
     b.save()
-    update_item_from_metadata(b.id)
+    if not url.endswith(".pdf"): update_item_from_metadata(b.id)
     return ds.redirect("/items")    
 
 # Toggle embeddeing of Youtube video 
