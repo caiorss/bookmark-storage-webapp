@@ -10,3 +10,4 @@ back/*
 files/*
 *-back
 *.-back
+*.lock
