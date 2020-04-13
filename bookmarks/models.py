@@ -143,6 +143,9 @@ class SiteBookmark(models.Model):
     # Set field only when instance is changed
     updated = models.DateField(editable = False, auto_now = True, null = True)
 
+    # User to which the collection belongs to
+    owner = models.ForeignKey(Account, editable = True, on_delete=models.PROTECT)
+
     # Override deleted behavior, mark field delete to True instead of elininate
     # this database row. See: https://stackoverflow.com/questions/52767988
     def delete(self):
