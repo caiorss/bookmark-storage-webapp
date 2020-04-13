@@ -6,6 +6,8 @@ from django.db.models import Q
 import django.shortcuts as ds 
 import django.core.exceptions
 from django.forms.utils import ErrorList
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection \
     , FileSnapshot
@@ -302,15 +304,25 @@ class BookmarkDelete(LoginRequiredMixin, DeleteView):
 class SavedSearchList(LoginRequiredMixin, ListView):
     template_name = "savedsearch_list.html"
     #model = SavedSearch
-    queryset = SavedSearch.objects.order_by(Lower("search"))
+    # queryset = SavedSearch.objects.order_by(Lower("search")) #.filter( owner = request.user)
     # paginate_by = 4
-
+    def get_queryset(self):
+        return SavedSearch.objects.filter(owner = self.request.user).order_by(Lower("search"))
 
 class SavedSearchCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SavedSearch 
     fields = ['search', 'description']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
+
+    # Overriden from CreateView
+    def form_valid(self, form):
+        req:  WSGIRequest      = self.request
+        user: AbstractBaseUser = req.user
+        assert user.is_authenticated
+        form.instance.owner = user
+        return super().form_valid(form = form)
+
 
 class SavedSearchUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
