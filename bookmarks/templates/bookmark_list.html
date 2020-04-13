@@ -108,13 +108,40 @@
                         <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > <img src="{% static "gdriver.png" %}"> </a>
                     {% endif %}
 
-                    <br/>                    
-            <ul>
-              <li> keywords: {{ bookmark.keywords }} </li>
-              <li> Domain = <a href="items?domain={{ bookmark.hostname }}" title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </li>              
-              <li> Created  = {{ bookmark.created }} ; Modified = {{ bookmark.updated }} </li>
-              <li> starred = {{ bookmark.starred }} </li>     
+                    <br/>                                
+
+              <table class="item-table-info">
+                  <tr>
+                    <th class="row-label">Starred</th>
+                    <th>{{ bookmark.starred }} </th>
+                  </tr>
+                  <tr>
+                    <th class="row-label">Type</th>
+                    <th> <a href="items?doctype={{ bookmark.doctype }}" 
+                          title="Filter by document type"> {{ bookmark.doctype }} </a> 
+                    </th>
+                  </tr>
+
+                  <tr>
+                      <th class="row-label">Keywords</th>
+                      <th>  {{ bookmark.keywords }} </th>                    
+                  </tr>    
+                  <tr>
+                      <th class="row-label">Domain</th>
+                      <th> <a href="items?domain={{ bookmark.hostname }}" title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </th>                    
+                  </tr>    
+                  <tr>
+                    <th class="row-label">Created</th>
+                    <th>{{ bookmark.created }}</th>
+                  </tr>
+
+                  <tr>
+                      <th class="row-label">Modified</th>
+                      <th>{{ bookmark.updated }}</th>
+                    </tr>
+              </table>
               
+            <ul>             
               {% if bookmark.snapshot_exists %}
                 <li>  <a class="btn btn-primary" target="_blank" title="Open file snapshot file" 
                         href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            

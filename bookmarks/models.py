@@ -10,7 +10,7 @@ import django.shortcuts as ds
 import bookmarks.dutils as utils 
 from   bookmarks.dutils import DownloadedFile
 import os 
-
+import enum 
 from typing import Optional
 
 class Tag(models.Model):
@@ -38,6 +38,31 @@ class SavedSearch(models.Model):
     def __str__(self):
         return self.search  
 
+class DocumentType(models.TextChoices):
+    webpage        = "webpage"
+    document       = "document"
+    # Social media accounts that are followed. 
+    follow         = "follow"  
+    # News outlets - magazines, newspapers, twitter accounts of news autlets
+    news           = "news"
+    # Course notes - lectures notes
+    course         = "course"
+    paper          = "paper"    
+    report         = "report"
+    article        = "article"
+    book           = "book"
+    thesis         = "thesis"
+    patent         = "patent"
+    presentation   = "presentation"
+    # Technical standard such as RFCs, ISO, DIN, ... 
+    standard       = "standard" 
+    law            = "law"
+    source_code    = "source code"
+    manual         = "manual"
+    documentation  = "documentation"
+    video          = "video"
+    music          = "music"  
+
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
     #url   = models.CharField(max_length=4000)
@@ -47,7 +72,7 @@ class SiteBookmark(models.Model):
     starred = models.BooleanField(blank = True, default = False, help_text = "Check this box to mark this bookmark as favourite")
     brief   = models.TextField(blank = True, null = True, help_text="Short web site description")
     tags    = models.ManyToManyField(Tag, blank = True)
-
+    doctype = models.CharField(max_length=80, choices = DocumentType.choices, default = DocumentType.webpage)
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
 
     # Set field only when instance is created

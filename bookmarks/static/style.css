@@ -62,6 +62,31 @@ h5 { color: white }
     padding: 2%                
 }
 
+
+.item-table-info {
+    font-size: 10pt;
+    font-family: 'Courier New', Courier, monospace;
+    border-spacing: 5px;
+    border:1px dotted #9cc5b3;
+    margin-top: 10px; 
+
+    border-radius: 1em;
+    overflow: hidden;
+    background:#333
+  
+}
+
+ th, td { 
+    width:150px;               
+     padding:5px 
+              
+ } 
+
+.row-label {
+  text-align:right ;
+  background-color: #000;
+}
+
 #top-panel{
     background: #4e4e50;
     border-radius: 25px;

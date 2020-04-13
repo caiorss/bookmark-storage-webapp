@@ -85,7 +85,11 @@ def bookmark_list_process(request: WSGIRequest):
     # Tag filtering
     tag = request.GET.get("tag")
     if tag:
-        return self.model.objects.filter(tags__name = tag)
+        return model.objects.filter(tags__name = tag)
+
+    doctype = request.GET.get("doctype")
+    if doctype:
+        return model.objects.filter(doctype = doctype).exclude(deleted = True).order_by("id").reverse()
 
     # Search filtering 
     search = request.GET.get('search')
@@ -108,18 +112,22 @@ def bookmark_list_process(request: WSGIRequest):
 
 @login_required
 def bookmark_list_view(request: WSGIRequest):
+    
+    print(" [TRACE] type = {type} ; User = {user} ; id = {id} ".format(type =  type(request.user),user = request.user, id = request.user.id))
+
     queryset: QuerySet = bookmark_list_process(request)
     #--------- Paginate ------------------------#       
     p:    str = request.GET.get("page")
     page: int = int(p) if p is not None and p.isnumeric() else 1
     items, page_range = paginate_queryset(queryset, page, 10, 5)
 
-    url_state = "view={view}&search={search}&mode={mode}&domain={domain}&collection={collection}"\
+    url_state = "view={view}&search={search}&mode={mode}&domain={domain}&collection={collection}&doctype={doctype}"\
         .format( view       = request.GET.get("view") or ""
                 ,search     = django.utils.http.urlquote(request.GET.get("search") or "") 
                 ,mode       = request.GET.get("mode") or ""
                 ,domain     = request.GET.get("domain") or ""
                 ,collection = request.GET.get("collection") or ""                
+                ,doctype    = request.GET.get("doctype") or ""
         )
     count: int = queryset.count()
     return ds.render(request, tpl_main, { 'object_list': items
@@ -250,7 +258,7 @@ def document_viewer(request: WSGIRequest, itemID: int):
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'deleted', 'tags']
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')    
 
     # Overriden from CreateView 
@@ -276,7 +284,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'deleted', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'deleted', 'tags']
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')
 
     # Override UpdateView.get_success_url()
