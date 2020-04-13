@@ -269,21 +269,18 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         req: WSGIRequest = self.request
         url: str = req.POST.get("url")
+        user: AbstractBaseUser = req.user 
         assert url is not None
         try:
-            it = SiteBookmark.objects.get(url = url)
+            it = SiteBookmark.objects.filter(owner = user).get(url = url)
             err = ErrorList([ u'Error: URL already exists.'])
             form._errors[django.forms.forms.NON_FIELD_ERRORS] = err 
             return self.form_invalid(form = form)        
         except SiteBookmark.DoesNotExist:
             pass         
-                
+        # Set foreign Key owner 
+        form.instance.owner = user                 
         return super().form_valid(form = form)
-        # => Log form parameters 
-        # print(" [TRACE] Form Params = {}".format( list(req.POST.items()) ))
-        #self.object = form.save()
-        # return django.http.HttpResponseRedirect(self.get_success_url())
-        #return django.http.HttpResponseRedirect(self.success_url)
 
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
