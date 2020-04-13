@@ -117,7 +117,9 @@ def bookmark_list_view(request: WSGIRequest):
     
     print(" [TRACE] type = {type} ; User = {user} ; id = {id} ".format(type =  type(request.user),user = request.user, id = request.user.id))
 
-    queryset: QuerySet = bookmark_list_process(request)
+    ql: QuerySet = bookmark_list_process(request)
+    queryset = ql.filter(owner = request.user)
+
     #--------- Paginate ------------------------#       
     p:    str = request.GET.get("page")
     page: int = int(p) if p is not None and p.isnumeric() else 1
