@@ -307,7 +307,10 @@ class SavedSearchList(LoginRequiredMixin, ListView):
     # queryset = SavedSearch.objects.order_by(Lower("search")) #.filter( owner = request.user)
     # paginate_by = 4
     def get_queryset(self):
-        return SavedSearch.objects.filter(owner = self.request.user).order_by(Lower("search"))
+        user: AbstractBaseUser = self.request.user
+        if user.is_superuser:
+            return SavedSearch.objects.filter(owner__isnull = True).order_by(Lower("search"))
+        return SavedSearch.objects.filter(owner = user).order_by(Lower("search"))
 
 class SavedSearchCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
