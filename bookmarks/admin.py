@@ -9,6 +9,8 @@ class CollectionAdmin(admin.ModelAdmin):
     model = bm.Collection
     filter_horizontal = ('item', )
 
+admin.site.register(bm.Account)
+
 admin.site.register(bm.SiteBookmark, SiteBookmarkAdmin)
 admin.site.register(bm.Tag)
 admin.site.register(bm.SavedSearch)
