@@ -209,6 +209,9 @@ class Collection(models.Model):
     created = models.DateField(editable = False, auto_now_add = True, null = True)
     # Set field only when instance is changed
     updated = models.DateField(editable = False, auto_now = True, null = True)
+
+    # User to which the collection belongs to 
+    owner = models.ForeignKey(Account, null = True, blank = True, editable = True, on_delete=models.PROTECT)
     
     def __str__(self):
         return " title = {title} ".format(title = self.title)
