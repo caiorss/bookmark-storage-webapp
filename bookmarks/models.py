@@ -132,12 +132,15 @@ class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
     #url   = models.CharField(max_length=4000)
     url     = models.CharField( #unique = True,
-        help_text = "Enter bookmark URL (Required)", max_length=8000)
-    title    = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Enter web site title")
-    starred = models.BooleanField(blank = True, default = False, help_text = "Check this box to mark this bookmark as favourite")
+                                 verbose_name="Web site URL"
+                                ,help_text = "Enter bookmark URL (Required)", max_length=8000)
+    title    = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Enter the web site title")
+    starred = models.BooleanField(  blank = True, default = False
+                                  , help_text = "Check this box to mark this bookmark as favourite")
     brief   = models.TextField(blank = True, null = True, help_text="Short web site description")
     tags    = models.ManyToManyField(Tag, blank = True)
-    doctype = models.CharField(max_length=80, choices = DocumentType.choices, default = DocumentType.webpage)
+    doctype = models.CharField(max_length=80, choices = DocumentType.choices, default = DocumentType.webpage
+                             , verbose_name = "Type")
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
 
     # Set field only when instance is created
