@@ -103,29 +103,30 @@ class SavedSearch(models.Model):
         return self.search  
 
 class DocumentType(models.TextChoices):
-    webpage        = "webpage"
-    document       = "document"
+    webpage         = "webpage"
+    search_engine   =  "search engine"
+    document        = "document"
     # Social media accounts that are followed. 
-    follow         = "follow"  
+    follow          = "follow"
     # News outlets - magazines, newspapers, twitter accounts of news autlets
-    news           = "news"
+    news            = "news"
     # Course notes - lectures notes
-    course         = "course"
-    paper          = "paper"    
-    report         = "report"
-    article        = "article"
-    book           = "book"
-    thesis         = "thesis"
-    patent         = "patent"
-    presentation   = "presentation"
+    course          = "course"
+    paper           = "paper"
+    report          = "report"
+    article         = "article"
+    book            = "book"
+    thesis          = "thesis"
+    patent          = "patent"
+    presentation    = "presentation"
     # Technical standard such as RFCs, ISO, DIN, ... 
-    standard       = "standard" 
-    law            = "law"
-    source_code    = "source code"
-    manual         = "manual"
-    documentation  = "documentation"
-    video          = "video"
-    music          = "music"  
+    standard        = "standard"
+    law             = "law"
+    source_code     = "source code"
+    manual          = "manual"
+    documentation   = "documentation"
+    video           = "video"
+    music           = "music"
 
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
