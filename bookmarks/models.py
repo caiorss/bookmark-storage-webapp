@@ -104,8 +104,9 @@ class SavedSearch(models.Model):
 
 class DocumentType(models.TextChoices):
     webpage         = "webpage"
-    search_engine   =  "search engine"
     document        = "document"
+    # Online forums or communities 
+    community       = "community"
     # Social media accounts that are followed. 
     follow          = "follow"
     # News outlets - magazines, newspapers, twitter accounts of news autlets
@@ -125,6 +126,7 @@ class DocumentType(models.TextChoices):
     source_code     = "source code"
     manual          = "manual"
     documentation   = "documentation"
+    search_engine   = "search engine"
     video           = "video"
     music           = "music"
 
