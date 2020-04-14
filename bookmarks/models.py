@@ -64,7 +64,8 @@ class Account(AbstractBaseUser):
 
     def __str__(self):
         # String representation 
-        return self.email 
+        return "username = {username} ; email = {email} ; id = {id}"\
+            .format(username = self.username, email = self.email, id = self.id)
 
     def has_perm(self, perm, obj = None): 
         return self.is_admin
