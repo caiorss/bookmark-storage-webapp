@@ -127,8 +127,11 @@ class DocumentType(models.TextChoices):
     manual          = "manual"
     documentation   = "documentation"
     search_engine   = "search engine"
-    video           = "video"
+    # Ecommerce websites, online stores such as Amazon, BestBuy, Alibaba, AliExpress,  ...
+    online_store    = "online store"
     music           = "music"
+    video           = "video"
+    youtube_channel = "youtube channel"    
 
 class SiteBookmark(models.Model):
     # Max URL size has 3000 bytes
