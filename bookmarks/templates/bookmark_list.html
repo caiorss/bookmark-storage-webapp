@@ -85,12 +85,29 @@
     {% for bookmark in object_list %}
         <div class = "well item item_div">   
 
-            <h5> ID = {{ bookmark.id }} / <a target='_blank' title="{{bookmark.brief}}" href="{{ bookmark.url }}"> {{ bookmark.modified_title | default:bookmark.url }} </a></h5>
+            <h5>                        
+                  <a target='_blank' 
+                      title="{{bookmark.brief}}" 
+                      href="{{ bookmark.url }}"> 
+                      <svg xmlns="http://www.w3.org/2000/svg" 
+                          width="1.2rem" height="1.2rem" background="blue" viewBox="0 0 16 16" 
+                          focusable="false" aria-hidden="true">
+                          <path class="stroke-linecap-square" d="M10 2h4v4">
+                          </path><path d="M6 10l8-8"></path>
+                          <path class="stroke-linejoin-round" d="M14 9.048V14H2V2h5">
+                          </path>
+                      </svg>
+
+                        {{ bookmark.modified_title | default:bookmark.url }}                                                
+                        
+                  </a>
+            </h5>
             
             <br/>
 
-                    <a class="btn btn-primary" title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}">Edit</a>
-
+                    <a class="btn btn-primary" 
+                      title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}">Edit</a>
+                    
                     {% if bookmark.deleted != True  %}
                         <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
                     {% endif %}
@@ -111,6 +128,10 @@
                     <br/>                                
 
               <table class="item-table-info">
+                  <tr>
+                      <th class="row-label">Id</th>
+                      <th>{{ bookmark.id }} </th>
+                    </tr>
                   <tr>
                     <th class="row-label">Starred</th>
                     <th>{{ bookmark.starred }} </th>
