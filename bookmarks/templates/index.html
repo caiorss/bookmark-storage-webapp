@@ -27,6 +27,7 @@ Search Items:
 
 <div class="">
         <form method='GET' action="/items" class="form-group">
+            <input type="hidden" name="filter" value="search" /> 
             <input type='text' name='search' value='{{ request.GET.search }}'>
             <input class="btn btn-info" type='submit' value="Search">
         </form> 
@@ -36,9 +37,9 @@ Search Items:
 
 <ul>
     <li>  <a href='/items'>All items ordered by last created</a> </li>
-    <li>  <a href='/items?view=latest'>All items ordered by creation time</a> </li>
-    <li>  <a href='/items?view=removed'>Removed items</a> </li>
-    <li>  <a href='/items?view=starred'>Starred Items</a>  </li>
+    <li>  <a href='/items?filter=latest'>All items ordered by creation time</a> </li>
+    <li>  <a href='/items?filter=removed'>Removed items</a> </li>
+    <li>  <a href='/items?filter=starred'>Starred Items</a>  </li>
     <li>  <a href='/items/new'>Add item</a> </li>
 </ul>
 
@@ -53,28 +54,28 @@ Search Items:
 
 <ul>    
 
-    <li> <a href='/items?doctype=search%20engine'>Search Engine</a> </li>
+    <li> <a href='/items?filter=doctype&A0=search%20engine'>Search Engine</a> </li>
 
-    <li> <a href='/items?doctype=news'>News outlets</a> </li>
+    <li> <a href='/items?filter=doctype&A0=news'>News outlets</a> </li>
 
-    <li> <a href='/items?doctype=community'>Online Forums and Communities</a> </li>
+    <li> <a href='/items?filter=doctype&A0=community'>Online Forums and Communities</a> </li>
 
-    <li> <a href='/items?doctype=book'>Books or online books</a> </li>
+    <li> <a href='/items?filter=doctype&A0=book'>Books or online books</a> </li>
     
-    <li> <a href='/items?doctype=paper'>Papers</a> </li>
+    <li> <a href='/items?filter=doctype&A0=paper'>Papers</a> </li>
     
 
-    <li> <a href='/items?doctype=thesis'>Thesis: phd, master, undergrad thesis</a> </li>
+    <li> <a href='/items?filter=doctype&A0=thesis'>Thesis: phd, master, undergrad thesis</a> </li>
 
-    <li> <a href='/items?doctype=music'>Music</a> </li>
-    <li> <a href='/items?doctype=video'>Video</a> </li>
-    <li> <a href='/items?doctype=youtube%20channel'>Youtube Channel</a> </li>
+    <li> <a href='/items?filter=doctype&A0=music'>Music</a> </li>
+    <li> <a href='/items?filter=doctype&A0=video'>Video</a> </li>
+    <li> <a href='/items?filter=doctype&A0=youtube%20channel'>Youtube Channel</a> </li>
 
-    <li> <a href='/items?doctype=online%20store' 
+    <li> <a href='/items?filter=doctype&A0=online%20store' 
             title="Filter online store bookmarks such as Amazon, Ebay, BestBuy, Aliexpress ..." 
           >Online Store</a> </li>
 
-    <li> <a href='/items?doctype=follow'>Followed social media accounts</a> </li>
+    <li> <a href='/items?filter=doctype&A0=follow'>Followed social media accounts</a> </li>
     
 </ul>
 

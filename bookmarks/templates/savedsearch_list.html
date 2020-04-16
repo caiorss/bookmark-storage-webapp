@@ -16,10 +16,10 @@
            title="List all items ordered by the latest">List all</a>
       
         <a class="btn btn-info" 
-          href="/items?view=latest" 
+          href="/items?filter=latest" 
           title="Order by oldest">Oldest</a>
 
-      <a class="btn btn-info" href="/items?view=starred" 
+      <a class="btn btn-info" href="/items?filter=starred" 
           title="List only starred items">Starred</a>
 
       <a class="btn btn-info" href="/items/new">Add</a>                              
@@ -31,7 +31,8 @@
 
 <div class="">
   <form method='GET' action="/items" class="form-group">
-      <input type='text' name='search' value='{{ request.GET.search }}'>
+      <input type="hidden" name="filter" value="search" /> 
+      <input type='text' name='query' value='{{ request.GET.query }}'>
       <input class="btn btn-info" type='submit' value="Search">
   </form> 
 </div>
@@ -45,7 +46,7 @@
     {% for savedsearch in object_list %}
     
     <div class = "well item ">   
-        <a href="/items?search={{ savedsearch.search|urlencode }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
+        <a href="/items?filter=search&query={{ savedsearch.search|urlencode }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
         <p> {{ savedsearch.description }} </p>
     </div>                            
     {% endfor %}

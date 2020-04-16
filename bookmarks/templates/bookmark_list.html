@@ -16,10 +16,10 @@
            title="List all items ordered by the latest">List all</a>
       
       <a class="btn btn-info" 
-          href="items?view=latest" 
+          href="items?filter=oldest" 
           title="Order by oldest">Oldest</a>
 
-      <a class="btn btn-info" href="items?view=starred" 
+      <a class="btn btn-info" href="items?filter=starred" 
           title="List only starred items">Starred</a>
 
       <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
@@ -38,8 +38,9 @@
 </div>
 
 <div class="">
-  <form method='GET' class="form-group">
-      <input type='text' name='search' value='{{ request.GET.search }}'>
+  <form method='GET' action="/items" class="form-group">
+      <input type="hidden" name="filter" value="search" /> 
+      <input type='text' name='query' value='{{ request.GET.query }}'>
       <input class="btn btn-info" type='submit' value="Search">
 
       <!-- Set search mode  -->
@@ -54,32 +55,29 @@
 </div>
 
 <div id="bookmark-list" class="container">     
-    
-    {% if object_list.has_other_pages %}
-    
-       <ul class="pagination">
-            {% if object_list.has_previous %}
-              <li><a class="btn btn-primary" href="?page={{ object_list.previous_page_number }}&{{url_state}}">&laquo;</a></li>
-            {% else %}
-              <li  class="btn btn-primary" class="disabled"><span>&laquo;</span></li>
-            {% endif %}            
-            
-            {% for i in page_range %}
-              {% if object_list.number == i %}
-                <li class="active btn btn-info"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-              {% else %}
-                <li><a class = "btn btn-primary" href="?page={{ i }}&{{url_state}} ">{{ i }}</a></li>
-              {% endif %}
-            {% endfor %}
-            {% if object_list.has_next %}
-              <li><a class="btn btn-primary" href="?page={{ object_list.next_page_number }}&{{url_state}}">&raquo;</a></li>
-            {% else %}
-              <li class="btn btn-primary disabled"><span>&raquo;</span></li>
-            {% endif %}
-          </ul>
-     
-    {% endif %}    
+        
 
+    <div class="pagination">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li><a class="btn btn-primary" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">&laquo</a></li>
+            {% else %}
+                <li class="btn btn-primary disabled"><span>&laquo;</span></li> 
+            {% endif %}
+
+            {% if page_obj.has_next %}
+               <li><a class="btn btn-primary" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">&raquo</a></li>
+            {% else %}
+              <li class="btn btn-primary disabled"><span>&raquo;</span></li> 
+            {% endif %}
+
+            <li class="page-current">
+                  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </li>
+
+          </ul>
+    </div>
+ 
     Found {{count}} results.
 
     {% for bookmark in object_list %}
@@ -138,7 +136,7 @@
                   </tr>
                   <tr>
                     <th class="row-label">Type</th>
-                    <th> <a href="items?doctype={{ bookmark.doctype }}" 
+                    <th> <a href="items?filter=doctype&A0={{ bookmark.doctype }}" 
                           title="Filter by document type"> {{ bookmark.doctype }} </a> 
                     </th>
                   </tr>
@@ -149,7 +147,7 @@
                   </tr>    
                   <tr>
                       <th class="row-label">Domain</th>
-                      <th> <a href="items?domain={{ bookmark.hostname }}" title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </th>                    
+                      <th> <a href="items?filter=domain&A0={{ bookmark.hostname }}" title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a> </th>                    
                   </tr>    
                   <tr>
                     <th class="row-label">Created</th>

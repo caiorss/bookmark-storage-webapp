@@ -139,6 +139,116 @@ def bookmark_list_view(request: WSGIRequest):
                                         , 'url_state': url_state
                                         , 'count': count})
 
+
+class BookmarksList(ListView):
+    # --- overriden variables --------
+    model         = SiteBookmark
+    template_name = tpl_main
+    paginate_by  = 5
+    context_object_name = "object_list"
+    
+    filter_dispatch = {}    
+    empty_query = model.objects.none()
+
+    def __init__(self):
+        super(BookmarksList, self).__init__()
+        self.start()
+
+        # ---------- Set callbacks ------------#   
+    def start(self):
+        self.add_filter("latest",  self.filter_latest)
+        self.add_filter("oldest",  self.filter_oldest)
+        self.add_filter("starred", self.filter_starred)
+        self.add_filter("removed", self.filter_removed)
+        self.add_filter("doctype",  self.filter_doctype)
+        self.add_filter("search",  self.filter_search)
+        return self 
+
+    def add_filter(self, view: str, callback):
+        self.filter_dispatch[view] = callback            
+
+    # Determines the query 
+    def get_queryset(self):
+        filter_: str = self.request.GET.get("filter", "")                
+        if filter_ in self.filter_dispatch.keys():            
+            return self.filter_dispatch[filter_]()                        
+        return self.filter_latest()
+
+    # Return context data dictionary to the rendered template 
+    def get_context_data(self, **kwargs):
+        context = super(BookmarksList, self).get_context_data(**kwargs)
+        assert context is not None 
+        print(f" Trace = { self.context_object_name }")
+        query: QuerySet = context[self.context_object_name]
+        assert query is not None 
+       
+        url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}"\
+            .format( filter = self.request.GET.get("filter") or ""
+                    ,A0     = self.request.GET.get("A0")   or ""
+                    ,query  = self.request.GET.get("query")   or ""
+                    ,mode   = self.request.GET.get("mode") or ""
+                    )        
+        context['count'] = self.get_queryset().count()
+        context["url_state"] = url_state
+        return context
+
+    #--------- Callbacks / Query Filters -----------------------#
+
+    def filter_latest(self):
+        return self.model.objects.exclude(deleted = True)\
+                   .filter(owner = self.request.user).order_by("id").reverse()
+
+    def filter_oldest(self):
+        return self.model.objects.exclude(deleted = True)\
+            .filter(owner = self.request.user).order_by("id")
+
+    # Select only user marked (starred, favourite) bookmarks
+    def filter_starred(self):
+        return self.model.objects.filter(starred = True).exclude(deleted = True)\
+            .filter(owner = self.request.user).order_by("id").reverse()    
+    
+    def filter_removed(self):        
+        return self.model.objects.filter(deleted = True)\
+            .filter(owner = self.request.user).order_by("id").reverse()    
+
+    # Url example: /items?filter=domain&A0=www.reddit.com
+    def filter_domain(self):
+        # Argument zer0 
+        A0: str = request.GET.get("A0")            
+        if not A0: return self.empty_query
+        d = A0.strip("www.").strip("m.").strip("old.").strip("mobile.")
+        return self.model.objects.filter(url__contains = d)\
+                   .exclude(deleted = True).filter(owner = self.request.user)\
+                   .order_by("id").reverse()
+
+    # Url example: /items?filter=doctype&A0=thesis
+    def filter_doctype(self):
+        # Argument zer0 
+        A0: str = self.request.GET.get("A0")            
+        if not A0: return self.empty_query
+        return self.model.objects.filter(doctype = A0)\
+                   .exclude(deleted = True)\
+                   .filter(owner = self.request.user).order_by("id").reverse()
+
+    def filter_search(self):
+        search = self.request.GET.get('query')
+        mode   = self.request.GET.get('mode', "")
+        if not search:
+            return self.filter_latest()        
+        words = shlex.split(search)
+        lam = lambda x, y: x | y
+        if  mode == "OR":
+            lam = lambda x, y: x | y
+        if mode == "AND":
+            lam = lambda x, y: x & y
+        # q = Q(title__contains =   search) | Q(url__contains =  search)       
+        q1 = reduce(lam, [ Q(url__contains=w) for w in words])
+        q2 = reduce(lam, [ Q(title__contains=w) for w in words])
+        return self.model.objects.filter(owner = self.request.user)\
+            .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
+
+
+
 # URL route for adding item through bookmarklet 
 @login_required 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):

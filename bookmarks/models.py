@@ -126,6 +126,8 @@ class DocumentType(models.TextChoices):
     source_code     = "source code"
     manual          = "manual"
     documentation   = "documentation"
+    # Reference card, cheat sheet
+    refcard         = "reference card"
     search_engine   = "search engine"
     # Ecommerce websites, online stores such as Amazon, BestBuy, Alibaba, AliExpress,  ...
     online_store    = "online store"
