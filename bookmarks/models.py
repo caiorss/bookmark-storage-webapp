@@ -111,6 +111,8 @@ class DocumentType(models.TextChoices):
     follow          = "follow"
     # News outlets - magazines, newspapers, twitter accounts of news autlets
     news            = "news"
+    # Inspirational reading
+    inspirational   = "inspirational"
     # Course notes - lectures notes
     course          = "course"
     paper           = "paper"
@@ -131,6 +133,10 @@ class DocumentType(models.TextChoices):
     search_engine   = "search engine"
     # Ecommerce websites, online stores such as Amazon, BestBuy, Alibaba, AliExpress,  ...
     online_store    = "online store"
+    # Software tools
+    developer_tool   = "developer_tool"
+    # Online tool 
+    online_tool     = "online_tool"
     music           = "music"
     video           = "video"
     youtube_channel = "youtube channel"    
