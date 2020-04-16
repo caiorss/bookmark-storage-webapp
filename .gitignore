@@ -11,3 +11,4 @@ files/*
 *-back
 *.-back
 *.lock
+*.code-workspace
