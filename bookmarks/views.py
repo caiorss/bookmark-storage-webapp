@@ -59,6 +59,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("removed", self.filter_removed)
         self.add_filter("doctype",  self.filter_doctype)
         self.add_filter("search",  self.filter_search)
+        self.add_filter("domain", self.filter_domain)
         return self 
 
     def add_filter(self, view: str, callback):
@@ -111,7 +112,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
     # Url example: /items?filter=domain&A0=www.reddit.com
     def filter_domain(self):
         # Argument zer0 
-        A0: str = request.GET.get("A0")            
+        A0: str = self.request.GET.get("A0")            
         if not A0: return self.empty_query
         d = A0.strip("www.").strip("m.").strip("old.").strip("mobile.")
         return self.model.objects.filter(url__contains = d)\
