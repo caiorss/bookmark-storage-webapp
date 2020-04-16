@@ -164,7 +164,9 @@ def bookmark_add_item_bookmarklet(request: WSGIRequest):
     except SiteBookmark.DoesNotExist:
         pass
 
-    b: SiteBookmark = SiteBookmark(url = url, title = title)
+    b:    SiteBookmark     = SiteBookmark(url = url, title = title)
+    user: AbstractBaseUser = request.user
+    b.owner = user 
     b.save()
     if not url.endswith(".pdf"): update_item_from_metadata(b.id)
     return ds.redirect("/items")    
