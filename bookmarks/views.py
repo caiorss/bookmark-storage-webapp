@@ -37,7 +37,7 @@ tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
 
-class BookmarksList(ListView):
+class BookmarksList(LoginRequiredMixin, ListView):
     # --- overriden variables --------
     model         = SiteBookmark
     template_name = tpl_main
