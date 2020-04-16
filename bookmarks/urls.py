@@ -10,8 +10,7 @@ urlpatterns = [
   # see: https://stackoverflow.com/questions/3402708/
    path('', dvgb.TemplateView.as_view(template_name = 'index.html'), name = 'home')
   
-  ,path('items', views.BookmarksList.as_view())
-  ,path('items2', views.bookmark_list_view, name='bookmark_list')
+  ,path('items', views.BookmarksList.as_view(), name = "bookmark_list")
 
   ,path('items/new', views.BookmarkCreate.as_view(), name='bookmark_new')
   ,path('items/edit/<int:pk>', views.BookmarkUpdate.as_view(), name='bookmark_edit')  
