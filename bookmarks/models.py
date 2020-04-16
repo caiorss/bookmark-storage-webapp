@@ -120,14 +120,14 @@ class DocumentType(models.TextChoices):
     thesis          = "thesis"
     patent          = "patent"
     presentation    = "presentation"
+    # Reference card, cheat sheet
+    referece_card   = "reference card"        
     # Technical standard such as RFCs, ISO, DIN, ... 
     standard        = "standard"
     law             = "law"
     source_code     = "source code"
     manual          = "manual"
     documentation   = "documentation"
-    # Reference card, cheat sheet
-    refcard         = "reference card"
     search_engine   = "search engine"
     # Ecommerce websites, online stores such as Amazon, BestBuy, Alibaba, AliExpress,  ...
     online_store    = "online store"
