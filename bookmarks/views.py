@@ -246,8 +246,9 @@ def fetch_itemsnapshot(request: WSGIRequest):
 
     try:
         FileSnapshot.createSnapshot(item.id, item.url)
-    except urllib.error.URLError as ex:          
-        return django.http.HttpResponseBadRequest("Error: urrlib Exception = {}".format(ex))        
+    except urllib.error.URLError as ex:    
+        print(f" Exception = {ex}")      
+        return django.http.HttpResponseBadRequest("Error: urrlib Exception = {ex}".format(ex = ex))        
     
     return ds.redirect(redirect_url)
 
@@ -259,8 +260,9 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     try:
         return FileResponse(open(sn.getFilePath(), 'rb'), content_type=sn.fileMimeType)
     except FileNotFoundError as err:
-        raise Http404("Error: file not found => {}".format(err))
+        raise Http404("Error: file not found => {err}".format(err = err))
 
+@login_required
 def document_viewer(request: WSGIRequest, itemID: int):
     item: SiteBookmark = ds.get_object_or_404(SiteBookmark, id = itemID)
     path = item.snapshot_file()
