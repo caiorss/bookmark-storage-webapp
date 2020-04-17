@@ -41,7 +41,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
     # --- overriden variables --------
     model         = SiteBookmark
     template_name = tpl_main
-    paginate_by  = 5
+    paginate_by  = 15
     context_object_name = "object_list"
     
     filter_dispatch = {}    
