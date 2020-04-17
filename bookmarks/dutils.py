@@ -10,6 +10,7 @@ import urllib.request
 from urllib.parse import urlparse, unquote
 from collections import namedtuple
 import hashlib
+import ssl 
 
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
@@ -25,7 +26,10 @@ def download_file(url: str):
         headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
     })
-    u = urllib.request.urlopen(req)
+    # Ignore SSL verification for downloading file in any case 
+    context = ssl._create_unverified_context()
+
+    u = urllib.request.urlopen(req, context = context)
     #req           = urllib.request.urlopen(url)
     f_name: str   = unquote(os.path.basename(urlparse(url).path))
     f_data: bytes = u.read()
