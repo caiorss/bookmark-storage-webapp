@@ -1,8 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html>    
 
     <head>
+        <title> Bookmark Manager</title>        
+
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <link rel="icon" href={% static "favicon.png" %} type="image/png" sizes="16x16"> 
@@ -12,22 +14,68 @@
         <!-- Bootstrap CSS -->
         <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
         <link rel="stylesheet" href={% static "bootstrap.min.css" %}>
-        <link rel="stylesheet" href="/static/style.css?rnd=true">        
-       <title> Bookmark Manager</title>        
+        <link rel="stylesheet" href="/static/style.css?rnd=10">        
         
+       <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+
+       <style>
+       </style>
+
+        <script>
+                // Hide DOM element. selector is the element's css selector.
+                function DOM_hide(selector)
+                {                 
+                    m = document.querySelector(selector);
+                    if(m == null){ alert(" Error: element not found");  }
+                    m.style.display = "block";
+                    m.style.visibility = "hidden";
+                }
+
+                // Show DOM element. selector is the element's css selector.
+                function show_DOM_element(selector)
+                {
+                    var m = document.querySelector(selector);
+                    if(m == null){ alert(" Error: element not found");  }
+                    m.style.display = "block";
+                    m.style.visibility = "visible";
+                }
+
+                // Toggle DOM element 
+                function DOM_toggle(selector)
+                {
+                    var m = document.querySelector(selector);
+                    if(m == null){ alert(" Error: element not found");  }
+                    m.style.display = "block";
+                    var v = window.getComputedStyle(m);
+                    // if(m.style.visibility == "" || m.style.visibility == "visible")
+                    if(v.visibility == "visible")
+                    {
+                        console.log(" [TRACE] => Hide element");
+                        m.style.visibility = "hidden";
+                    } else {
+                        console.log(" [TRACE] => Show element");
+                        m.style.visibility = "visible";
+                    }
+                        
+                }                              
+        </script>
+   
     </head>
 
-<body>
-   
-    {% if user.is_authenticated %}
-        <div id="content">
-            {% block content %}
-            {% endblock %}
-        </div><!-- content -->
-    {% else %}
-        <!-- Redirect to /accounts/login -->
-        <meta http-equiv="REFRESH" content="0;url=/accounts/login">
-        <a href="{% url 'login' %}">login</a>
-    {% endif %}
-</body>
+    <body>
+
+      
+        {% if user.is_authenticated %}
+            <div id="content">
+                {% block content %}
+                {% endblock %}
+            </div><!-- content -->
+        {% else %}
+            <!-- Redirect to /accounts/login -->
+            <meta http-equiv="REFRESH" content="0;url=/accounts/login">
+            <a href="{% url 'login' %}">login</a>
+        {% endif %}
+    </body>
+
+
 </html>

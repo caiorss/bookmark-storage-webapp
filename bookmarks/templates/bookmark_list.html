@@ -3,82 +3,77 @@
 
 {% block content %}
 
-<div class="container" id="top-panel">
-    <h1>Bookmarks Storage</h1>
 
-    <div  class="btn-group btn-group-sm">
+<div class="topbar">
+    <a class="btn btn-primary" href="#" onclick="DOM_toggle('.sidebar');">Menu</a>
+    <a class="btn btn-primary"  href="/">Home</a>
 
-      <a class="btn btn-info" href="/search/list" 
-        title="Saved search">Search</a>
-
-      <a class="btn btn-info" 
-           href="items" 
-           title="List all items ordered by the latest">List all</a>
-      
-      <a class="btn btn-info" 
-          href="items?filter=oldest" 
-          title="Order by oldest">Oldest</a>
-
-      <a class="btn btn-info" href="items?filter=starred" 
-          title="List only starred items">Starred</a>
-
-      <a class="btn btn-info" href="{% url 'bookmarks:bookmark_new' %}">Add</a>                              
-
-      <a class="btn btn-info" href="/" 
-          title="Go to home page or index">Index</a>
-
-      <br/>
-
- <!--      {% if request.session.video_toggle %}
-        <a class="btn btn-info" title="Disable Youtube Video Embedding" href="/options/video_toggle?url={{ request.get_full_path | urlencode}}">Disable Video</a> </li>    
-      {% else %}
-        <a class="btn btn-info" title="Enable Youtube Video Embedding" href="/options/video_toggle?url={{ request.get_full_path | urlencode }}">Enable Video</a> </li>    
-      {% endif %} -->
-
-</div>
-
-<div class="">
-  <form method='GET' action="/items" class="form-group">
-      <input type="hidden" name="filter" value="search" /> 
-      <input type='text' name='query' value='{{ request.GET.query }}'>
-      <input class="btn btn-info" type='submit' value="Search">
-
-      <!-- Set search mode  -->
-      <select name="mode" title="Select search mode.">
-          <option value="AND">AND</option>
-          <option value="OR">OR</option>
-        </select>        
-  </form> 
-</div>
-
-
-</div>
-
-<div id="bookmark-list" class="container">     
-        
-
-    <div class="pagination">
-        <ul class="pagination">
+    
             {% if page_obj.has_previous %}
-                <li><a class="btn btn-primary" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">&laquo</a></li>
+                <a class="btn btn-primary" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">&laquo</a>
             {% else %}
-                <li class="btn btn-primary disabled"><span>&laquo;</span></li> 
+                <!-- <li class="btn btn-primary disabled"><span>&laquo;</span></li>  -->
+                <span class="btn btn-primary disabled">&laquo;</span>
             {% endif %}
 
             {% if page_obj.has_next %}
-               <li><a class="btn btn-primary" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">&raquo</a></li>
+               <a class="btn btn-primary" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">&raquo</a>
             {% else %}
-              <li class="btn btn-primary disabled"><span>&raquo;</span></li> 
-            {% endif %}
+                <span class="btn btn-primary disabled">&raquo;</span>
+                <!-- <li class="btn btn-primary disabled"><span>&raquo;</span></li>  -->
+            {% endif %}            
+</div>
 
-            <li class="page-current">
-                  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </li>
+<div class="sidebar">
 
-          </ul>
+    <ul class="sidebar-nav">
+       <li>User: {{ request.user.username }}</li>
+
+       <li>
+          <a href="#">log out</a>
+      </li>
+
+        <li><a href='/items/new'>Add item</a> </li>
+
+        <li><a href="/items">Last bookmarks</a></li>
+        <li><a href="/items?filter=oldest">First bookmarks</a></li>
+        <li><a href="/items?filter=starred">Starred Bookmarks</a></li>
+        <li><a href="/items?filter=removed">Removed Bookmarks</a></li>
+        
+        <li><span>Documents Filters</span></li>
+        <li> <a href='/items?filter=doctype&A0=book'>Books or online books</a> </li>    
+        <li> <a href='/items?filter=doctype&A0=paper'>Papers</a> </li>        
+        <li> <a href='/items?filter=doctype&A0=thesis'>Thesis</a> </li>    
+        <li> <a href='/items?filter=doctype&A0=reference%20card'>Reference card, cheat sheet</a> </li>       
+
+        <li><span>Media Filters</span></li>
+        <li> <a href='/items?filter=doctype&A0=music'>Music</a> </li>
+        <li> <a href='/items?filter=doctype&A0=video'>Video</a> </li>
+        <li> <a href='/items?filter=doctype&A0=youtube%20channel'>Youtube Channel</a> </li>                        
+    </ul>
+</div>  
+
+<div id="bookmark-list" class="container">           
+
+    <div id="top-panel">
+        <h1>Bookmarks Storage</h1>
+
+        <div class="div-form-search">
+          <form method='GET' action="/items" class="form-group">
+            <input type="hidden" name="filter" value="search" /> 
+            <input type='text' name='query' value='{{ request.GET.query }}'>
+            <input class="btn btn-info" type='submit' value="Search">
+
+            <!-- Set search mode  -->
+            <select name="mode" title="Select search mode.">
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>        
+          </form> 
+        </div>
     </div>
- 
-    Found {{count}} results.
+
+    Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.          
 
     {% for bookmark in object_list %}
         <div class = "well item item_div">   
