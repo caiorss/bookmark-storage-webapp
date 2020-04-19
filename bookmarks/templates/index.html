@@ -6,7 +6,7 @@
 {% if user.is_authenticated %}
         Welcome user: {{ request.user.username }} / logged as {{ request.user.email }}                
         <ul>
-            <li><a class="btn btn-primary" href="/accounts/logout">Logout</a></li>
+            <li><a class="btn-sm btn-primary" href="/accounts/logout">Logout</a></li>
         </ul>
         
 {% else %}

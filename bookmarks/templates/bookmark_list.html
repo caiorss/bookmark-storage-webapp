@@ -102,7 +102,7 @@
           <form method='GET' action="/items" class="form-group">
             <input type="hidden" name="filter" value="search" /> 
             <input type='text' name='query' value='{{ request.GET.query }}'>
-            <input class="btn btn-info" type='submit' value="Search">
+            <input class="btn-sm btn-info" type='submit' value="Search">
 
             <!-- Set search mode  -->
             <select name="mode" title="Select search mode.">
@@ -140,20 +140,20 @@
             
             <br/>
 
-                    <a class="btn btn-primary" 
+                    <a class="btn-sm btn-primary" 
                       title="Edit current item" href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}">Edit</a>
                     
                     {% if bookmark.deleted != True  %}
-                        <a class="btn btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
+                        <a class="btn-sm btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                           
                     {% endif %}
 
-                    <a class="btn btn-primary" title="Fetch bookmark metdata automatically" 
+                    <a class="btn-sm btn-primary" title="Fetch bookmark metdata automatically" 
                         href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Get metadata</a>
 
                   {% if bookmark.snapshot_exists %}
-                       <a class="btn btn-primary" target="_blank" title="Open file snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}">Open snapshot</a>                           
+                       <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}">Open snapshot</a>                           
                   {% else %}
-                       <a class="btn btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive snapshot</a>                           
+                       <a class="btn-sm btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive snapshot</a>                           
                   {% endif %}
 
                     {%if bookmark.isDocumentFile %}
@@ -164,7 +164,7 @@
 
                     <ul>             
                         {% if bookmark.snapshot_exists %}
-                          <li>  <a class="btn btn-primary" target="_blank" title="Open file snapshot file" 
+                          <li>  <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" 
                                   href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
                           </li>
                         {% endif %}
