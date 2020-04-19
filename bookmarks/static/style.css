@@ -109,8 +109,25 @@ h5 { color: white }
     width:         600px;
     padding-left:  50px; 
   /*   border-radius: 10px; 
-    padding-bottom: 50px;  */
-    
+    padding-bottom: 50px;  */    
+}
+
+.topbar-svg-button {
+    fill: rgb(116, 238, 122);
+    /* background-color:  rgb(116, 238, 122); */
+    margin-left: 5px;
+    border-radius: 10px;
+    width:  30px;
+    height: 30px;
+}
+
+.topbar-svg-button:hover {
+    fill:  rgb(30, 69, 95);
+}
+
+.topbar-svg-button svg {
+    width: 30px;
+    height: 30px;
 }
 
 .sidebar {
@@ -166,9 +183,14 @@ h5 { color: white }
     transition: background 0.5s;
 }
 
-  /** =============== Mobile-specific Style ================ */
-  @media only screen and (max-width: 960px) {
 
+
+  /** =============== Mobile-specific Style ================ */
+  @media only screen and (max-width: 960px) 
+  {
+    .container {
+        margin-top: 30px;
+    }
 
   }
 
