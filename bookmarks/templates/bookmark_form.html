@@ -8,7 +8,7 @@
         <!-- <h2><a href="{% url 'bookmarks:bookmark_list' %}">Web Site Bookmark</a>: Edit</h2> -->
         
         <form method="post">{% csrf_token %}
-            <input type="submit" value="Submit" />
+            <input class="btn-sm btn-primary" type="submit" value="Submit" />
             <table biorder="1"> 
                     <!-- {{ form.as_p }} -->
                     {{ form.as_table }}
