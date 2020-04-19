@@ -12,6 +12,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from bookmarks.models import SiteBookmark, SavedSearch, Collection \
     , FileSnapshot
 
+import bookmarks.models as bm 
+
 import django.core.paginator as pag 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
@@ -22,6 +24,10 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.db.models.functions import Lower
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 import bs4 
@@ -37,7 +43,36 @@ tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
 
-class BookmarksList(LoginRequiredMixin, ListView):
+class SignUpForm(UserCreationForm):
+    username = forms.CharField( max_length =30
+                              , required   = True
+                              , help_text  ='Optional.')
+    
+    email = forms.EmailField( max_length =254
+                            , required   =True
+                            , help_text  ='Required. Inform a valid email address.')
+    
+    class Meta:
+        model = bm.Account
+        fields = ('username', 'email', 'password1', 'password2', )
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username     = form.cleaned_data.get('username')
+            email        = form.cleaned_data.get('email')
+            raw_password = form.cleaned_data.get('password1')
+            user         = django.contrib.auth.authenticate(email=email, password=raw_password)
+            django.contrib.auth.login(request, user)
+            return ds.redirect('/items')
+    else:
+        form = SignUpForm()
+    return ds.render(request, 'registration.html', {'form': form})
+
+# class BookmarksList(LoginRequiredMixin, ListView):
+class BookmarksList(ListView):
     # --- overriden variables --------
     model         = SiteBookmark
     template_name = tpl_main
@@ -93,6 +128,11 @@ class BookmarksList(LoginRequiredMixin, ListView):
     #--------- Callbacks / Query Filters -----------------------#
 
     def filter_latest(self):
+        user: AbstractBaseUser = self.request.user         
+        if user.is_anonymous:
+            return self.model.objects.exclude(deleted = True)\
+                       .order_by("id").reverse()
+
         return self.model.objects.exclude(deleted = True)\
                    .filter(owner = self.request.user).order_by("id").reverse()
 

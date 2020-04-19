@@ -9,7 +9,9 @@ urlpatterns = [
   # Redirect straight to template 
   # see: https://stackoverflow.com/questions/3402708/
    path('', dvgb.TemplateView.as_view(template_name = 'index.html'), name = 'home')
-  
+
+  ,path('signup/', views.signup, name='signup')
+
   ,path('items', views.BookmarksList.as_view(), name = "bookmark_list")
 
   ,path('items/new', views.BookmarkCreate.as_view(), name='bookmark_new')
@@ -38,4 +40,5 @@ urlpatterns = [
   ,path('collection/list', views.CollectionList.as_view(), name='bookmark_collection_list')
   ,path('collection/new',  views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
+  
 ]
