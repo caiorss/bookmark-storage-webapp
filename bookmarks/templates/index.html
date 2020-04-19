@@ -1,5 +1,28 @@
 {% extends "base.html" %}
+
 {% block content %}
+
+
+{% if user.is_authenticated %}
+        Welcome user: {{ request.user.username }} / logged as {{ request.user.email }}                
+        <ul>
+            <li><a class="btn btn-primary" href="/accounts/logout">Logout</a></li>
+        </ul>
+        
+{% else %}
+        Welcome user: Anonymous user.
+        <ul>
+            <li>
+                <a class="btn-sm btn-primary" href="/accounts/login" 
+                   title="Click here to login (authenticate)">Login</a>
+
+                <a class="btn-sm btn-primary" href="/accounts/signup" 
+                   title="Click here to sign up (register)">Sign up</a>           
+            </li>                
+        </ul>        
+{% endif %}
+
+
 
 <h1> Index </h1>
 
