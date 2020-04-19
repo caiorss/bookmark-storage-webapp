@@ -42,7 +42,6 @@ tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
-
 class SignUpForm(UserCreationForm):
     username = forms.CharField( max_length =30
                               , required   = True
@@ -71,8 +70,8 @@ def signup(request):
         form = SignUpForm()
     return ds.render(request, 'registration.html', {'form': form})
 
-# class BookmarksList(LoginRequiredMixin, ListView):
-class BookmarksList(ListView):
+class BookmarksList(LoginRequiredMixin, ListView):
+
     # --- overriden variables --------
     model         = SiteBookmark
     template_name = tpl_main
