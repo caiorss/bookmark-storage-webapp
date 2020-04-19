@@ -64,17 +64,12 @@
 
     <body>
 
-      
-        {% if user.is_authenticated %}
-            <div id="content">
+        Changed: 
+        <div id="content">
                 {% block content %}
                 {% endblock %}
-            </div><!-- content -->
-        {% else %}
-            <!-- Redirect to /accounts/login -->
-            <meta http-equiv="REFRESH" content="0;url=/accounts/login">
-            <a href="{% url 'login' %}">login</a>
-        {% endif %}
+        </div><!-- content -->
+
     </body>
 
 
