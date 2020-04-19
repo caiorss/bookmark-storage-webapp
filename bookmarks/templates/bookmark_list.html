@@ -150,7 +150,15 @@
                         <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > <img src="{% static "gdriver.png" %}"> </a>
                     {% endif %}
 
-                    <br/>                                
+                    <br/><br/>                                
+
+                    <ul>             
+                        {% if bookmark.snapshot_exists %}
+                          <li>  <a class="btn btn-primary" target="_blank" title="Open file snapshot file" 
+                                  href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
+                          </li>
+                        {% endif %}
+                      </ul>  
 
               <table class="item-table-info">
                   <tr>
@@ -186,14 +194,7 @@
                       <th>{{ bookmark.updated }}</th>
                     </tr>
               </table>
-              
-            <ul>             
-              {% if bookmark.snapshot_exists %}
-                <li>  <a class="btn btn-primary" target="_blank" title="Open file snapshot file" 
-                        href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
-                </li>
-              {% endif %}
-            </ul>          
+                    
 
             <p class = ""> {{ bookmark.brief|default:"" }} </p>
 
