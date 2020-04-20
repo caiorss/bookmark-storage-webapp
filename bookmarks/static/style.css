@@ -107,7 +107,7 @@ h5 { color: white }
     position:      fixed;
     z-index:       1000;
     width:         600px;
-    padding-left:  50px; 
+    padding-left:  10px; 
   /*   border-radius: 10px; 
     padding-bottom: 50px;  */    
 }
@@ -188,6 +188,10 @@ h5 { color: white }
   /** =============== Mobile-specific Style ================ */
   @media only screen and (max-width: 960px) 
   {
+    #top-panel {
+        margin-top: 50px;
+    }
+
     .container {
         margin-top: 30px;
     }
