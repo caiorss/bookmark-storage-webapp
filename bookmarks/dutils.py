@@ -7,10 +7,14 @@ from functools import reduce
 
 import os 
 import urllib.request 
-from urllib.parse import urlparse, unquote
+
+from urllib.parse import urlparse, unquote 
+import urllib.parse
+
 from collections import namedtuple
 import hashlib
 import ssl 
+import re 
 
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
@@ -41,3 +45,16 @@ def download_file(url: str):
                          , fileHash = f_hash
                          , fileData = f_data  )
 
+
+def clean_search_engine_url(url: str):
+    """Clean URLs obfuscated by search engines."""
+
+    # Remove google search engine obfuscated URLs.
+    if re.match(".*google.*/url?", url) != None: 
+        u = urllib.parse.urlparse(url)
+        q = urllib.parse.parse_qs(u.query) 
+        # print(f" q = {q}")
+        if "url" in q: 
+            return q["url"][0]
+        return url 
+    return url 
