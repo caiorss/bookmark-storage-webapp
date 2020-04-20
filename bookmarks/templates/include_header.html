@@ -15,47 +15,6 @@
         <link rel="stylesheet" href="/static/style.css?rnd=10">        
         
        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
-
-       <style>
-       </style>
-
-        <script>
-                // Hide DOM element. selector is the element's css selector.
-                function DOM_hide(selector)
-                {                 
-                    m = document.querySelector(selector);
-                    if(m == null){ alert(" Error: element not found");  }
-                    m.style.display = "block";
-                    m.style.visibility = "hidden";
-                }
-
-                // Show DOM element. selector is the element's css selector.
-                function show_DOM_element(selector)
-                {
-                    var m = document.querySelector(selector);
-                    if(m == null){ alert(" Error: element not found");  }
-                    m.style.display = "block";
-                    m.style.visibility = "visible";
-                }
-
-                // Toggle DOM element 
-                function DOM_toggle(selector)
-                {
-                    var m = document.querySelector(selector);
-                    if(m == null){ alert(" Error: element not found");  }
-                    m.style.display = "block";
-                    var v = window.getComputedStyle(m);
-                    // if(m.style.visibility == "" || m.style.visibility == "visible")
-                    if(v.visibility == "visible")
-                    {
-                        console.log(" [TRACE] => Hide element");
-                        m.style.visibility = "hidden";
-                    } else {
-                        console.log(" [TRACE] => Show element");
-                        m.style.visibility = "visible";
-                    }
-                        
-                }                              
-        </script>
+        <script src="/static/main.js"></script>
    
     </head>
