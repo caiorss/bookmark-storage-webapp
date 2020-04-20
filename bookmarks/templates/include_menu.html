@@ -1,120 +1,124 @@
 <div class="topbar">
-        <a class="topbar-svg-button" href="#" onclick="toggle_sidebar();" 
-                title="Toggle sidebar">    
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/></svg>
+    <a class="topbar-svg-button" href="#" onclick="toggle_sidebar();" 
+            title="Toggle sidebar">    
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/></svg>
+    </a>
+    
+    <a class="topbar-svg-button" href="/" title="Go to home page or index">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M13 20v-5h-2v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7.59l-.3.3a1 1 0 1 1-1.4-1.42l9-9a1 1 0 0 1 1.4 0l9 9a1 1 0 0 1-1.4 1.42l-.3-.3V20a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2zm5 0v-9.59l-6-6-6 6V20h3v-5c0-1.1.9-2 2-2h2a2 2 0 0 1 2 2v5h3z"/></svg>
+    </a>
+
+    <a class="topbar-svg-button" href="/items?filter=starred" 
+        title="Show only starred (favourite) bookmarks">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5.173l2.335 4.817 5.305.732-3.861 3.71.942 5.27-4.721-2.524-4.721 2.525.942-5.27-3.861-3.71 5.305-.733 2.335-4.817zm0-4.586l-3.668 7.568-8.332 1.151 6.064 5.828-1.48 8.279 7.416-3.967 7.416 3.966-1.48-8.279 6.064-5.827-8.332-1.15-3.668-7.569z"/></svg>
+    </a>
+
+    <a class="topbar-svg-button" href="/items/new" title="Add new bookmark">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M6 2h9a1 1 0 0 1 .7.3l4 4a1 1 0 0 1 .3.7v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2zm9 2.41V7h2.59L15 4.41zM18 9h-3a2 2 0 0 1-2-2V4H6v16h12V9zm-5 4h2a1 1 0 0 1 0 2h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2v-2a1 1 0 0 1 2 0v2z"/></svg>
+    </a>
+
+    <a class="topbar-svg-button"  href="/items?filter=doctype&A0=music" title="Filter music bookmarks" >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M8 14.54V6a1 1 0 0 1 .76-.97l12-3A1 1 0 0 1 22 3v12a4 4 0 1 1-2-3.46V4.28l-10 2.5V18a4 4 0 1 1-2-3.46zM6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12-3a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+    </a>
+
+    <a class="topbar-svg-button"  href="/items?filter=doctype&A0=news" title="Filter music bookmarks" >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18 21H7a4 4 0 0 1-4-4V5c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v11a3 3 0 0 1-3 3zm-3-3V5H5v12c0 1.1.9 2 2 2h8.17a3 3 0 0 1-.17-1zm-7-3h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 1 1 0-2zm9 11a1 1 0 0 0 2 0V7h-2v11z"/></svg>            
+    </a>
+
+    <a class="topbar-svg-button" href="/items?filter=removed" title="List removed items">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M8 6V4c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v2h5a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8H3a1 1 0 1 1 0-2h5zM6 8v12h12V8H6zm8-2V4h-4v2h4zm-4 4a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0v-6a1 1 0 0 1 1-1zm4 0a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0v-6a1 1 0 0 1 1-1z"/></svg>
+    </a>
+
+    {% if page_obj.has_previous %}
+        <a class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg>
         </a>
+    {% else %}
+        <!-- <li class="btn btn-primary disabled"><span>&laquo;</span></li>  -->
+        <span class="topbar-svg-button"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg> </span>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+        <a class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </a>
+    {% else %}
+        <span class="topbar-svg-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </span>
+        <!-- <li class="btn btn-primary disabled"><span>&raquo;</span></li>  -->
+    {% endif %}            
+</div>
+
+<div class="sidebar">
+
+    <ul class="sidebar-nav">
+        <li>User: {{ request.user.username }}</li>
+
+        <li>
+            <a href="/accounts/logout">Log out</a>
+        </li>
+
+        <li><a href='/items/new'>Add item</a> </li>
+
+        <li><a href="/items">Last bookmarks</a></li>
+        <li><a href="/items?filter=oldest">First bookmarks</a></li>
+        <li><a href="/items?filter=starred">Starred Bookmarks</a></li>
+        <li><a href="/items?filter=removed">Removed Bookmarks</a></li>
         
-        <a class="topbar-svg-button" href="/" title="Go to home page or index">
-           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M13 20v-5h-2v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7.59l-.3.3a1 1 0 1 1-1.4-1.42l9-9a1 1 0 0 1 1.4 0l9 9a1 1 0 0 1-1.4 1.42l-.3-.3V20a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2zm5 0v-9.59l-6-6-6 6V20h3v-5c0-1.1.9-2 2-2h2a2 2 0 0 1 2 2v5h3z"/></svg>
-        </a>
-    
-        <a class="topbar-svg-button" href="/items?filter=starred" 
-            title="Show only starred (favourite) bookmarks">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5.173l2.335 4.817 5.305.732-3.861 3.71.942 5.27-4.721-2.524-4.721 2.525.942-5.27-3.861-3.71 5.305-.733 2.335-4.817zm0-4.586l-3.668 7.568-8.332 1.151 6.064 5.828-1.48 8.279 7.416-3.967 7.416 3.966-1.48-8.279 6.064-5.827-8.332-1.15-3.668-7.569z"/></svg>
-        </a>
-    
-        <a class="topbar-svg-button" href="/items/new" title="Add new bookmark">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M6 2h9a1 1 0 0 1 .7.3l4 4a1 1 0 0 1 .3.7v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2zm9 2.41V7h2.59L15 4.41zM18 9h-3a2 2 0 0 1-2-2V4H6v16h12V9zm-5 4h2a1 1 0 0 1 0 2h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2v-2a1 1 0 0 1 2 0v2z"/></svg>
-        </a>
-    
-        <a class="topbar-svg-button"  href="/items?filter=doctype&A0=music" title="Filter music bookmarks" >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M8 14.54V6a1 1 0 0 1 .76-.97l12-3A1 1 0 0 1 22 3v12a4 4 0 1 1-2-3.46V4.28l-10 2.5V18a4 4 0 1 1-2-3.46zM6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12-3a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
-        </a>
+        <li><span>Saved Search</span></li>
+        <li> <a href='/search/new'>New  saved search</a> </li>
+        <li> <a href='/search/list'>Saved searches</a> </li>      
 
-        <a class="topbar-svg-button"  href="/items?filter=doctype&A0=news" title="Filter music bookmarks" >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18 21H7a4 4 0 0 1-4-4V5c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v11a3 3 0 0 1-3 3zm-3-3V5H5v12c0 1.1.9 2 2 2h8.17a3 3 0 0 1-.17-1zm-7-3h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 1 1 0-2zm9 11a1 1 0 0 0 2 0V7h-2v11z"/></svg>            
-        </a>
+        <li><span>Collections</span></li>
+        <li> <a href='/collection/list'>List collections</a> </li>
+        <li> <a href='/collection/new'>Add new collection</a> </li>
 
-        <a class="topbar-svg-button" href="/items?filter=removed" title="List removed items">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M8 6V4c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v2h5a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8H3a1 1 0 1 1 0-2h5zM6 8v12h12V8H6zm8-2V4h-4v2h4zm-4 4a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0v-6a1 1 0 0 1 1-1zm4 0a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0v-6a1 1 0 0 1 1-1z"/></svg>
-        </a>
-    
-        {% if page_obj.has_previous %}
-            <a class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg>
-            </a>
-        {% else %}
-            <!-- <li class="btn btn-primary disabled"><span>&laquo;</span></li>  -->
-            <span class="topbar-svg-button"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg> </span>
-        {% endif %}
-    
-        {% if page_obj.has_next %}
-            <a class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
-            </a>
-        {% else %}
-            <span class="topbar-svg-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
-            </span>
-            <!-- <li class="btn btn-primary disabled"><span>&raquo;</span></li>  -->
-        {% endif %}            
+        <li><span>Misc Filters</span></li>
+        <li> <a href='/items?filter=doctype&A0=search%20engine'>Search Engine</a> </li>
+        <li> <a href='/items?filter=doctype&A0=news'>News outlets</a> </li>
+        <li> <a href='/items?filter=doctype&A0=community'>Online Forums and Communities</a> </li>
+        <li> <a href='/items?filter=doctype&A0=online%20store' 
+                title="Filter online store bookmarks such as Amazon, Ebay, BestBuy, Aliexpress ..." 
+                >Online Store</a> </li>
+        <li> <a href='/items?filter=doctype&A0=follow'>Followed social media accounts</a> </li>
+
+        <li><span>Documents Filters</span></li>
+        <li> <a href='/items?filter=doctype&A0=book'>Books or online books</a> </li>    
+        <li> <a href='/items?filter=doctype&A0=paper'>Papers</a> </li>        
+        <li> <a href='/items?filter=doctype&A0=thesis'>Thesis</a> </li>    
+        <li> <a href='/items?filter=doctype&A0=reference%20card'>Reference card, cheat sheet</a> </li>       
+
+        <li><span>Media Filters</span></li>
+        <li> <a href='/items?filter=doctype&A0=music'>Music</a> </li>
+        <li> <a href='/items?filter=doctype&A0=video'>Video</a> </li>
+        <li> <a href='/items?filter=doctype&A0=youtube%20channel'>Youtube Channel</a> </li>                        
+    </ul>
+</div>  
+
+<div id="top-panel">
+    <h1>Bookmarks Storage</h1>
+
+    <div class="div-form-search">
+        <form method='GET' action="/items" class="form-group">
+        <input type="hidden" name="filter" value="search" /> 
+        <input type='text' name='query' value='{{ request.GET.query }}'>
+        <input class="btn-sm btn-info" type='submit' value="Search">
+
+        <!-- Set search mode  -->
+        <select name="mode" title="Select search mode.">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+            </select>        
+        </form> 
     </div>
-    
-    <div class="sidebar">
-    
-        <ul class="sidebar-nav">
-           <li>User: {{ request.user.username }}</li>
-    
-           <li>
-              <a href="/accounts/logout">Log out</a>
-          </li>
-    
-            <li><a href='/items/new'>Add item</a> </li>
-    
-            <li><a href="/items">Last bookmarks</a></li>
-            <li><a href="/items?filter=oldest">First bookmarks</a></li>
-            <li><a href="/items?filter=starred">Starred Bookmarks</a></li>
-            <li><a href="/items?filter=removed">Removed Bookmarks</a></li>
-            
-            <li><span>Saved Search</span></li>
-            <li> <a href='/search/new'>New  saved search</a> </li>
-            <li> <a href='/search/list'>Saved searches</a> </li>      
-    
-            <li><span>Collections</span></li>
-            <li> <a href='/collection/list'>List collections</a> </li>
-            <li> <a href='/collection/new'>Add new collection</a> </li>
-    
-            <li><span>Misc Filters</span></li>
-            <li> <a href='/items?filter=doctype&A0=search%20engine'>Search Engine</a> </li>
-            <li> <a href='/items?filter=doctype&A0=news'>News outlets</a> </li>
-            <li> <a href='/items?filter=doctype&A0=community'>Online Forums and Communities</a> </li>
-            <li> <a href='/items?filter=doctype&A0=online%20store' 
-                    title="Filter online store bookmarks such as Amazon, Ebay, BestBuy, Aliexpress ..." 
-                  >Online Store</a> </li>
-            <li> <a href='/items?filter=doctype&A0=follow'>Followed social media accounts</a> </li>
-    
-            <li><span>Documents Filters</span></li>
-            <li> <a href='/items?filter=doctype&A0=book'>Books or online books</a> </li>    
-            <li> <a href='/items?filter=doctype&A0=paper'>Papers</a> </li>        
-            <li> <a href='/items?filter=doctype&A0=thesis'>Thesis</a> </li>    
-            <li> <a href='/items?filter=doctype&A0=reference%20card'>Reference card, cheat sheet</a> </li>       
-    
-            <li><span>Media Filters</span></li>
-            <li> <a href='/items?filter=doctype&A0=music'>Music</a> </li>
-            <li> <a href='/items?filter=doctype&A0=video'>Video</a> </li>
-            <li> <a href='/items?filter=doctype&A0=youtube%20channel'>Youtube Channel</a> </li>                        
-        </ul>
-    </div>  
-    
-    <div id="top-panel">
-            <h1>Bookmarks Storage</h1>
-    
-            <div class="div-form-search">
-              <form method='GET' action="/items" class="form-group">
-                <input type="hidden" name="filter" value="search" /> 
-                <input type='text' name='query' value='{{ request.GET.query }}'>
-                <input class="btn-sm btn-info" type='submit' value="Search">
-    
-                <!-- Set search mode  -->
-                <select name="mode" title="Select search mode.">
-                    <option value="AND">AND</option>
-                    <option value="OR">OR</option>
-                  </select>        
-              </form> 
-            </div>
-        </div>
-    
-        <span style="font-weight:bold">
-            Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.          
-        </span>  
-    
+</div>
+
+<span style="font-weight:bold">
+    Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.          
+</span>  
+
+<ul>
+    <li><a class="btn-sm btn-primary" href="#" onclick="toggle_items_table_info();">Toggle Details</a></li>
+</ul>
+
