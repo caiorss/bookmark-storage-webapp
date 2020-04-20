@@ -2,11 +2,12 @@
 <html>    
     {% include 'include_header.html' %}
 
-    <body>     
+    <body>
+        {% include 'include_menu.html' %}
         
         <div class="content">
-            {% block content %}{% endblock %}
+             {% block content %}{% endblock %}
         </div><!-- content -->
-        
+
     </body>
 </html>
