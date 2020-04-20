@@ -8,11 +8,12 @@ import django.core.exceptions
 from django.forms.utils import ErrorList
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+from bookmarks import dutils
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection \
     , FileSnapshot
 
-import bookmarks.models as bm 
+import bookmarks.models as bm
 
 import django.core.paginator as pag 
 from django.core.handlers.wsgi import WSGIRequest
@@ -319,7 +320,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
     # Overriden from CreateView 
     def form_valid(self, form):
         req: WSGIRequest = self.request
-        url: str = req.POST.get("url")
+        url: str = dutils.clean_search_engine_url(req.POST.get("url"))
         user: AbstractBaseUser = req.user 
         assert url is not None
         try:
@@ -331,6 +332,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
             pass         
         # Set foreign Key owner 
         form.instance.owner = user                 
+        form.instance.url   = dutils.clean_search_engine_url(form.instance.url)
         return super().form_valid(form = form)
 
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
