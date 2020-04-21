@@ -102,7 +102,7 @@
     <div class="div-form-search">
         <form method='GET' action="/items" class="form-group">
         <input type="hidden" name="filter" value="search" /> 
-        <input type='text' name='query' value='{{ request.GET.query }}'>
+        <input id="search-entry-box" type='text' name='query' value='{{ request.GET.query }}'>
         <input class="btn-sm btn-info" type='submit' value="Search">
 
         <!-- Set search mode  -->
@@ -120,5 +120,8 @@
 
 <ul>
     <li><a class="btn-sm btn-primary" href="#" onclick="toggle_items_table_info();">Toggle Details</a></li>
+    <li><span id="keyboard-status">Keyboard Shortcuts Disabled </li>
+    <li>Type Alt + P to toggle keyboard shortcuts.</li>
+    <li>Type '?' question mark to show shortcuts.</li>
 </ul>
 
