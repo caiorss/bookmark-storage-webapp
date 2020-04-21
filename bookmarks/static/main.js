@@ -43,34 +43,10 @@ function DOM_set_visibility(m, flag)
     }        
 } /* -- End of - DOM_toggle() --- */
 
-function localstorage_flag_set(name, value)
-{
-    localStorage.setItem(name, value);
-}
-
-function localstorage_flag_get(name)
-{
-    return JSON.parse(localStorage.getItem(name)) || false;
-}
-
-// Set local storage flag only once, if it is not initialized yet.
-function localstorage_flag_init(name, value)
-{
-    var q = localStorage.getItem(name);
-    if(q == null){
-        localstorage_flag_set(name, value);
-    }
-}
-
-function localstorage_flag_toggle(name)
-{
-    var f = localstorage_flag_get(name);
-    localstorage_flag_set(name, !f);
-}
 
 // Boolean flag ('true' or 'false') stored in html5
-// local storage API. It is useful for storing non critical
-// user preference data on client-side.
+// local storage API. It is useful for storing non critical 
+// user preference data on client-side. 
 function LocalStorageFlag(name, value)
 {
     this.name = name;
@@ -83,12 +59,14 @@ function LocalStorageFlag(name, value)
 
     this.get     = ()      => JSON.parse(localStorage.getItem(this.name)) || false;
     this.set     = (value) => localStorage.setItem(this.name, value);
-    this.toggle  = ()      => this.set(this.get());
+    this.toggle  = ()      => this.set(!this.get());  
 }
 
 // ----------- Keyboard Navigation ------------------ //
 
 navigation_enabled_flag = "navigation_enabled";
+
+flagKeyboardShortcut = new LocalStorageFlag("navigation_enabled", false);
 
 function show_keybind_help()
 {
@@ -99,8 +77,8 @@ function show_keybind_help()
             ,"  => (t) - Toggle sidebar"
             ,"  => (y) - Toggle items information table."
             ," === Items ============================="
-            ," => (h) - Focus on next bookmark"
-            ," => (p) - Focus on previous bookmark"
+            ," => (j) - Focus on previous bookmark"
+            ," => (k) - Focus on next bookmark"            
             ," => (o) - Open Selected bookmark in a new tab and switch to it."
             ," => (i) - Open Selected bookmark in a new tab. (DON'T switch to it)"
             ," === Results Paging ====================="
@@ -125,25 +103,33 @@ function Counter(value, max){
 
 counter = new Counter(-1, 14);
 
+// Shows whether keyboard shortcuts are enabled or disabled.
+function set_keyboard_indicator(flag)
+{
+    var q = document.querySelector("#keyboard-status");
+    q.textContent = flag ? "Keyboard shortcuts enabled" : "Keyboard shortcuts disabled ";
+    q.style.background = flag ? "green" : "black";
+}
+
+function enable_keyboard_shortcut(navigation_enabled)
+{
+    // navigation_enabled = !navigation_enabled;      
+    flagKeyboardShortcut.set(navigation_enabled);
+    set_keyboard_indicator(navigation_enabled);
+}
+
 document.onkeyup = (e) => {
     // for IE to cover IEs window event-object
     var e = e || window.event; 
     var key = String.fromCharCode(e.which);
     console.log(" Pressed keybindind => key = " + key + " ; code = " + e.which);
 
-    var navigation_enabled = localstorage_flag_get(navigation_enabled_flag);
+    var navigation_enabled = flagKeyboardShortcut.get();
 
     // Alt + P for enabling shortcut navigation 
     if(e.altKey && key == 'P') 
     {
-        if(navigation_enabled == false){
-            show_keybind_help();
-        } else {
-            alert(" Keyboard navigation disabled. Ok.")
-        }
-    
-        // navigation_enabled = !navigation_enabled;      
-        localstorage_flag_set(navigation_enabled_flag, !navigation_enabled);
+        enable_keyboard_shortcut(!navigation_enabled);
     }    
     if(navigation_enabled && key == "T") 
     {
@@ -194,7 +180,7 @@ document.onkeyup = (e) => {
     }
     
     // Select previous link 
-    if(navigation_enabled && key == "H") 
+    if(navigation_enabled && key == "J") 
     {
         var links = document.querySelectorAll(".item-bookmark-link");
         var e = links[counter.decrement()];
@@ -205,7 +191,7 @@ document.onkeyup = (e) => {
     }
     
     // Select next link 
-    if(navigation_enabled && key == "J") 
+    if(navigation_enabled && key == "K") 
     {
         var links = document.querySelectorAll(".item-bookmark-link");      
         var e = links[counter.increment()];
@@ -234,18 +220,24 @@ document.onkeyup = (e) => {
         }        
     }    
 
+    if(navigation_enabled && key == "S")
+    {
+        var elem = document.querySelector("#search-entry-box");
+        elem.focus();
+        enable_keyboard_shortcut(false);
+    }
+
 };
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
 
-flag_items_table_visible = "items_table_visible";
+flagItemDetailsVisible = new LocalStorageFlag("itemsTableVisible", true);
 
 document.addEventListener("DOMContentLoaded", () => {
-    localstorage_flag_init(flag_items_table_visible, true);
-
-    var flag = localstorage_flag_get(flag_items_table_visible);
+    var flag = flagItemDetailsVisible.get();
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
+    set_keyboard_indicator(flagKeyboardShortcut.get());
 });
 
 function toggle_sidebar()
@@ -256,8 +248,8 @@ function toggle_sidebar()
 
 function toggle_items_table_info()
 {
-    localstorage_flag_toggle(flag_items_table_visible);
-    var flag = localstorage_flag_get(flag_items_table_visible);
+    flagItemDetailsVisible.toggle();
+    var flag = flagItemDetailsVisible.get();
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
 }
