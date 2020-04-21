@@ -68,6 +68,24 @@ function localstorage_flag_toggle(name)
     localstorage_flag_set(name, !f);
 }
 
+// Boolean flag ('true' or 'false') stored in html5
+// local storage API. It is useful for storing non critical
+// user preference data on client-side.
+function LocalStorageFlag(name, value)
+{
+    this.name = name;
+    this._dummy = (function() {
+        var q = localStorage.getItem(name);
+        if(q == null){
+            localStorage.setItem(name, value);
+        }
+    }());
+
+    this.get     = ()      => JSON.parse(localStorage.getItem(this.name)) || false;
+    this.set     = (value) => localStorage.setItem(this.name, value);
+    this.toggle  = ()      => this.set(this.get());
+}
+
 // ----------- Keyboard Navigation ------------------ //
 
 navigation_enabled_flag = "navigation_enabled";
