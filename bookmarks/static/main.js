@@ -109,14 +109,27 @@ function set_keyboard_indicator(flag)
     var q = document.querySelector("#keyboard-status");
     q.textContent = flag ? "Keyboard shortcuts enabled" : "Keyboard shortcuts disabled ";
     q.style.background = flag ? "green" : "black";
-}
+};
 
 function enable_keyboard_shortcut(navigation_enabled)
 {
     // navigation_enabled = !navigation_enabled;      
     flagKeyboardShortcut.set(navigation_enabled);
     set_keyboard_indicator(navigation_enabled);
-}
+};
+
+
+function isMobileDevice() {
+    try{ 
+         document.createEvent("TouchEvent");
+         //alert('Is mobile device OK');
+         return true; 
+        }
+    catch(e){ 
+        //alert('NOT MOBILE Device');
+        return false;        
+    }
+};
 
 document.onkeyup = (e) => {
     // for IE to cover IEs window event-object
@@ -238,6 +251,13 @@ document.addEventListener("DOMContentLoaded", () => {
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
     set_keyboard_indicator(flagKeyboardShortcut.get());
+
+    var q = document.querySelector("#div-keyboard-status");
+    if(isMobileDevice())
+    {
+        DOM_toggle(q);
+    }
+ 
 });
 
 function toggle_sidebar()
