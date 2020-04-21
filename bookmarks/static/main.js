@@ -77,8 +77,10 @@ function show_keybind_help()
     alert([  " Keyboard Navigation Enabled. Ok "
             ,"\n Keybindings: "
             ,"  => (?) - Show this messagebox"
-            ,"  => (s) - Toggle sidebar"
-            ,"  => (h) - Toggle items information table."
+            ,"  => (t) - Toggle sidebar"
+            ,"  => (y) - Toggle items information table."
+            ,"  => (b) - Show previous 15 results (paging)."
+            ,"  => (n) - Show next 15 results (paging)."            
             ,"  => (1) - Show all items ordered by newest."
             ,"  => (2) - Show all items ordered by oldest."
             ,"  => (3) - List only starred items."
@@ -107,11 +109,11 @@ document.onkeyup = (e) => {
         // navigation_enabled = !navigation_enabled;      
         localstorage_flag_set(navigation_enabled_flag, !navigation_enabled);
     }    
-    if(navigation_enabled && key == "S") 
+    if(navigation_enabled && key == "T") 
     {
         toggle_sidebar();
     }
-    if(navigation_enabled && key == "H") 
+    if(navigation_enabled && key == "Y") 
     {
         toggle_items_table_info();
     }
