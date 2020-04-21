@@ -76,11 +76,19 @@ function show_keybind_help()
 {
     alert([  " Keyboard Navigation Enabled. Ok "
             ,"\n Keybindings: "
+            ," === General ==========================="
             ,"  => (?) - Show this messagebox"
             ,"  => (t) - Toggle sidebar"
             ,"  => (y) - Toggle items information table."
+            ," === Items ============================="
+            ," => (h) - Focus on next bookmark"
+            ," => (p) - Focus on previous bookmark"
+            ," => (o) - Open Selected bookmark in a new tab and switch to it."
+            ," => (i) - Open Selected bookmark in a new tab. (DON'T switch to it)"
+            ," === Results Paging ====================="
             ,"  => (b) - Show previous 15 results (paging)."
             ,"  => (n) - Show next 15 results (paging)."            
+            ," === Pages =============================="
             ,"  => (1) - Show all items ordered by newest."
             ,"  => (2) - Show all items ordered by oldest."
             ,"  => (3) - List only starred items."
@@ -88,6 +96,16 @@ function show_keybind_help()
             ,"  => (5) - List music bookmarks."
           ].join("\n"));
 }
+
+function Counter(value, max){
+    this.value = value;
+    this.max   = max;
+    this.get = () => this.value;
+    this.increment = () => { if(this.value < max) this.value++; return this.value; }
+    this.decrement = () => { if(this.value > 0  ) this.value--; return this.value; }
+}
+
+counter = new Counter(-1, 14);
 
 document.onkeyup = (e) => {
     // for IE to cover IEs window event-object
@@ -155,6 +173,47 @@ document.onkeyup = (e) => {
         window.location.href = "/search/list";
     }
     
+    // Select previous link 
+    if(navigation_enabled && key == "H") 
+    {
+        var links = document.querySelectorAll(".item-bookmark-link");
+        var e = links[counter.decrement()];
+        e.focus();
+        //counter.decrement();        
+        //console.log(" [TRACE] current item = " + counter.get());
+        //if(current_item < links.length){ current_item = current_item + 1; }
+    }
+    
+    // Select next link 
+    if(navigation_enabled && key == "J") 
+    {
+        var links = document.querySelectorAll(".item-bookmark-link");      
+        var e = links[counter.increment()];
+        e.focus();
+        //counter.increment();
+        //console.log(" [TRACE] current item = " + counter.get());
+    }
+
+    // Open current bookmark when user types 'O'
+    if(navigation_enabled && key == "O") 
+    {
+        var elem = document.activeElement;
+        if(elem.className == "item-bookmark-link")
+        {
+            var win = window.open(elem.href, '_blank');
+            win.focus();
+        }        
+    }    
+    // Open current bookmark when user types 'O'
+    if(navigation_enabled && key == "I") 
+    {
+        var elem = document.activeElement;
+        if(elem.className == "item-bookmark-link")
+        {
+            var win = window.open(elem.href, '_blank');
+        }        
+    }    
+
 };
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
