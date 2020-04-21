@@ -121,6 +121,20 @@ document.onkeyup = (e) => {
     {
         show_keybind_help();
     }
+
+    // Show next page 
+    if(navigation_enabled && key == "N") 
+    {
+        var q = document.querySelector("#page-next-button");
+        if(q != null) window.location.href = q.href;
+    }
+
+    // Show previous page 
+    if(navigation_enabled && key == "B") 
+    {
+        var q = document.querySelector("#page-prev-button");
+        if(q != null) window.location.href = q.href;
+    }
     
     if(navigation_enabled && key == "1") 
     {
