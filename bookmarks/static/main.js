@@ -23,17 +23,25 @@ function DOM_toggle(m)
     }        
 } /* -- End of - DOM_toggle() --- */
 
-function toggle_sidebar()
-{
-    var s = DOM_select(".sidebar");
-    DOM_toggle(s);
-}
 
-function toggle_items_table_info()
+// Set visibility of DOM element 
+function DOM_set_visibility(m, flag)
 {
-    var obs = document.querySelectorAll(".item-table-info");
-    obs.forEach(DOM_toggle);
-}
+    if(m == null){ alert(" Error: element not found");  }
+    var d = m.style.display;
+    var v = window.getComputedStyle(m);
+    // if(m.style.visibility == "" || m.style.visibility == "visible")
+    if(flag == true)
+    {
+        console.log(" [TRACE] => Hide element");
+        m.style.visibility = "hidden";
+        m.style.display = "none";
+    } else {
+        console.log(" [TRACE] => Show element");
+        m.style.visibility = "visible";
+        m.style.display = "block";
+    }        
+} /* -- End of - DOM_toggle() --- */
 
 function localstorage_flag_set(name, value)
 {
@@ -45,6 +53,20 @@ function localstorage_flag_get(name)
     return JSON.parse(localStorage.getItem(name)) || false;
 }
 
+// Set local storage flag only once, if it is not initialized yet.
+function localstorage_flag_init(name, value)
+{
+    var q = localStorage.getItem(name);
+    if(q == null){
+        localstorage_flag_set(name, value);
+    }
+}
+
+function localstorage_flag_toggle(name)
+{
+    var f = localstorage_flag_get(name);
+    localstorage_flag_set(name, !f);
+}
 
 // ----------- Keyboard Navigation ------------------ //
 
@@ -118,3 +140,31 @@ document.onkeyup = (e) => {
     }
     
 };
+
+// ---- Executed after document (DOM objects) is loaded ---------- //
+
+flag_items_table_visible = "items_table_visible";
+
+document.addEventListener("DOMContentLoaded", () => {
+    localstorage_flag_init(flag_items_table_visible, true);
+
+    var flag = localstorage_flag_get(flag_items_table_visible);
+    var obs = document.querySelectorAll(".item-details");
+    obs.forEach(x => DOM_set_visibility(x, flag));    
+});
+
+function toggle_sidebar()
+{
+    var s = DOM_select(".sidebar");
+    DOM_toggle(s);
+}
+
+function toggle_items_table_info()
+{
+    localstorage_flag_toggle(flag_items_table_visible);
+    var flag = localstorage_flag_get(flag_items_table_visible);
+    var obs = document.querySelectorAll(".item-details");
+    obs.forEach(x => DOM_set_visibility(x, flag));    
+}
+
+
