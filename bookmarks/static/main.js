@@ -130,6 +130,8 @@ document.onkeyup = (e) => {
     if(navigation_enabled && key == "T") 
     {
         toggle_sidebar();
+        var q = document.querySelector(".sidebar-nav a")
+        q.focus();
     }
     if(navigation_enabled && key == "Y") 
     {
