@@ -240,6 +240,12 @@ document.onkeyup = (e) => {
         enable_keyboard_shortcut(false);
     }
 
+    // Shortcut for adding new item.
+    // 187 is the code of character '='
+    if(navigation_enabled && e.which ==  187)
+    {
+        window.location.href = "/items/new";
+    }
 };
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
