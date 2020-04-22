@@ -5,7 +5,7 @@
     {% for savedsearch in object_list %}
         
     <div class = "well item ">   
-        <a href="/items?filter=search&query={{ savedsearch.search|urlencode }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
+        <a class="item-bookmark-link" href="/items?filter=search&query={{ savedsearch.search|urlencode }}" title="{{ savedsearch.description }}" > {{ savedsearch.search }} </a>
         <p> {{ savedsearch.description }} </p>
     </div>                            
     {% endfor %}
