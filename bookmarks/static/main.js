@@ -244,7 +244,9 @@ document.onkeyup = (e) => {
     // 187 is the code of character '='
     if(navigation_enabled && e.which ==  187)
     {
+        enable_keyboard_shortcut(false);
         window.location.href = "/items/new";
+        
     }
 };
 
