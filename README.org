@@ -1,0 +1,14 @@
+* Django Bookmarks Server - Web Application 
+
+   + This project is a Django web application for storing websites
+     bookmarks and files and accessing them anywhere on any device
+     from any computer.
+
+   + Features:
+     + Multiple user accounts 
+     + Bookmark Search
+     + Saved Search  => Search can be saved and replayed. 
+     + Collections
+     + Tags
+     + Mobile Resposive Design => Works on tablets, phones and devices
+       with small screens.
