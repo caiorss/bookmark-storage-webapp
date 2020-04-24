@@ -140,7 +140,7 @@ document.onkeyup = (e) => {
     var navigation_enabled = flagKeyboardShortcut.get();
 
     // Alt + P for enabling shortcut navigation 
-    if(e.altKey && key == 'P') 
+    if(e.which == 27) 
     {
         enable_keyboard_shortcut(!navigation_enabled);
     }    
