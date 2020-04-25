@@ -172,7 +172,12 @@ class SiteBookmark(models.Model):
         self.save()
 
     def __str__(self):
-        return "title = {title} ; url = {url}".format(title = self.title, url = self.url)
+        return f""" 
+           id = {self.id}     
+        / title = '{self.title}' 
+        ; url   = '{self.url}'
+        """
+        #return "title = {title} ; url = {url}".format(title = self.title, url = self.url)
 
     def get_absolute_url(self):
         return reverse('bookmarks:book_edit', kwargs={'pk': self.pk})
