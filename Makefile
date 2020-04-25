@@ -37,11 +37,23 @@ docker-build:
 # Run docker Image container
 # The server URL will be the URL: http://localhost:9000/
 docker-run: 
-	docker run --detach --rm -p 9000:8000 --name django-server django-bookmark-server
+	docker volume create django-server-volume 
+	docker run --detach --rm \
+		-p 9000:9000 \
+		-v django-server-volume:/app/data \
+		--name django-server \
+		django-bookmark-server
 
 # Stop docker image container 
 docker-stop:
 	docker rm -f django-server
+
+docker-restart:
+	docker rm -f django-server \
+		|| docker run --detach --rm -p 9000:9000 -v django-server-volume:/app/data --name django-server django-bookmark-server
+
+docker-shell: 
+	docker run --rm -it --entrypoint=sh -v django-server-volume:/app/data  django-bookmark-server
 
 # Remove container and image 
 docker-clean:
