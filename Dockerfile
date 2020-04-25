@@ -3,22 +3,43 @@
 #
 #  https://medium.com/c0d1um/building-django-docker-image-with-alpine-32de65d2706
 
-# Docker i mage based on Debian SLIM 
-FROM python:3.7-alpine 
+# Docker i mage based on Debian SLIM
+FROM python:3.7-alpine
+
+#------------- Dependencies ----------------------------#
 
 # Create a group and user to run our app
 #ARG APP_USER=appuser
 #RUN groupadd -r ${APP_USER} && useradd --no-log-init -r -g ${APP_USER} ${APP_USER}
 
-RUN mkdir /app 
-WORKDIR   /app 
-ADD .     /app 
-
 RUN apk add --no-cache --virtual .build-deps \
     ca-certificates gcc postgresql-dev linux-headers musl-dev \
-    libffi-dev jpeg-dev zlib-dev \
-    && pip install -r requirements.txt
+    libffi-dev jpeg-dev zlib-dev
 
-EXPOSE 8000:8000 
+#--------------- App Settings --------------------------#
+
+# Install Requiremenets
+COPY requirements.txt  /tmp
+RUN pip install -r /tmp/requirements.txt 
+
+
+# RUN mkdir /app
+WORKDIR   /app
+ADD .     /app
+
+# Database setup SQLite 3 default.
+RUN python manage.py makemigrations \
+    && python manage.py makemigrations bookmarks \
+    && python manage.py migrate --run-syncdb
+
+# Create default administrator user with
+#  =>> login:    admin 
+#  =>> email:    root@gmail.com
+#  =>> password: admin
+#
+# It can be changed later by accessing: http://localhost:9000/admin
+RUN python manage.py initadmin 
+
+EXPOSE 8000:8000
 
 CMD ["python3", "/app/manage.py", "runserver", "0.0.0.0:8000"]
