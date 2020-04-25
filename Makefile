@@ -11,19 +11,19 @@ shell:
 # Update Database 
 db:
 	mkdir -p back/
-	cp -a db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
+	cp -v -a data/db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
 	${PYTHON} manage.py makemigrations bookmarks
 	${PYTHON} manage.py migrate --run-syncdb
 
 # Database backup 
 db-back:
 	mkdir -p back/
-	cp -v db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
+	cp -v data/db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
 
 # Reset dabase
 db-reset:
 	mkdir -p back/
-	cp -a db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
+	cp -v -a db.sqlite3 back/db.sqlite3.back-$(shell date +"%m-%d-%y-%s")
 	rm -rf db.sqlite3 
 	${PYTHON} manage.py makemigrations bookmarks
 	${PYTHON} manage.py migrate --run-syncdb
@@ -32,14 +32,24 @@ db-reset:
 
 # Build Docker Image 
 docker-build: 
-	docker build . -t django-crud
+	docker build . -t django-bookmark-server
 
-# Run docker Image 
+# Run docker Image container
+# The server URL will be the URL: http://localhost:9000/
 docker-run: 
-	docker run --detach --rm -p 8000:8000 --name django-container django-crud 
+	docker run --detach --rm -p 9000:8000 --name django-server django-bookmark-server
 
+# Stop docker image container 
+docker-stop:
+	docker rm -f django-server
+
+# Remove container and image 
+docker-clean:
+	docker rm -f django-server || docker image rm django-bookmark-server
+
+# Show container logs
 docker-log: 
-	docker logs  django-container 			
+	docker logs -f  django-server
 
 exe: 
 	pyinstaller --name=bookmark-django ./manage.py
