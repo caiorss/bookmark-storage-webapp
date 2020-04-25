@@ -246,8 +246,14 @@ def update_item_from_metadata(itemID: int):
     # , it is set to "" (empty string)
     title: str = getattr( soup.find("title"), "text", "")
     
+    # Extract tag <meta name='description' content="Website description here ...." />
     m = soup.find("meta", attrs={'name': 'description'})             
     brief: str = m["content"] if m is not None else ""
+
+    url: str = b.url
+    if "stackoverflow.com/questions" in url:
+        m = soup.find("meta", attrs={'name': 'twitter:description'})         
+        brief: str = m["content"] if m is not None else ""        
 
     b.title = title 
     b.brief = brief 
