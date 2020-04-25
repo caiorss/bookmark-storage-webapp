@@ -1,0 +1,16 @@
+version: '3'
+
+volumes:
+  app-data:
+    driver: local 
+ 
+# Image built from Dockerfile 
+services:
+  django-bm-server:
+    build: . 
+    #dockerfile: Dockefile 
+
+    ports:
+      - "9000:9000"
+    volumes:
+      - app-data:/app/data
