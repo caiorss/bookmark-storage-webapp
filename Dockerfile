@@ -22,8 +22,7 @@ RUN apk add --no-cache --virtual .build-deps \
 COPY requirements.txt  /tmp
 RUN pip install -r /tmp/requirements.txt 
 
-
-# RUN mkdir /app
+RUN mkdir -p /app/data/files 
 WORKDIR   /app
 ADD .     /app
 
@@ -40,6 +39,9 @@ RUN python manage.py makemigrations \
 # It can be changed later by accessing: http://localhost:9000/admin
 RUN python manage.py initadmin 
 
-EXPOSE 8000:8000
+# Persistence of database (SQLite3) and user downloaded files.
+### VOLUME [ "/app/data" ]
 
-CMD ["python3", "/app/manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 9000:9000
+
+ENTRYPOINT ["python3", "/app/manage.py", "runserver", "0.0.0.0:9000"]
