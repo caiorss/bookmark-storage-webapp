@@ -7,6 +7,7 @@ import django.shortcuts as ds
 import django.core.exceptions
 from django.forms.utils import ErrorList
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+import socket 
 
 from bookmarks import dutils
 
@@ -228,15 +229,16 @@ def update_item_from_metadata(itemID: int):
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     try:
         req = urllib.request.Request(
-            b.url, 
-            data=None, 
+            b.url,             
+            data=None,             
             headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
         })
-        page = urllib.request.urlopen(req)
+        page = urllib.request.urlopen(req, timeout = 4)
         #page = urllib.request.urlopen(b.url)
-    except urllib.error.URLError as ex:          
-        return django.http.HttpResponseBadRequest("Error: urrlib Exception = {}".format(ex))        
+    except (urllib.error.URLError, socket.timeout) as ex:          
+        return django.http.HttpResponseBadRequest("Error: Exception = {}".format(ex))        
+    
 
     soup = bs4.BeautifulSoup(page, features = "lxml")
 
