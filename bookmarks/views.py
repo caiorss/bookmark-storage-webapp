@@ -96,6 +96,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("doctype",  self.filter_doctype)
         self.add_filter("search",  self.filter_search)
         self.add_filter("domain", self.filter_domain)
+        self.add_filter("collection", self.filter_collection)
         return self 
 
     def add_filter(self, view: str, callback):
@@ -125,6 +126,17 @@ class BookmarksList(LoginRequiredMixin, ListView):
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
         return context
+
+    #---------- Utility methods  -------------------------------#
+
+    # Get query parameter as Integer
+    def query_param_as_int(self, param: str):
+        a0: str = self.request.GET.get(param)
+        if not a0: 
+            raise ds.Http404("Error: expected number for parameter A0, but got empty parameter")
+        if a0.isnumeric:
+            return int(a0)
+        raise ds.Http404("Error: expected number for parameter A0")            
 
     #--------- Callbacks / Query Filters -----------------------#
 
@@ -169,6 +181,11 @@ class BookmarksList(LoginRequiredMixin, ListView):
                    .exclude(deleted = True)\
                    .filter(owner = self.request.user).order_by("id").reverse()
 
+    def filter_collection(self):
+        coll_id: int = self.query_param_as_int("A0")
+        c: Collection = ds.get_object_or_404(Collection, id = coll_id)
+        return c.item.all()
+
     def filter_search(self):
         search = self.request.GET.get('query')
         mode   = self.request.GET.get('mode', "")
@@ -185,6 +202,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         q2 = reduce(lam, [ Q(title__contains=w) for w in words])
         return self.model.objects.filter(owner = self.request.user)\
             .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
+
 
 
 

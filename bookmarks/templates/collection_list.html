@@ -9,7 +9,7 @@
     {% for collection in object_list %}
     
     <div class = "well item ">   
-        <a target="_blank" href="/items?collection={{ collection.id }}" title="{{ collection.description }}" > {{ collection.title }} </a>
+        <a target="_blank" href="/items?filter=collection&A0={{ collection.id }}" title="{{ collection.description }}" > {{ collection.title }} </a>
         <p> {{ collection.description }} </p>
     </div>                            
     {% endfor %}
