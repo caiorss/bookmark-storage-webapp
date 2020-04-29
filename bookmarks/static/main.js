@@ -52,21 +52,55 @@ function LocalStorageFlag(name, value)
     this.name = name;
     this._dummy = (function() {
         var q = localStorage.getItem(name);
-        if(q == null){
+        if(q == null || q == "undefined" ){
             localStorage.setItem(name, value);
         }
     }());
 
-    this.get     = ()      => JSON.parse(localStorage.getItem(this.name)) || false;
+    this.get     = () => {
+        var result = localStorage.getItem(this.name);
+        if(result == "undefined") { 
+            this.set(false);
+            return false;            
+        }
+        return JSON.parse(result) || false;
+    };
     this.set     = (value) => localStorage.setItem(this.name, value);
-    this.toggle  = ()      => this.set(!this.get());  
-}
+    this.toggle  = ()      => { this.set(!this.get()); return this.get(); }
+};
+
+
+
+
 
 // ----------- Keyboard Navigation ------------------ //
 
 navigation_enabled_flag = "navigation_enabled";
 
 flagKeyboardShortcut = new LocalStorageFlag("navigation_enabled", false);
+
+
+function KeyDispatcher() {
+    this._disp = {};
+    this._toggle_key_code = 27; /* ESC */
+
+    this.add_key = (keycode, callback) => {  this._disp[keycode] = callback; };
+
+    this.process_key = (e) => {
+	if(e.which == this._toggle_key_code)
+	    enable_keyboard_shortcut(flagKeyboardShortcut.toggle());
+	    
+	console.log(" [TRACE] User typed key = " + e.which);
+	var callback = this._disp[e.which];
+	if(flagKeyboardShortcut.get() && callback != null){ callback(); }
+    };
+    
+    this._ctor = (() => {
+	                  document.onkeyup = this.process_key;
+	                  console.log(" [TRACE] Constructed OK.");
+			})();
+}
+
 
 function show_keybind_help()
 {
@@ -131,124 +165,88 @@ function isMobileDevice() {
     }
 };
 
-document.onkeyup = (e) => {
-    // for IE to cover IEs window event-object
-    var e = e || window.event; 
-    var key = String.fromCharCode(e.which);
-    console.log(" Pressed keybindind => key = " + key + " ; code = " + e.which);
+kdb = new KeyDispatcher();
+kdb.add_key(84 /* t */,() => {
+    // console.log(" [TRACE] Toggle menu bar.");
+     toggle_sidebar();
+     var q = document.querySelector(".sidebar-nav a")
+     q.focus();    
+});
 
-    var navigation_enabled = flagKeyboardShortcut.get();
+kdb.add_key(89 /* y */, toggle_items_table_info);
+kdb.add_key(191 /* '/' forward slash */, show_keybind_help);
 
-    // Alt + P for enabling shortcut navigation 
-    if(e.which == 27) 
-    {
-        enable_keyboard_shortcut(!navigation_enabled);
-    }    
-    if(navigation_enabled && key == "T") 
-    {
-        toggle_sidebar();
-        var q = document.querySelector(".sidebar-nav a")
-        q.focus();
-    }
-    if(navigation_enabled && key == "Y") 
-    {
-        toggle_items_table_info();
-    }
+kdb.add_key(78 /* n */, () => {
+    var q = document.querySelector("#page-next-button");
+    if(q != null) window.location.href = q.href;
+});
 
-    // User types: (?) question mark key.
-    if(navigation_enabled && e.which == 191) 
-    {
-        show_keybind_help();
-    }
+kdb.add_key(66 /* b */, () => {
+    var q = document.querySelector("#page-prev-button");
+    if(q != null) window.location.href = q.href;
 
-    // Show next page 
-    if(navigation_enabled && key == "N") 
-    {
-        var q = document.querySelector("#page-next-button");
-        if(q != null) window.location.href = q.href;
-    }
+});
 
-    // Show previous page 
-    if(navigation_enabled && key == "B") 
+// Show latest or newest added bookmarks
+kdb.add_key(49 /* 1 */, () => {
+    window.location.href = "/items?filter=latest";
+});
+
+kdb.add_key(50 /* 2 */, () => {
+    window.location.href = "/items?filter=oldest";
+});
+
+kdb.add_key(50 /* 3 */, () => {
+    window.location.href = "/items?filter=starred";;
+});
+
+kdb.add_key(51 /* 4 */, () => {
+    window.location.href = "/search/list";
+});
+
+// Select previous link 
+kdb.add_key(74 /* j */, () => {
+    var links = document.querySelectorAll(".item-bookmark-link");
+    var e = links[counter.decrement()];
+    e.focus();
+    //counter.decrement();        
+    //console.log(" [TRACE] current item = " + counter.get());
+    //if(current_item < links.length){ current_item = current_item + 1; }   
+});
+
+kdb.add_key(75 /* k */, () => {
+    var links = document.querySelectorAll(".item-bookmark-link");      
+    var e = links[counter.increment()];
+    e.focus();
+    //counter.increment();
+    //console.log(" [TRACE] current item = " + counter.get());
+});
+
+// Open current bookmark when user types 'O'
+kdb.add_key(79 /* o */, () => {
+    var elem = document.activeElement;
+    if(elem.className == "item-bookmark-link")
     {
-        var q = document.querySelector("#page-prev-button");
-        if(q != null) window.location.href = q.href;
-    }
+        var win = window.open(elem.href, '_blank');
+        win.focus();
+    }        
+});
+
+// Open current bookmark when user types 'O'
+kdb.add_key(83 /* s */, () => {
+    var elem = document.querySelector("#search-entry-box");
+    elem.focus();
+    enable_keyboard_shortcut(false);    
+});
+
+// Shortcut for adding new item.
+kdb.add_key(187 /* + */, () => {
+    enable_keyboard_shortcut(false);
+    window.location.href = "/items/new";
     
-    if(navigation_enabled && key == "1") 
-    {
-        window.location.href = "/items?filter=latest";
-    }
-    if(navigation_enabled && key == "2") 
-    {
-        window.location.href = "/items?filter=oldest";
-    }
-    if(navigation_enabled && key == "3") 
-    {
-        window.location.href = "/items?filter=starred";
-    }
-    if(navigation_enabled && key == "4") 
-    {
-        window.location.href = "/search/list";
-    }
-    
-    // Select previous link 
-    if(navigation_enabled && key == "J") 
-    {
-        var links = document.querySelectorAll(".item-bookmark-link");
-        var e = links[counter.decrement()];
-        e.focus();
-        //counter.decrement();        
-        //console.log(" [TRACE] current item = " + counter.get());
-        //if(current_item < links.length){ current_item = current_item + 1; }
-    }
-    
-    // Select next link 
-    if(navigation_enabled && key == "K") 
-    {
-        var links = document.querySelectorAll(".item-bookmark-link");      
-        var e = links[counter.increment()];
-        e.focus();
-        //counter.increment();
-        //console.log(" [TRACE] current item = " + counter.get());
-    }
+});
 
-    // Open current bookmark when user types 'O'
-    if(navigation_enabled && key == "O") 
-    {
-        var elem = document.activeElement;
-        if(elem.className == "item-bookmark-link")
-        {
-            var win = window.open(elem.href, '_blank');
-            win.focus();
-        }        
-    }    
-    // Open current bookmark when user types 'O'
-    if(navigation_enabled && key == "I") 
-    {
-        var elem = document.activeElement;
-        if(elem.className == "item-bookmark-link")
-        {
-            var win = window.open(elem.href, '_blank');
-        }        
-    }    
 
-    if(navigation_enabled && key == "S")
-    {
-        var elem = document.querySelector("#search-entry-box");
-        elem.focus();
-        enable_keyboard_shortcut(false);
-    }
-
-    // Shortcut for adding new item.
-    // 187 is the code of character '='
-    if(navigation_enabled && e.which ==  187)
-    {
-        enable_keyboard_shortcut(false);
-        window.location.href = "/items/new";
-        
-    }
-};
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
 
