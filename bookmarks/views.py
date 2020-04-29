@@ -381,14 +381,11 @@ class BookmarkDelete(LoginRequiredMixin, DeleteView):
 
 class SavedSearchList(LoginRequiredMixin, ListView):
     template_name = "savedsearch_list.html"
-    #model = SavedSearch
-    # queryset = SavedSearch.objects.order_by(Lower("search")) #.filter( owner = request.user)
-    # paginate_by = 4
+
     def get_queryset(self):
+        # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
         user: AbstractBaseUser = self.request.user
-        if user.is_superuser:
-            return SavedSearch.objects.filter(owner__isnull = True).order_by(Lower("search"))
-        return SavedSearch.objects.filter(owner = user).order_by(Lower("search"))
+        return SavedSearch.objects.filter(owner = user).order_by(Lower("search"))            
 
 class SavedSearchCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
