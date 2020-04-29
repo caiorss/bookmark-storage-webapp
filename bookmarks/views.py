@@ -247,7 +247,7 @@ def update_item_from_metadata(itemID: int):
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     try:
         req = urllib.request.Request(
-            b.url,             
+            urllib.parse.quote(b.url, safe=':/'),             
             data=None,             
             headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
