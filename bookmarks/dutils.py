@@ -48,6 +48,8 @@ def download_file(url: str):
 
 
 def clean_search_engine_url(url: str):
+
+def remove_url_obfuscation(url: str):
     """Clean URLs obfuscated by search engines."""
 
     # Remove google search engine obfuscated URLs.

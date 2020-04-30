@@ -346,7 +346,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
     # Overriden from CreateView 
     def form_valid(self, form):
         req: WSGIRequest = self.request
-        url: str = dutils.clean_search_engine_url(req.POST.get("url"))
+        url: str = dutils.remove_url_obfuscation(req.POST.get("url"))
         user: AbstractBaseUser = req.user 
         assert url is not None
         try:
@@ -358,7 +358,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
             pass         
         # Set foreign Key owner 
         form.instance.owner = user                 
-        form.instance.url   = dutils.clean_search_engine_url(form.instance.url)
+        form.instance.url   = dutils.remove_url_obfuscation(form.instance.url)
         return super().form_valid(form = form)
 
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
