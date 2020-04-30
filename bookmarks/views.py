@@ -266,7 +266,7 @@ def update_item_from_metadata(itemID: int):
     
     # Extract tag <meta name='description' content="Website description here ...." />
     m = soup.find("meta", attrs={'name': 'description'})             
-    brief: str = m["content"] if m is not None else ""
+    brief: str = m.get("content") if m is not None else ""
 
     url: str = b.url
     if "stackoverflow.com/questions" in url:
