@@ -47,8 +47,6 @@ def download_file(url: str):
                          , fileData = f_data  )
 
 
-def clean_search_engine_url(url: str):
-
 def remove_url_obfuscation(url: str):
     """Clean URLs obfuscated by search engines."""
 
