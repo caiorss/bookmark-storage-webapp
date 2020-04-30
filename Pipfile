@@ -12,6 +12,7 @@ mypy = "*"
 bs4     = "*"
 Django  = "*"
 lxml    = "*"
+django-pdb = "*"
 
 [requires]
 python_version = "3.7"

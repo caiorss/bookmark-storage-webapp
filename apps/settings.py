@@ -41,10 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #'theme',
+    # Main app 
     'bookmarks',
-    #'books_fbv',
-    #'books_fbv_user',    
+    
+    # DJango-pdb: note - require installing
+    # $ pip install django-pdb
+    # Reference: https://github.com/HassenPy/django-pdb
+    'django_pdb'
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # DJango-pdb: note - require installing
+    # $ pip install django-pdb
+    # Reference: https://github.com/HassenPy/django-pdb
+    'django_pdb.middleware.PdbMiddleware',
+
 ]
+
+# Call Pdb() on exception =>> See: https://github.com/HassenPy/django-pdb
+POST_MORTEN = True 
 
 ROOT_URLCONF = 'apps.urls'
 
