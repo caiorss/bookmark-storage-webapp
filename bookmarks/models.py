@@ -200,7 +200,7 @@ class SiteBookmark(models.Model):
         return any(map(lambda x: self.url.endswith(x), doclist))    
 
     def modifiedURL(self):
-        if self.url.endswith(".pdf"):
+        if self.isDocumentFile():
             # print(" [TRACE] File is PDF url = {url} ".format(url = self.url))
             return "https://docs.google.com/viewer?url=" + self.url
         return self.url

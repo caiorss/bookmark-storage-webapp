@@ -45,12 +45,6 @@
                   <a class="btn-sm btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive</a>                           
               {% endif %}
 
-              {% comment %}
-                {%if bookmark.isDocumentFile %}
-                  <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > <img src="{% static "gdriver.png" %}"> </a>
-                {% endif %}
-              {% endcomment %}
-
               <a class="btn-sm btn-primary" title="Save page to web archive (Wayback Machine)" 
                 target="_blank" href="http://web.archive.org/save/{{ bookmark.url }}">WebArchive</a>
 
@@ -63,7 +57,16 @@
                             href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
                     </li>
                   {% endif %}
-                </ul>  
+                  
+              {%if bookmark.isDocumentFile %}
+              <li>
+                <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
+                  <img src="/static/gdriver.png"> 
+                </a>
+              </li>
+              {% endif %}
+
+              </ul>  
 
             <table class="item-table-info">
                 <tr>
