@@ -16,6 +16,9 @@ import hashlib
 import ssl 
 import re 
 
+# Constant:
+DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
     fileName:     str 
@@ -27,9 +30,7 @@ def download_file(url: str):
     req = urllib.request.Request(
         url, 
         data=None, 
-        headers={
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-    })
+        headers={ 'User-Agent': DEFAULT_USER_AGENT })
     # Ignore SSL verification for downloading file in any case 
     context = ssl._create_unverified_context()
 
