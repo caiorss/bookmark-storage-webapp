@@ -96,6 +96,7 @@ h5 { color: white }
   background-color: #000;
 }
 
+
 #top-panel{
     background: #4e4e50;
     border-radius: 25px;
@@ -184,6 +185,33 @@ h5 { color: white }
 }
 
 
+/** --------- Action Menu Table Style  -----------*/
+
+   .action-menu-table {
+    font-family: 'Courier New', Courier, monospace;
+    border-spacing: 5px;
+    width: 250px;
+    margin-top: 10px; 
+    
+    border-radius: 1em;
+    overflow: hidden;
+    background:#333 
+
+
+}
+
+.action-menu-table th, td { 
+    width:  200px;               
+    padding:5px 
+              
+ } 
+
+.action-menu-table a {
+  font-size: 10pt;
+  width: 100%;
+  display: block;
+  background-color: dimgray;
+}
 
   /** =============== Mobile-specific Style ================ */
   @media only screen and (max-width: 960px) 

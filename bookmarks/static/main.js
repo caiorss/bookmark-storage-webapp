@@ -71,8 +71,6 @@ function LocalStorageFlag(name, value)
 
 
 
-
-
 // ----------- Keyboard Navigation ------------------ //
 
 navigation_enabled_flag = "navigation_enabled";
@@ -259,10 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
     set_keyboard_indicator(flagKeyboardShortcut.get());
 
     var q = document.querySelector("#div-keyboard-status");
-    if(isMobileDevice())
-    {
-        DOM_toggle(q);
-    }
+    if(isMobileDevice()){ DOM_toggle(q); }
+
+    var elem_item_detail = document.querySelector("#item-details");
+    
  
 });
 
@@ -280,4 +278,14 @@ function toggle_items_table_info()
     obs.forEach(x => DOM_set_visibility(x, flag));    
 }
 
+function toggle_action_menu(actionID)
+{
+    var elem = document.querySelector(actionID);
+    DOM_toggle(elem);
+}
 
+function open_url_newtab(url)
+{
+    var win = window.open(url, '_blank');
+    win.focus();
+}
