@@ -196,7 +196,7 @@ class SiteBookmark(models.Model):
 
     
     def isDocumentFile(self):
-        doclist = ['.pdf', '.docx', 'doc', '.ppt', '.pptx', '.ps']
+        doclist = ['.pdf', '.docx', 'doc', '.ppt', '.pptx', '.ps', ".odp", ".odx"]
         return any(map(lambda x: self.url.endswith(x), doclist))    
 
     def modifiedURL(self):
