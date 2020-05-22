@@ -242,15 +242,19 @@ def video_toggle(request: WSGIRequest):
     return ds.redirect( redirect_url ) 
 
 def update_item_from_metadata(itemID: int):  
-    b: SiteBookmark = SiteBookmark.objects.get(id = itemID)
+    b: SiteBookmark = SiteBookmark.objects.get(id = itemID)    
+    # URL with obfuscation removed 
+    real_url: str = dutils.remove_url_obfuscation(b.url)
+    print(f" [TRACE] real_url = { real_url }")    
+
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     try:
         req = urllib.request.Request(
-            urllib.parse.quote(b.url, safe=':/'),             
-            data=None,             
-            headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+              real_url
+            , data=None
+            , headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
         })
         page = urllib.request.urlopen(req, timeout = 4)
         #page = urllib.request.urlopen(b.url)
@@ -273,6 +277,7 @@ def update_item_from_metadata(itemID: int):
         m = soup.find("meta", attrs={'name': 'twitter:description'})         
         brief: str = m["content"] if m is not None else ""        
 
+    b.url   = real_url
     b.title = title 
     b.brief = brief 
     b.save()
