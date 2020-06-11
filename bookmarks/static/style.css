@@ -11,6 +11,27 @@
    
   }
 
+/*  Change global style with 
+ * 
+ *  let root = document.documentElement;
+ *  root.style.setProperty("--background-color", "gree")
+ *  
+ */  
+:root {
+    --main-background-color:  #3c3c3c; 
+    --foreground-color:       white;
+    --item-background-color:  #2f2f2f;
+
+    --hyperlink-color:    lightskyblue;
+
+    --left-row-label-color:  #1b1b1b;
+    --right-row-label-color: black;
+
+    --btn-primary-bgcolor: #007bff;
+    
+}
+
+
 #the-canvas {
     border: 1px solid black;
     direction: ltr;
@@ -19,18 +40,19 @@
   }
 
 body { 
-    background-color: #3c3c3c; 
-    color:            white;
+    background-color: var(--main-background-color);
+    color:           var(--foreground-color);
     font-family:     'Lato', sans-serif;  
 }
-a { color: lightskyblue }
+
+a { color: var(--hyperlink-color); }
 
 .item_div a {
     font-weight: bold;
 }
 
 p { 
-    color:      white; 
+    color:     var(--foreground-color); 
     font-family: unknown_font;
     font-size: 10pt;
     font-weight: 400;
@@ -49,14 +71,14 @@ h4 { color: white }
 h5 { color: white }
 
 .item { 
-    background-color: #2f2f2f;
+    background-color: var(--item-background-color);
     display: block;
     position: relative;
     border: 8px solid #666;
     border-radius: 30px;
     margin-top: 1%;
     max-width: 95%;
-    background-color: #3f3f3f;
+    /* background-color: #3f3f3f; */
     /* border-color: black; */
     border: 1px solid #607D8B;
     padding: 2%                
@@ -81,21 +103,24 @@ h5 { color: white }
 
     border-radius: 1em;
     overflow: hidden;
-    background:#333
+    background: var(--item-background-color);
   
 }
 
  th, td { 
     width:150px;               
-     padding:5px 
-              
+    padding:5px;
+    background-color: var(--left-row-label-color);              
  } 
 
 .row-label {
   text-align:right ;
-  background-color: #000;
+  background-color: var(--right-row-label-color);
 }
 
+.btn-primary {
+    background-color: var(--btn-primary-bgcolor);
+}
 
 #top-panel{
     background: #4e4e50;
@@ -184,10 +209,16 @@ h5 { color: white }
     transition: background 0.5s;
 }
 
+.kbd-status {
+    background-color: #d8ff46;
+    color: blue;
+    display: block;
+}
+
 
 /** --------- Action Menu Table Style  -----------*/
 
-   .action-menu-table {
+.action-menu-table {
     font-family: 'Courier New', Courier, monospace;
     border-spacing: 5px;
     width: 250px;
@@ -195,22 +226,20 @@ h5 { color: white }
     
     border-radius: 1em;
     overflow: hidden;
-    background:#333 
-
-
+    background:#333     
 }
 
 .action-menu-table th, td { 
     width:  200px;               
-    padding:5px 
-              
+    padding:5px;
+    background-color: #1b1b1b;
  } 
 
 .action-menu-table a {
   font-size: 10pt;
   width: 100%;
   display: block;
-  background-color: dimgray;
+  background-color: #1b1b1b;
 }
 
   /** =============== Mobile-specific Style ================ */

@@ -125,12 +125,24 @@
 </span>  
 
 <ul>
-    <li><a class="btn-sm btn-primary" href="#" onclick="toggle_items_table_info();">Toggle Details</a></li>
+    <li><a class="btn-sm btn-primary" 
+            href="#" onclick="toggle_items_table_info();">Toggle Details</a></li>
+
+    <li>
+        <!-- Set search mode  -->
+        <select id="theme-selector-box" 
+                title="Select web site theme"
+                onChange="selection_changed">
+            <option value="dark_mode">Dark mode</option>
+            <option value="light_mode">Light mode</option>
+        </select>        
+    </li>
 </ul>
 
-<div id="div-keyboard-status" display="none">
+
+<div id="div-keyboard-status" display="none" class="kdb-status">
    <ul>
-        <li><span id="keyboard-status">Keyboard Shortcuts Disabled </li>
+        <li><span id="keyboard-status" class="kdb-status" >Keyboard Shortcuts Disabled </li>
         <li>Type 'ESC' (Escape) key to toggle keyboard shortcuts.</li>            
     </ul>
 </div>
