@@ -71,6 +71,30 @@ function LocalStorageFlag(name, value)
 
 
 
+function LocalStorageString(name, value)
+{
+    this.name = name;
+    this._dummy = (function() {
+        var q = localStorage.getItem(name);
+        if(q == null || q == "undefined" ){
+            localStorage.setItem(name, value);
+        }
+    }());
+
+    this.get     = ( default_value ) => {
+        var result = localStorage.getItem(this.name);
+        if(result == "undefined") {
+            this.set(default_value);
+            return default_value;
+        }
+        return result;
+    };
+    this.set     = (value) => localStorage.setItem(this.name, value);
+};
+
+
+
+
 // ----------- Keyboard Navigation ------------------ //
 
 navigation_enabled_flag = "navigation_enabled";
