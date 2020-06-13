@@ -13,6 +13,7 @@ bs4     = "*"
 Django  = "*"
 lxml    = "*"
 django-pdb = "*"
+pypdf2  = "*"
 
 [requires]
 python_version = "*"
