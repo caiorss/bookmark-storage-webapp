@@ -365,3 +365,63 @@ function open_url_newtab(url)
     var win = window.open(url, '_blank');
     win.focus();
 }
+
+function api_item_add(csrf_token)
+{
+    var guess = "";
+
+    var send_url = (url) => {       
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/item", true);
+        
+        // Called when request is completed 
+        xhr.onload = () => {
+            // print JSON response
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // parse JSON
+                var resp = JSON.parse(xhr.responseText);
+                console.log(resp);
+                
+                if(resp["result"] == "OK")
+                    location.reload();
+                else 
+                    alert(" Error: " + resp["reason"]);
+            }        
+        };
+    
+        xhr.onerror = () => {
+            alert(" [ERROR] Network error.")
+        };
+    
+        // 
+    
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', generated_token);
+        var body = { "url": url};
+        xhr.send(JSON.stringify(body));
+    
+    }; // end of send_url()
+
+    var query_url = (guess) => {
+        var url = prompt("Enter the URL to add:", guess);
+        if(url == null) return;
+        send_url(url);
+    }
+
+    if(navigator.clipboard == null){
+        query_url("");
+        return;
+    }
+
+    navigator.clipboard.readText()
+        .then(text => { guess = text; 
+                        console.log("Text =  " + text);
+                        query_url(guess);
+        
+             })
+        .catch(err => { console.error(" Error: = " + err);
+             query_url("");
+            });
+
+    
+}
