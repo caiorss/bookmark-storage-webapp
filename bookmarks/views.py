@@ -368,6 +368,80 @@ def document_viewer(request: WSGIRequest, itemID: int):
     return ds.render(request, "viewer.html", { "item": item
                                            , "file_url": "/snapshot/file/" + path})
 
+@login_required
+def rest_item_query(request: WSGIRequest):    
+    from django.http import JsonResponse
+    from django.core import serializers
+    item_id_str : str = request.GET.get("id")    
+    if not item_id_str or not item_id_str.isnumeric:
+        return JsonResponse({"result": "ERROR", "reason": "Expected id query parameter"})    
+    item_id: int = int(item_id_str)    
+    try:
+        item = SiteBookmark.objects.get(id = item_id)
+        print(f" [TRACE] - type = {type(item)} ; item = {item} ")
+        js = serializers.serialize('json', [item] )
+        print(f" [TRACE] - type = {type(js)} js = {js}  ")
+        return  HttpResponse( js )
+    except SiteBookmark.DoesNotExist:
+        return JsonResponse({"result": "ERROR", "reason": "Item not found"})
+    
+
+# Rest API Request: 
+#   Endpoint: /api/item 
+#   Method:   POST 
+#   Payload:  { 'url': <URL> }
+#
+# Rest API Response body: 
+#  [+] For success =>  { "result": "OK" }                         
+#  [+] For failure =>  { "result": "ERROR", "Reason": <REASON> }  
+#
+def rest_item_create(request: WSGIRequest):
+    from django.http import JsonResponse
+    import json 
+
+    print(" [TRACE] Enter rest_item_create() function. ")
+
+    if request.method != "POST":
+        return JsonResponse({ "result": "ERROR"
+                              , "reason": "Invalid method for this endpoint"})
+    
+    body_unicode = request.body.decode("utf-8")
+    body = json.loads(body_unicode)
+
+    if not "url" in body:
+        return JsonResponse( { "result": "ERROR"
+                              , "reason": "misssing URL field"})
+
+    print(f" [TRACE] request body = {body} ; type(body) = {type(body)} ")
+
+    url:  str = body["url"]
+    url_: str = dutils.remove_url_obfuscation(url)    
+    assert url_ is not None 
+
+    # Current logged user 
+    user: AbstractBaseUser = request.user
+
+    try:
+        # Check whether URL already exists in the database         
+        it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
+        return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+    except SiteBookmark.DoesNotExist:
+        pass         
+
+    item = SiteBookmark.objects.create(url = url_, owner = user)
+    item.save()
+    update_item_from_metadata(item.id)
+    return  JsonResponse({ "result": "OK" })
+
+def rest_item(request: WSGIRequest):
+    print(f" [INFO] request.method == {request.method} ")
+    method: str = request.method
+    if method.lower() == "get":
+        return rest_item_query(request)
+    if method.lower() == "post":
+        return rest_item_create(request)
+    return Http404("Error: method not allowed for this endpoint")
+
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SiteBookmark

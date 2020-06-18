@@ -40,5 +40,6 @@ urlpatterns = [
   ,path('collection/list', views.CollectionList.as_view(), name='bookmark_collection_list')
   ,path('collection/new',  views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
-  
+  # ----------------- REST API ------------------------#
+  ,path("api/item", views.rest_item)  
 ]
