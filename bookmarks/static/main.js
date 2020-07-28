@@ -408,7 +408,8 @@ function api_item_add(csrf_token)
         send_url(url);
     }
 
-    if(navigator.clipboard == null){
+    if( navigator.clipboard == null 
+        || navigator.clipboard.readText == null ){
         query_url("");
         return;
     }

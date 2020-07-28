@@ -21,10 +21,15 @@
                           </path>
                       </svg>
 
-                        {{ bookmark.modified_title | default:bookmark.url }}                                                
-                        
-                  </a>
+                        {{ bookmark.modified_title | default:bookmark.url }}                                                                        
+                  </a>                  
             </h5>
+
+            <ul>
+              <li><a href="items?filter=domain&A0={{ bookmark.hostname }}" 
+                    title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a>
+              </li>
+            </ul>
 
             <a class="btn-sm btn-primary" 
                title="Actions for current bookmark" 
