@@ -426,3 +426,48 @@ function api_item_add(csrf_token)
 
     
 }
+
+
+class YoutubeThumb extends HTMLElement {
+    constructor() {
+        super()
+        this.attachShadow( { mode: 'open' } )            
+    }
+
+    connectedCallback() {
+        var video = this.getAttribute("video");
+        console.log("VIDEO = ", video);
+        this.shadowRoot.innerHTML = `
+            <style>
+                .youtube-embed {
+                    visibiity: visible;
+                    /* background-color: gray; */
+                    width:  500px;
+                    height: auto;
+                    display: block;
+                }
+
+                span {
+                    color: black;
+                    font-size: 14pt;
+                    font-weight: 500%;
+                }
+
+                img {
+                    width:  60%;
+                    height: auto;
+                }
+
+            </style>
+
+            <div class="youtube-embed">                 
+                 <a href="https://www.youtube.com/watch?v=${video}" target="_blank"> 
+                   <img src="https://img.youtube.com/vi/${video}/sddefault.jpg" />                             
+                 </a>
+            </div>
+            `;
+                                    
+            
+    }
+}
+customElements.define('youtube-thumb', YoutubeThumb);

@@ -151,8 +151,8 @@
 
             <p class = ""> {{ bookmark.brief|default:"" }} </p>
 
-            {% if bookmark.is_youtube_video and request.session.video_toggle  %}
-              <iframe src="https://www.youtube.com/embed/{{ bookmark.youtube_id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            {% if bookmark.is_youtube_video %}
+              <youtube-thumb video="{{ bookmark.youtube_id }}"></youtube-thumb>              
             {% endif %}
         </div>                            
     {% endfor %}
