@@ -123,7 +123,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}"\
             .format( filter = self.request.GET.get("filter") or ""
                     ,A0     = self.request.GET.get("A0")   or ""
-                    ,query  = self.request.GET.get("query")   or ""
+                    ,query  = urllib.parse.quote(self.request.GET.get("query") or "")
                     ,mode   = self.request.GET.get("mode") or ""
                     )        
         context['count'] = self.get_queryset().count()
