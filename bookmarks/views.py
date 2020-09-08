@@ -376,9 +376,16 @@ def fetch_itemsnapshot(request: WSGIRequest):
 def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     """Download bookmark's file snapshot (attachment) from the database. """
     # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
+    print(" [TRACE] get_snapshot_file() ")
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
+
+    title = urllib.parse.quote(request.GET.get("title") or "archive")
     try:
-        return FileResponse(open(sn.getFilePath(), 'rb'), content_type=sn.fileMimeType)
+        with open(sn.getFilePath(), 'rb') as fp:
+            res = HttpResponse(fp, content_type = sn.fileMimeType)
+            extension = os.path.splitext(sn.getFilePath())[1]
+            res["Content-Disposition"] = f"inline; filename = {title}.{extension}"
+            return res 
     except FileNotFoundError as err:
         raise Http404("Error: file not found => {err}".format(err = err))
 

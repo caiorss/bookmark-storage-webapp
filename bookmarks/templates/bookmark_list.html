@@ -89,7 +89,8 @@
               <tr>
                 <th> 
                   {% if bookmark.snapshot_exists %}
-                    <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" href="/snapshot/file/{{ bookmark.snapshot_file }}">Open snapshot</a>                           
+                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
+                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                           
                   {% else %}
                     <a class="btn-sm btn-primary" title="Archive snapshot" href="/snapshot/get?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}" >Archive</a>                           
                   {% endif %}                      
