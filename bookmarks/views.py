@@ -107,7 +107,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("oldest",     "Listing items by oldest",         self.filter_oldest)
         self.add_filter("starred",    "Starred items",                   self.filter_starred)
         self.add_filter("removed",    "Removed items",                   self.filter_removed)
-        self.add_filter("doctype",    "Items fitered by document type",  self.filter_doctype)
+        self.add_filter("doctype",    "Items fitered by type",  self.filter_doctype)
         self.add_filter("search",     "Search results",                  self.filter_search)
         self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
         self.add_filter("collection", "Collection items",                self.filter_collection)
@@ -142,7 +142,12 @@ class BookmarksList(LoginRequiredMixin, ListView):
         view = self.request.GET.get("filter") or "null"
         print(f" [TRACE] get_context_data() =>> view = {view}")
 
-        context["page_title"] = (self.filter_dispatch.get(view) or self.null_view).title 
+        title = (self.filter_dispatch.get(view) or self.null_view).title 
+        
+        if(view == "doctype"):
+            title = title + ": " + (self.request.GET.get("A0") or "")
+
+        context["page_title"] = title 
 
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
