@@ -44,16 +44,20 @@ def download_file(url: str):
     f_hash: str   = hashlib.md5(f_data).hexdigest()
     f_mime        = u.getheader("Content-Type", "application/octet-stream")
 
+    header_disposion = u.getheader("Content-Disposition")
     ext = mimetypes.guess_extension(f_mime)
-    if f_mime is not None:        
-        f_name: str = "archive." + ext 
+
+    if header_disposion is not None:
+        f_name = header_disposion.split(";")[1].strip().strip("filename=").strip("\"")
+    elif f_mime is not None and ext is not None:        
+        f_name: str = "archive" + ext 
     else: 
         f_name: str = "archive"
 
-    return DownloadedFile( fileName = f_name
+    return DownloadedFile( fileName     = f_name
                          , fileMimeType = f_mime
-                         , fileHash = f_hash
-                         , fileData = f_data  )
+                         , fileHash     = f_hash
+                         , fileData     = f_data  )
 
 
 def remove_url_obfuscation(url: str):
