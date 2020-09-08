@@ -1,3 +1,6 @@
+import typing
+from typing import Dict, List, NamedTuple
+
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.generic import TemplateView,ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -75,6 +78,12 @@ def signup(request):
         form = SignUpForm()
     return ds.render(request, 'registration.html', {'form': form})
 
+
+class BookMarkFilter(NamedTuple):
+    view:     str 
+    title:    str
+    callback: typing.Any 
+
 class BookmarksList(LoginRequiredMixin, ListView):
 
     # --- overriden variables --------
@@ -83,7 +92,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
     paginate_by  = 15
     context_object_name = "object_list"
     
-    filter_dispatch = {}    
+    null_view = BookMarkFilter("null", "Listing items by latest added", None)
+
+    filter_dispatch: Dict[str, BookMarkFilter] = {}    
     empty_query = model.objects.none()
 
     def __init__(self):
@@ -92,24 +103,24 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         # ---------- Set callbacks ------------#   
     def start(self):
-        self.add_filter("latest",  self.filter_latest)
-        self.add_filter("oldest",  self.filter_oldest)
-        self.add_filter("starred", self.filter_starred)
-        self.add_filter("removed", self.filter_removed)
-        self.add_filter("doctype",  self.filter_doctype)
-        self.add_filter("search",  self.filter_search)
-        self.add_filter("domain", self.filter_domain)
-        self.add_filter("collection", self.filter_collection)
+        self.add_filter("latest",     "Listing items by latest",         self.filter_latest)
+        self.add_filter("oldest",     "Listing items by oldest",         self.filter_oldest)
+        self.add_filter("starred",    "Starred items",                   self.filter_starred)
+        self.add_filter("removed",    "Removed items",                   self.filter_removed)
+        self.add_filter("doctype",    "Items fitered by document type",  self.filter_doctype)
+        self.add_filter("search",     "Search results",                  self.filter_search)
+        self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
+        self.add_filter("collection", "Collection items",                self.filter_collection)
         return self 
 
-    def add_filter(self, view: str, callback):
-        self.filter_dispatch[view] = callback            
+    def add_filter(self, view: str, title: str, callback):
+        self.filter_dispatch[view] = BookMarkFilter(view = view, title = title, callback = callback)
 
     # Determines the query 
     def get_queryset(self):
         filter_: str = self.request.GET.get("filter", "")                
         if filter_ in self.filter_dispatch.keys():            
-            return self.filter_dispatch[filter_]()                        
+            return self.filter_dispatch[filter_].callback()                     
         return self.filter_latest()
 
     # Return context data dictionary to the rendered template 
@@ -125,7 +136,14 @@ class BookmarksList(LoginRequiredMixin, ListView):
                     ,A0     = self.request.GET.get("A0")   or ""
                     ,query  = urllib.parse.quote(self.request.GET.get("query") or "")
                     ,mode   = self.request.GET.get("mode") or ""
-                    )        
+                    )   
+        print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
+        
+        view = self.request.GET.get("filter") or "null"
+        print(f" [TRACE] get_context_data() =>> view = {view}")
+
+        context["page_title"] = (self.filter_dispatch.get(view) or self.null_view).title 
+
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
         return context
