@@ -42,4 +42,5 @@ urlpatterns = [
 
   # ----------------- REST API ------------------------#
   ,path("api/item", views.rest_item)  
+  ,path("api/bulk", views.rest_bulk_action)  
 ]

@@ -1,3 +1,57 @@
+
+/** @brief Performs Http POST request to some endpoint. 
+ *  @param {string} url         - Http request (REST API) endpoint 
+ *  @param {string} crfs_token  - Django CRFSS token from global variable (generated_token)
+ *  @param {object} data        - HTTP request body, aka payload  
+ */
+async function ajax_post(url, crfs_token, data)
+{
+
+    var payload = JSON.stringify(data);
+
+    const resp = await fetch(url, {
+          method:  'POST'
+        , headers: {    'Content-Type':     'application/json'
+                      , 'X-Requested-With': 'XMLHttpRequest'
+                      , 'X-CSRFToken':      crfs_token 
+                   }
+        , body: payload
+    });
+    return resp.json();
+}
+
+async function ajax_get(url, crfs_token, data)
+{
+
+    var payload = JSON.stringify(data);
+
+    const resp = await fetch(url, {
+          method:  'GET'
+        , headers: {    'Content-Type':     'application/json'
+                      , 'X-Requested-With': 'XMLHttpRequest'
+                      , 'X-CSRFToken':      crfs_token 
+                   }
+        , body: payload
+    });
+    return resp.json();
+}
+
+
+/** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
+ * 
+ */
+function dom_querySelectorAll(css_selector)
+{
+    return Array.prototype.slice.call(document.querySelectorAll(css_selector));
+}
+
+function dom_onClicked(css_selector, callback)
+{
+    var elem = document.querySelector(css_selector);
+    console.assert(elem, "dom_onClicked() => Element with css_selector not found in DOM");
+    elem.addEventListener("click", callback);
+}
+
 function DOM_select(selector)
 {
     return document.querySelector(selector);
@@ -81,7 +135,7 @@ function LocalStorageString(name, value)
         }
     }());
 
-    this.get     = ( default_value ) => {
+    this.get = ( default_value ) => {
         var result = localStorage.getItem(this.name);
         if(result == "undefined") { 
             this.set(default_value);
@@ -89,7 +143,7 @@ function LocalStorageString(name, value)
         }
         return result;
     };
-    this.set     = (value) => localStorage.setItem(this.name, value);    
+    this.set = (value) => localStorage.setItem(this.name, value);    
 };
 
 
@@ -316,6 +370,52 @@ function selection_changed(mode)
     site_theme.set(mode);
 }
 
+/*  Usage example: 
+ * 
+ *     var anchor = document.querySelector("#element-dom-id");
+ *     var div = insert_html_template(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);
+ *    
+ ******************************************************************/
+function insert_html_template(anchor_element, html)
+{
+    var el = document.createElement("template");
+    el.innerHTML = html;
+    var elem = el.content.firstChild;
+    anchor_element.appendChild(elem);
+    return elem;
+}
+
+const ACTION_RESTORE = "RESTORE";
+const ACTION_DELETE  = "DELETE";
+const ACTION_STARRED = "STARRED";
+
+
+async function ajax_perform_bulk_operation(action)
+{
+    var crfs_token = window["generated_token"];
+    console.log(" [TRACE] Current token = ", crfs_token);
+
+    // Get ID of selected bookmarks 
+    var selected_items = dom_querySelectorAll(".bulk-checkbox")
+                            .filter(x => x.checked)
+                            .map(x => parseInt(x.id));
+    
+    console.log(" selected items = ", selected_items);
+
+    var payload = {                  
+        action:   action 
+      , items:    selected_items
+    };
+
+    var resp = await ajax_post("/api/bulk", crfs_token, payload);
+    console.log("Response = ",  resp);
+
+    //return resp;
+    // Reload current page 
+    location.reload();
+}
+
+
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     var flag = flagItemDetailsVisible.get();
@@ -338,7 +438,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
     if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
 
+    var body = document.body;
+
+    var dialog = insert_html_template(body, `
+        <dialog class="dialog-bulk-action"> 
+            <div>
+                <button id="btn-bulk-starred"> Mark items as starred</button> </br> 
+                <button id="btn-bulk-delete">  Delete items</button>          </br> 
+                <button id="btn-bulk-restore"> Restore items</button>         </br>             
+            </div>
+            <button id="btn-dialog-close">Close</button>
+        </dialog>
+    `.trim());
+
+    var btn = dialog.querySelector("#btn-dialog-close");
+    btn.addEventListener("click", () => dialog.close() );
+
+    dom_onClicked("#btn-bulk-actions", () => dialog.showModal() );
+    dom_onClicked("#btn-bulk-starred", () => ajax_perform_bulk_operation(ACTION_STARRED) );
+    dom_onClicked("#btn-bulk-delete",  () => ajax_perform_bulk_operation(ACTION_DELETE) );
+    dom_onClicked("#btn-bulk-restore", () => ajax_perform_bulk_operation(ACTION_RESTORE) );
+
+    
 });
+
 
 function toggle_sidebar()
 {

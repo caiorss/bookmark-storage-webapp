@@ -463,6 +463,7 @@ def rest_item_create(request: WSGIRequest):
     update_item_from_metadata(item.id)
     return  JsonResponse({ "result": "OK" })
 
+
 def rest_item(request: WSGIRequest):
     print(f" [INFO] request.method == {request.method} ")
     method: str = request.method
@@ -471,6 +472,48 @@ def rest_item(request: WSGIRequest):
     if method.lower() == "post":
         return rest_item_create(request)
     return Http404("Error: method not allowed for this endpoint")
+
+
+def rest_bulk_action(request: WSGIRequest):
+    from django.http import JsonResponse
+    import json 
+    
+    print(" [TRACE] rest_bulk_action() called Ok.")
+    assert( request.method == "POST" and request.is_ajax() )
+
+    body = json.loads(request.body.decode("utf-8"))
+    print(f" [TRACE] type(body) = {type(body)} ")
+    items_id = body["items"]
+
+    action: str = body["action"]
+
+    print(" [TRACE] Request body = ", body, " Items = ", items_id)
+
+    for id in items_id:
+        print(f" [TRACE] id = {id} - {type(id)}")
+        try:
+            item: SiteBookmark = SiteBookmark.objects.get(id = id)
+            
+            if action == "DELETE": 
+                item.deleted = True; item.save()
+
+            if action == "RESTORE":
+                item.deleted = False; item.save()
+            
+            if action == "STARRED":
+                item.deleted = False
+                item.starred = True
+                item.save()
+
+            print(" [TRACE] Item = ", item)
+        except SiteBookmark.DoesNotExist:
+            return JsonResponse({"result": "ERROR", "reason": "Item not found"})    
+
+    # if request.method != "POST" or (not request.is_ajax()):
+    #    return Http404("Error: invalid request for this endpoint")
+
+    return JsonResponse({  "result": "OK"
+                         , "data":    body })
 
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
