@@ -45,6 +45,10 @@ from functools import reduce
 import PyPDF2
 import io 
 
+# --- Imports for REST APIs -----------------------#
+from django.http import JsonResponse
+import json
+
 # Template files 
 tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
