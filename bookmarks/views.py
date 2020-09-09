@@ -47,7 +47,7 @@ import io
 
 # --- Imports for REST APIs -----------------------#
 from django.http import JsonResponse
-import json
+import json 
 
 # Template files 
 tpl_main           = "bookmark_list.html"
@@ -479,8 +479,6 @@ def rest_item(request: WSGIRequest):
 
 
 def rest_bulk_action(request: WSGIRequest):
-    from django.http import JsonResponse
-    import json 
     
     print(" [TRACE] rest_bulk_action() called Ok.")
     assert( request.method == "POST" and request.is_ajax() )
@@ -523,6 +521,8 @@ def rest_bulk_action(request: WSGIRequest):
 
     return JsonResponse({  "result": "OK"
                          , "data":    body })
+
+
 
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
@@ -608,3 +608,15 @@ class CollectionCreate(LoginRequiredMixin, CreateView):
     fields = ['title', 'description', 'item', 'starred', 'deleted']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
+
+# Endpoints: /api/collection 
+class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
+    """Provides AJAX (REST) API response containing all user collections. """
+    # Overrident from class View 
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        from django.core import serializers
+        query = Collection.objects.filter(owner = self.request.user).values() 
+        res   = [ { "id": q["id"], "title": q["title"]} for q in query  ]
+        # print(" [TRACE] data = ", res)
+        return JsonResponse( res , safe = False)
+        
