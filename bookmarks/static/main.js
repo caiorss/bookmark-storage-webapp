@@ -30,9 +30,7 @@ async function ajax_get(url, crfs_token, data)
         , headers: {    'Content-Type':     'application/json'
                       , 'X-Requested-With': 'XMLHttpRequest'
                       , 'X-CSRFToken':      crfs_token 
-                   }
-        , body: payload
-    });
+                   }});
     return resp.json();
 }
 
