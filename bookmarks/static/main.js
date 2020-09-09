@@ -385,9 +385,10 @@ function insert_html_template(anchor_element, html)
     return elem;
 }
 
-const ACTION_RESTORE = "RESTORE";
-const ACTION_DELETE  = "DELETE";
-const ACTION_STARRED = "STARRED";
+const ACTION_RESTORE     = "RESTORE";
+const ACTION_DELETE      = "DELETE";
+const ACTION_ADD_STARRED = "ADD_STARRED";
+const ACTION_REM_STARRED = "REM_STARRED";
 
 
 async function ajax_perform_bulk_operation(action)
@@ -443,9 +444,14 @@ document.addEventListener("DOMContentLoaded", () => {
     var dialog = insert_html_template(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
-                <button id="btn-bulk-starred"> Mark items as starred</button> </br> 
-                <button id="btn-bulk-delete">  Delete items</button>          </br> 
-                <button id="btn-bulk-restore"> Restore items</button>         </br>             
+                <button id="btn-bulk-add-starred"> Add items to starred items</button> 
+                </br> 
+                <button id="btn-bulk-rem-starred"> Remove items from starred items</button> 
+                </br> 
+                <button id="btn-bulk-delete">  Delete items</button>          
+                </br> 
+                <button id="btn-bulk-restore"> Restore items</button>         
+                </br>             
             </div>
             <button id="btn-dialog-close">Close</button>
         </dialog>
@@ -455,7 +461,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => dialog.close() );
 
     dom_onClicked("#btn-bulk-actions", () => dialog.showModal() );
-    dom_onClicked("#btn-bulk-starred", () => ajax_perform_bulk_operation(ACTION_STARRED) );
+    dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
+    dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
     dom_onClicked("#btn-bulk-delete",  () => ajax_perform_bulk_operation(ACTION_DELETE) );
     dom_onClicked("#btn-bulk-restore", () => ajax_perform_bulk_operation(ACTION_RESTORE) );
 

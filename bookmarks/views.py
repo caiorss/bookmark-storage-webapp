@@ -500,9 +500,14 @@ def rest_bulk_action(request: WSGIRequest):
             if action == "RESTORE":
                 item.deleted = False; item.save()
             
-            if action == "STARRED":
+            if action == "ADD_STARRED":
                 item.deleted = False
                 item.starred = True
+                item.save()
+
+            if action == "REM_STARRED":
+                #item.deleted = False
+                item.starred = False 
                 item.save()
 
             print(" [TRACE] Item = ", item)
