@@ -46,4 +46,6 @@ urlpatterns = [
   ,path("api/collections",     views.Ajax_Collection_List.as_view())  
   ,path("api/collections/new", views.Ajax_Collection_New.as_view())  
   ,path("api/collections/del", views.Ajax_Collection_Delete.as_view())  
+
+  ,path("api/collections/add_item", views.Ajax_Collection_AddItem.as_view())  
 ]

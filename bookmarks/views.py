@@ -214,7 +214,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def filter_collection(self):
         coll_id: int = self.query_param_as_int("A0")
         c: Collection = ds.get_object_or_404(Collection, id = coll_id)
-        return c.item.all()
+        return c.item.all().order_by("id").reverse()
 
     def filter_search(self):
         search = self.request.GET.get('query')
@@ -688,4 +688,35 @@ class Ajax_Collection_Delete(LoginRequiredMixin, django.views.View):
         # coll.save()
         
         print(" Delete collection = ", body)
+        return JsonResponse({ "result": "OK" }, safe = False)        
+
+class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
+    """ Create new collection """
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))        
+
+        coll_id = body["collection_id"]
+        url     = body["url"]
+        url_: str = dutils.remove_url_obfuscation(url)   
+        assert url_ is not None  
+
+        try:
+            # Check whether URL already exists in the database         
+            it  = SiteBookmark.objects.filter(owner = request.user).get(url = url_)        
+            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+        except SiteBookmark.DoesNotExist:
+            pass         
+
+        coll: Collection = Collection.objects.get(id = coll_id, owner = request.user)
+        
+        item = SiteBookmark.objects.create(url = url_, owner = request.user)
+        item.save()
+        update_item_from_metadata(item.id)        
+        print(" Item = ", item)
+        print(" Coll = ", coll)
+        coll.item.add(item)
+        coll.save()
         return JsonResponse({ "result": "OK" }, safe = False)        

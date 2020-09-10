@@ -964,14 +964,36 @@ function api_item_add(crfs_token)
     var url = prompt("Enter the URL to add:", "");
     if(url == null) return;
 
-    var payload = {url: url};
+    var query_params = new URLSearchParams(window.location.search);
+    if(query_params.get("filter") == "collection")
+    {
+        console.trace(" [TRACE] Add item to collection")
 
+        var collection_id = query_params.get("A0");
+        var data = { url: url, collection_id: collection_id };
+
+        var token = window["generated_token"];
+        ajax_post("/api/collections/add_item", token, data).then( res => {
+            if(res["result"] == "OK"){
+                dialog_notify.notify("Bookmark added successfuly", 2000);
+                location.reload();
+            } else {
+                dialog_notify.notify("Error: bookmark already exists", 2000);
+            }
+    
+        });
+
+        return;
+    }
+
+
+    var payload = {url: url};
     ajax_post("/api/item", crfs_token, payload).then( res => {
         if(res["result"] == "OK"){
-            dialog_notify.notify("Bookmark added successfuly");
+            dialog_notify.notify("Bookmark added successfuly", 2000);
             location.reload();
         } else {
-            dialog_notify.notify("Error: bookmark already exists");
+            dialog_notify.notify("Error: bookmark already exists", 2000);
         }
 
     });
