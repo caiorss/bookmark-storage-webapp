@@ -225,9 +225,9 @@ class SiteBookmark(models.Model):
         return None 
 
 class Collection(models.Model):
-    title = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")
+    title       = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")
     description = models.TextField(blank = True)
-    item = models.ManyToManyField(SiteBookmark, blank = True)
+    item        = models.ManyToManyField(SiteBookmark, blank = True)
 
     starred = models.BooleanField(blank = True, default = False, help_text = "Mark this collection as favourite")
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
