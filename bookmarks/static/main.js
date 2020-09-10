@@ -475,6 +475,21 @@ class DialogFormBuilder extends HTMLElement
     }
 
     connectedCallback(){
+        this.shadowRoot.innerHTML = `
+            <style>
+                dialog {
+                    position: fixed; 
+                    top:      20px;
+                    
+                    background-color: darkgray                    
+                    color: black;
+
+                    border-radius: 20px;
+                    z-index: 2;
+                }
+            </style>            
+        `;
+        
         this.shadowRoot.appendChild(this.node);
     }
 
