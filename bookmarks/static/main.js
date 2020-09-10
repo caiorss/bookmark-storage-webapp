@@ -981,6 +981,8 @@ function api_item_add(crfs_token)
                 dialog_notify.notify("Error: bookmark already exists", 2000);
             }
     
+        }).catch(err => { 
+            dialog_notify.notify(" Error: " + err)
         });
 
         return;
