@@ -34,6 +34,12 @@ async function ajax_get(url, crfs_token, data)
     return resp.json();
 }
 
+/** Reload current page. (same as hit F5 in the web browser) */
+function dom_page_refresh()
+{
+    location.reload();
+}
+
 
 /** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
  * 
@@ -50,12 +56,12 @@ function dom_onClicked(css_selector, callback)
     elem.addEventListener("click", callback);
 }
 
-/* Insert HTML code fragment to some DOM element.
- *
- *  Usage example:
- *
+/* Insert HTML code fragment to some DOM element. 
+ *  
+ *  Usage example: 
+ * 
  *     var anchor = document.querySelector("#element-dom-id");
- *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);
+ *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);   
  ******************************************************************/
 function dom_insert_html(anchor_element, html)
 {
@@ -421,9 +427,9 @@ async function ajax_perform_bulk_operation(action)
     location.reload();
 }
 
-class DialogFormBuilder extends HTMLElement
+class DialogFormBuilder extends HTMLElement 
 {
-
+   
     constructor()
     {
         super()
@@ -438,11 +444,11 @@ class DialogFormBuilder extends HTMLElement
         console.log(" Node = ", this.node);
 
         var html = `
-            <div>
+            <div>                
                 <h4 id="dialog-title">Dialog Title</h4>
 
                 <span id="dialog-description">Dialog description</span>
-                <table>
+                <table> 
                     <tbody>
 
                     </tbody>
@@ -503,10 +509,10 @@ class DialogFormBuilder extends HTMLElement
     add_row_widget(label, widget)
     {
         var anchor = this.node.querySelector("tbody");
-
+        
         var th_label = document.createElement("th");
         th_label.textContent = label;
-
+        
         var th_widget = document.createElement("th");
         th_widget.appendChild(widget);
 
@@ -530,9 +536,9 @@ class DialogFormBuilder extends HTMLElement
     hide(){ this.node.close();         }
 
     setVisible(flag){
-        if(flag)
+        if(flag) 
             this.node.showModal(true);
-        else
+        else 
             this.node.close();
     }
 
@@ -555,7 +561,8 @@ customElements.define('dialog-formbuilder', DialogFormBuilder);
  *   c.notify("My notifcation", 1000);
  * ```
  */
-class NotificationDialog extends HTMLElement {
+class NotificationDialog extends HTMLElement 
+{
     constructor() {
         super()
         this.attachShadow( { mode: 'open' } )            
@@ -616,7 +623,14 @@ class NotificationDialog extends HTMLElement {
     }
 }
 
-customElements.define('notifcation-dialog', NotificationDialog);
+customElements.define('dialog-notification', NotificationDialog);
+
+
+
+
+//----------------------------------------------//
+//    D I A L O G S                             // 
+//----------------------------------------------//
 
 dialog_notify = new NotificationDialog();
 
@@ -716,7 +730,40 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log(" Response = ", res);
         });
     });
+
+    dialog_CreateCollection = new DialogFormBuilder();
+    dialog_CreateCollection.attach_body();
+    dialog_CreateCollection.setTitle("Create new collection");
+    dialog_CreateCollection.setText("Enter the following informations:");
+
+    var input_title       = dialog_CreateCollection.add_row_input("Title:");
+    var input_description = dialog_CreateCollection.add_row_input("Description:");
+
+    dialog_CreateCollection.onSubmit( () => {
+
+        var p = ajax_post("/api/collections/new", window["generated_token"], {
+              title: input_title.value 
+            , description: input_description.value
+        });
+
+        p.then( res => {
+            if(res["result"] == "OK"){
+                dialog_notify.notify("Bookmark added successfuly");
+                location.reload();
+            } else {
+                dialog_notify.notify("Error: bookmark already exists");
+            }
     
+        })
+    });
+
+    dom_onClicked("#btn-create-new-collection", () => { 
+        // alert(" Clicked at create new collection Ok. ");
+        dialog_CreateCollection.show();
+    });
+    
+
+
 });
 
 
