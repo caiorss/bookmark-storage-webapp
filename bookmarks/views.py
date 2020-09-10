@@ -599,8 +599,13 @@ class SavedSearchUpdate(LoginRequiredMixin, UpdateView):
 
 class CollectionList(LoginRequiredMixin, ListView):
     template_name = "collection_list.html"
-    model = Collection
+    # model = Collection
     # queryset = Collection.objects.order_by("title")
+
+    def get_queryset(self):
+        # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
+        user: AbstractBaseUser = self.request.user
+        return Collection.objects.filter(owner = user).order_by(Lower("title"))      
 
 class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
