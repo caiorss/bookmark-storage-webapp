@@ -154,7 +154,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if view == "collection":
             coll_id = self.request.GET.get("A0")
             coll = Collection.objects.get(id = coll_id, owner = self.request.user)
-            title = title + ":" + coll.title 
+            title = title + " : " + coll.title 
 
         context["page_title"] = title 
 
@@ -303,6 +303,7 @@ def update_item_from_metadata(itemID: int) -> None:
         view = io.BytesIO(data)
         pdf  = PyPDF2.PdfFileReader(view)
         inf  = pdf.documentInfo
+        assert(inf is not None)
 
         if inf.author is None:
             b.title = (inf.title or inf.subject or real_url) + " [PDF] "
@@ -384,6 +385,8 @@ def fetch_itemsnapshot(request: WSGIRequest):
 @login_required
 def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     """Download bookmark's file snapshot (attachment) from the database. """
+    from django.utils.text import slugify
+
     # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
     print(" [TRACE] get_snapshot_file() ")
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
@@ -391,9 +394,10 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     title = urllib.parse.quote(request.GET.get("title") or "archive")
     try:
         with open(sn.getFilePath(), 'rb') as fp:
-            res = HttpResponse(fp, content_type = sn.fileMimeType)
+            res       = HttpResponse(fp, content_type = sn.fileMimeType)
             extension = os.path.splitext(sn.getFilePath())[1]
-            res["Content-Disposition"] = f"inline; filename = {title}.{extension}"
+            fname     = slugify(request.GET.get("title"))
+            res["Content-Disposition"] = f"inline; filename = {fname}.{extension}"
             return res 
     except FileNotFoundError as err:
         raise Http404("Error: file not found => {err}".format(err = err))
