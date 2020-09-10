@@ -414,6 +414,79 @@ async function ajax_perform_bulk_operation(action)
     location.reload();
 }
 
+/**
+ * Usage:
+ * ```
+ *   var c = new NotificationDialog();
+ *   c.attach(document.body);
+ *   // Timeout 1 second (= 1000 milliseconds)
+ *   c.notify("My notifcation", 1000);
+ * ```
+ */
+class NotificationDialog extends HTMLElement {
+    constructor() {
+        super()
+        this.attachShadow( { mode: 'open' } )
+    }
+
+    connectedCallback() {
+        var text = this.getAttribute("text");
+        console.log("text = ", text);
+        this.shadowRoot.innerHTML = `
+            <style>
+                dialog {
+                    position: fixed;
+                    top:      20px;
+
+                    background-color: darkgray
+                    color: black;
+
+                    border-radius: 20px;
+                    z-index: 2;
+                }
+
+            </style>
+
+            <dialog id="notify-dialog">
+              <div>
+                 <h4>Notification</h4>
+                 <span id="text-display">Notification text here</span>
+               </div>
+            </dialog>
+            `;
+    }
+
+    setText(text){
+        var node = this.shadowRoot.querySelector("#text-display");
+        console.assert(node, "It must be attached to some DOM element");
+        node.textContent = text;
+    }
+
+    setVisible(flag){
+        var node = this.shadowRoot.querySelector("#notify-dialog");
+        if(flag)
+            node.showModal();
+        else
+            node.close();
+    }
+
+    notify(text, timeout = 1500)
+    {
+        this.setText(text);
+        this.setVisible(true);
+        var self = this;
+        setTimeout(() => self.setVisible(false) , timeout);
+    }
+
+    // Attach to DOM element such as document.body
+    attach(dom_node){
+        dom_node.appendChild(this)
+    }
+}
+
+customElements.define('notifcation-dialog', NotificationDialog);
+
+dialog_notify = new NotificationDialog();
 
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
