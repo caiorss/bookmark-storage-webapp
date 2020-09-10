@@ -605,7 +605,7 @@ class CollectionList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
         user: AbstractBaseUser = self.request.user
-        return Collection.objects.filter(owner = user).order_by(Lower("title"))      
+        return Collection.objects.filter(owner = user).order_by("id").reverse()    
 
 class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
@@ -647,4 +647,24 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
 
         return JsonResponse(body, safe = False)
         
+# Endpoint: /api/collections/new         
+class Ajax_Collection_New(LoginRequiredMixin, django.views.View):
+    """ Create new collection """
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))        
+
+        title       = body["title"]
+        description = body["description"]
+
+        new_collection = Collection.objects.create(title = title, description = description)
+        new_collection.owner = request.user 
+        new_collection.save()
         
+        #items_id: List[int] = body["items"]
+        #collectionID: int   = body["collectionID"]
+        #action:       str   = body["action"]
+        print(" Collection_New = ", body)
+        return JsonResponse({ "result": "OK" }, safe = False)        
