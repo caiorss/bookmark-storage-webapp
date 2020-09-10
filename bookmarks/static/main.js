@@ -50,6 +50,23 @@ function dom_onClicked(css_selector, callback)
     elem.addEventListener("click", callback);
 }
 
+/* Insert HTML code fragment to some DOM element.
+ *
+ *  Usage example:
+ *
+ *     var anchor = document.querySelector("#element-dom-id");
+ *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);
+ ******************************************************************/
+function dom_insert_html(anchor_element, html)
+{
+    var el = document.createElement("template");
+    el.innerHTML = html;
+    var elem = el.content.firstChild;
+    anchor_element.appendChild(elem);
+    return elem;
+}
+
+
 function DOM_select(selector)
 {
     return document.querySelector(selector);
@@ -368,20 +385,6 @@ function selection_changed(mode)
     site_theme.set(mode);
 }
 
-/*  Usage example: 
- * 
- *     var anchor = document.querySelector("#element-dom-id");
- *     var div = insert_html_template(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);
- *    
- ******************************************************************/
-function insert_html_template(anchor_element, html)
-{
-    var el = document.createElement("template");
-    el.innerHTML = html;
-    var elem = el.content.firstChild;
-    anchor_element.appendChild(elem);
-    return elem;
-}
 
 const ACTION_RESTORE     = "RESTORE";
 const ACTION_DELETE      = "DELETE";
@@ -521,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     var body = document.body;
 
-    var dialog = insert_html_template(body, `
+    var dialog = dom_insert_html(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
                 <button id="btn-bulk-add-starred"> Add items to starred items</button> 
