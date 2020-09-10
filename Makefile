@@ -1,12 +1,13 @@
-PYTHON=/home/archbox/opt/bin/python
+PYTHON=python
 
 # Run application
 run:
-	${PYTHON} manage.py runserver 0.0.0.0:8000
+	# ${PYTHON} manage.py runserver 0.0.0.0:8000
+	pipenv run python manage.py runserver 0.0.0.0:8000
 
 # Open Django's interactive console for interacting with the database (aka model)
 shell:
-	${PYTHON} manage.py shell
+	pipenv run python manage.py shell
 
 # Update Database
 db:
