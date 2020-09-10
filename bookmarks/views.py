@@ -148,8 +148,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         title = (self.filter_dispatch.get(view) or self.null_view).title 
         
-        if(view == "doctype"):
+        if view == "doctype":
             title = title + ": " + (self.request.GET.get("A0") or "")
+
+        if view == "collection":
+            coll_id = self.request.GET.get("A0")
+            coll = Collection.objects.get(id = coll_id, owner = self.request.user)
+            title = title + ":" + coll.title 
 
         context["page_title"] = title 
 
@@ -703,20 +708,23 @@ class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
         url_: str = dutils.remove_url_obfuscation(url)   
         assert url_ is not None  
 
+        coll: Collection = Collection.objects.get(id = coll_id, owner = request.user)
+        exists = False
+
+        item = None 
+
         try:
             # Check whether URL already exists in the database         
-            it  = SiteBookmark.objects.filter(owner = request.user).get(url = url_)        
-            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+            item  = SiteBookmark.objects.filter(owner = request.user).get(url = url)
+            exists = True 
         except SiteBookmark.DoesNotExist:
             pass         
-
-        coll: Collection = Collection.objects.get(id = coll_id, owner = request.user)
         
-        item = SiteBookmark.objects.create(url = url_, owner = request.user)
-        item.save()
-        update_item_from_metadata(item.id)        
-        print(" Item = ", item)
-        print(" Coll = ", coll)
+        if not exists:
+            item = SiteBookmark.objects.create(url = url_, owner = request.user)
+            item.save()
+            update_item_from_metadata(item.id)        
+        
         coll.item.add(item)
         coll.save()
         return JsonResponse({ "result": "OK" }, safe = False)        
