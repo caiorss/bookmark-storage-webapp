@@ -566,6 +566,137 @@ class DialogFormBuilder extends HTMLElement
 customElements.define('dialog-formbuilder', DialogFormBuilder);
 
 
+class Dialog_GenericNotification extends HTMLElement
+{
+
+    constructor()
+    {
+        super()
+
+        this.node = document.createElement("dialog");
+
+        this.submit_callback = (flag) => { alert("Submit Clicked"); }
+
+        var html = `
+            <div>
+                <div>
+                    <h4 id="dialog-title">Dialog Title</h4>
+                    <span id="dialog-text">Dialog Text</span>
+
+                </div id="dialog-body">
+                <div>
+
+                </div>
+                <div>
+                    <button id="btn-close">Close</button>
+                    <button id="btn-submit">Submit</button>
+                </div>
+             </div>
+        `.trim();
+
+        var el       = document.createElement("template");
+        el.innerHTML = html;
+        var elem     = el.content.firstChild;
+        this.node.appendChild(elem);
+
+        var self = this;
+        this.node.querySelector("#btn-close").addEventListener("click", () => {
+            self.node.close();
+            this.submit_callback(false);
+        });
+        this.node.querySelector("#btn-submit").addEventListener("click", () => {
+            self.submit_callback()
+            this.submit_callback(true);
+        });
+    }
+
+    connectedCallback()
+    {
+        this.shadowRoot.innerHTML = `
+            <style>
+                dialog {
+                    position: fixed;
+                    top:      20px;
+
+                    background-color: darkgray
+                    color: black;
+
+                    border-radius: 20px;
+                    z-index: 2;
+                }
+            </style>
+        `;
+
+        this.shadowRoot.appendChild(this.node);
+    }
+
+    attach_body()
+    {
+        document.body.appendChild(this)
+    }
+
+    setTitle(title)
+    {
+        var label = this.node.querySelector("#dialog-title");
+        label.textContent = title;
+        return this;
+    }
+
+    setText(text)
+    {
+        var desc = this.node.querySelector("#dialog-text");
+        desc.textContent = text;
+        return this;
+    }
+
+    setButtonCloseLabel(text)
+    {
+        var desc = this.node.querySelector("#btn-close");
+        desc.textContent = text;
+    }
+
+    setButtonSubmitLabel(text)
+    {
+        var desc = this.node.querySelector("#btn-submit");
+        desc.textContent = text;
+    }
+
+    onSubmit(callback) {
+        this.submit_callback = callback;
+    }
+
+    show() { this.node.showModal(true); }
+    hide() { this.node.close();         }
+    close(){ this.node.close();         }
+
+
+} // --- End of class Dialog_GenericNotification -------------//
+
+customElements.define('dialog-generic', Dialog_GenericNotification);
+
+
+class Dialog_OkCancel extends Dialog_GenericNotification
+{
+    constructor(){
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.setTitle("Are you sure?")
+        this.setText("Are you sure you want to delete this item?");
+        this.setButtonSubmitLabel("OK");
+        this.setButtonCloseLabel("Cancel");
+
+        this.onSubmit( (flag) => {
+            console.log(" [INFO] User clicked submit ? = ", flag);
+            this.close();
+        });
+    }
+}
+
+customElements.define('dialog-okcancel', Dialog_OkCancel);
+
+
+
 
 /**
  * Usage: 
