@@ -10,11 +10,20 @@
 <div id="bookmark-list" class="container">       
 
     {% for collection in object_list %}
-    
-    <div class = "well item ">   
-        <a target="_blank" href="/items?filter=collection&A0={{ collection.id }}" title="{{ collection.description }}" > {{ collection.title }} </a>
-        <p> {{ collection.description }} </p>
-    </div>                            
+        
+        <div class = "well item ">   
+
+            <a target="_blank" href="/items?filter=collection&A0={{ collection.id }}" 
+                               title="{{ collection.description }}"> 
+                {{ collection.title }} 
+            </a>
+
+            </br>
+            
+            <a class="btn btn-info" href="javascript:collection_delete({{collection.id}}, '{{ collection.title }}' )"  
+                                    title="Delete current collection.">Delete</a>
+            <p> {{ collection.description }} </p>
+        </div>                            
     {% endfor %}
     
 </div>

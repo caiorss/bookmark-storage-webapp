@@ -435,8 +435,6 @@ class DialogFormBuilder extends HTMLElement
         super()
         this.attachShadow( { mode: 'open' } )
 
-        console.log(" [TRACE] Started. OK. ");
-
         this.node = document.createElement("dialog");
 
         this.submit_callback = () => { alert("Submit Clicked"); }
@@ -489,7 +487,7 @@ class DialogFormBuilder extends HTMLElement
                 }
             </style>            
         `;
-        
+
         this.shadowRoot.appendChild(this.node);
     }
 
@@ -568,7 +566,7 @@ customElements.define('dialog-formbuilder', DialogFormBuilder);
 
 class Dialog_GenericNotification extends HTMLElement
 {
-
+    
     constructor()
     {
         super()
@@ -578,14 +576,14 @@ class Dialog_GenericNotification extends HTMLElement
         this.submit_callback = (flag) => { alert("Submit Clicked"); }
 
         var html = `
-            <div>
-                <div>
+            <div>    
+                <div>            
                     <h4 id="dialog-title">Dialog Title</h4>
                     <span id="dialog-text">Dialog Text</span>
-
-                </div id="dialog-body">
+                
+                </div id="dialog-body"> 
                 <div>
-
+                
                 </div>
                 <div>
                     <button id="btn-close">Close</button>
@@ -600,12 +598,12 @@ class Dialog_GenericNotification extends HTMLElement
         this.node.appendChild(elem);
 
         var self = this;
-        this.node.querySelector("#btn-close").addEventListener("click", () => {
+        this.node.querySelector("#btn-close").addEventListener("click", () => { 
             self.node.close();
             this.submit_callback(false);
         });
-        this.node.querySelector("#btn-submit").addEventListener("click", () => {
-            self.submit_callback()
+        this.node.querySelector("#btn-submit").addEventListener("click", () => { 
+            self.submit_callback() 
             this.submit_callback(true);
         });
     }
@@ -615,16 +613,16 @@ class Dialog_GenericNotification extends HTMLElement
         this.shadowRoot.innerHTML = `
             <style>
                 dialog {
-                    position: fixed;
+                    position: fixed; 
                     top:      20px;
-
-                    background-color: darkgray
+                    
+                    background-color: darkgray                    
                     color: black;
 
                     border-radius: 20px;
                     z-index: 2;
                 }
-            </style>
+            </style>            
         `;
 
         this.shadowRoot.appendChild(this.node);
@@ -907,8 +905,30 @@ document.addEventListener("DOMContentLoaded", () => {
         // alert(" Clicked at create new collection Ok. ");
         dialog_CreateCollection.show();
     });
-    
 
+    dialog_collection_delete = new Dialog_OkCancel();
+    dialog_collection_delete.setTitle("Delete collection");
+    dialog_collection_delete.attach_body();
+    
+    window["collection_delete"] = (collection_id, collection_title) => {
+        dialog_collection_delete.setText(`Are you sure you want to delete the collection: '${collection_title}' `)
+        dialog_collection_delete.show();
+        dialog_collection_delete.onSubmit( flag => {
+            if(!flag) return;
+
+            var p = ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
+
+            p.then( res => {
+                if(res["result"] == "OK"){
+                    dialog_notify.notify("Bookmark added successfuly");
+                    location.reload();
+                } else {
+                    dialog_notify.notify("Error: bookmark already exists");
+                }
+            });
+
+        });
+    };
 
 });
 
