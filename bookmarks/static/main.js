@@ -388,16 +388,20 @@ const ACTION_DELETE      = "DELETE";
 const ACTION_ADD_STARRED = "ADD_STARRED";
 const ACTION_REM_STARRED = "REM_STARRED";
 
+function get_selected_items_for_bulk_operation()
+{
+    // Get ID of selected bookmarks 
+    return dom_querySelectorAll(".bulk-checkbox")
+                            .filter(x => x.checked)
+                            .map(x => parseInt(x.id));
+}
 
 async function ajax_perform_bulk_operation(action)
 {
     var crfs_token = window["generated_token"];
     console.log(" [TRACE] Current token = ", crfs_token);
 
-    // Get ID of selected bookmarks 
-    var selected_items = dom_querySelectorAll(".bulk-checkbox")
-                            .filter(x => x.checked)
-                            .map(x => parseInt(x.id));
+    var selected_items = get_selected_items_for_bulk_operation();
     
     console.log(" selected items = ", selected_items);
 
@@ -415,7 +419,7 @@ async function ajax_perform_bulk_operation(action)
 }
 
 /**
- * Usage:
+ * Usage: 
  * ```
  *   var c = new NotificationDialog();
  *   c.attach(document.body);
@@ -426,7 +430,7 @@ async function ajax_perform_bulk_operation(action)
 class NotificationDialog extends HTMLElement {
     constructor() {
         super()
-        this.attachShadow( { mode: 'open' } )
+        this.attachShadow( { mode: 'open' } )            
     }
 
     connectedCallback() {
@@ -435,10 +439,10 @@ class NotificationDialog extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 dialog {
-                    position: fixed;
+                    position: fixed; 
                     top:      20px;
-
-                    background-color: darkgray
+                    
+                    background-color: darkgray                    
                     color: black;
 
                     border-radius: 20px;
@@ -446,14 +450,14 @@ class NotificationDialog extends HTMLElement {
                 }
 
             </style>
-
-            <dialog id="notify-dialog">
+        
+            <dialog id="notify-dialog"> 
               <div>
                  <h4>Notification</h4>
                  <span id="text-display">Notification text here</span>
                </div>
             </dialog>
-            `;
+            `;                                               
     }
 
     setText(text){
@@ -466,7 +470,7 @@ class NotificationDialog extends HTMLElement {
         var node = this.shadowRoot.querySelector("#notify-dialog");
         if(flag)
             node.showModal();
-        else
+        else 
             node.close();
     }
 
@@ -490,6 +494,11 @@ dialog_notify = new NotificationDialog();
 
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
+
+    dialog_notify.attach(document.body);
+    dialog_notify.id = "dialog-notify";
+    // dialog_notify.notify("Page created Ok", 900);
+
     var flag = flagItemDetailsVisible.get();
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
@@ -523,20 +532,62 @@ document.addEventListener("DOMContentLoaded", () => {
                 </br> 
                 <button id="btn-bulk-restore"> Restore items</button>         
                 </br>             
+                <button id="btn-bulk-add-to-collection">Add items to collection</button>         
+                <select id="selector-collection-add">
+                    <option value="-1">New collection</option>
+                </select>
             </div>
-            <button id="btn-dialog-close">Close</button>
+            <button id="btn-dialog-close">Close</button> 
         </dialog>
     `.trim());
 
     var btn = dialog.querySelector("#btn-dialog-close");
     btn.addEventListener("click", () => dialog.close() );
 
-    dom_onClicked("#btn-bulk-actions", () => dialog.showModal() );
+    dom_onClicked("#btn-bulk-actions",     () => dialog.showModal() );
     dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
     dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
-    dom_onClicked("#btn-bulk-delete",  () => ajax_perform_bulk_operation(ACTION_DELETE) );
-    dom_onClicked("#btn-bulk-restore", () => ajax_perform_bulk_operation(ACTION_RESTORE) );
+    dom_onClicked("#btn-bulk-delete",      () => ajax_perform_bulk_operation(ACTION_DELETE) );
+    dom_onClicked("#btn-bulk-restore",     () => ajax_perform_bulk_operation(ACTION_RESTORE) );
 
+    var selectbox  = dialog.querySelector("#selector-collection-add");
+    var crfs_token = window["generated_token"];
+    
+    // Fill selection box with all user collections 
+    ajax_get("/api/collections", crfs_token).then( colls => {
+        for(let n  in colls){
+            var opt   = document.createElement("option");
+            console.log(" row = ", colls[n]);
+            opt.text  = colls[n]["title"];
+            opt.value = colls[n]["id"];
+            selectbox.add(opt, -1);    
+        }
+        
+        console.log(" [TRACE] collections = ", colls);
+    });
+
+    const ACTION_COLLECTION_ADD = "ADD";
+    const ACTION_COLLECTION_NEW = "NEW";
+    
+    dom_onClicked("#btn-bulk-add-to-collection", () => {
+        var items = get_selected_items_for_bulk_operation();
+        var selectionbox = document.querySelector("#selector-collection-add");
+        var collectionID = selectionbox[selectionbox.selectedIndex]["value"];
+
+        console.log(" items = ", items);
+        console.log(" collection = ", collectionID);
+
+        var payload = {
+             items:        items
+            ,collectionID: collectionID
+            ,action:       ACTION_COLLECTION_ADD
+        };
+
+        var crfs_token = window["generated_token"];
+        ajax_post("/api/collections", crfs_token, payload).then( res => {
+            console.log(" Response = ", res);
+        });
+    });
     
 });
 
@@ -567,65 +618,22 @@ function open_url_newtab(url)
     win.focus();
 }
 
-function api_item_add(csrf_token)
+function api_item_add(crfs_token)
 {
-    var guess = "";
+    var url = prompt("Enter the URL to add:", "");
+    if(url == null) return;
 
-    var send_url = (url) => {       
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/api/item", true);
-        
-        // Called when request is completed 
-        xhr.onload = () => {
-            // print JSON response
-            if (xhr.status >= 200 && xhr.status < 300) {
-                // parse JSON
-                var resp = JSON.parse(xhr.responseText);
-                console.log(resp);
-                
-                if(resp["result"] == "OK")
-                    location.reload();
-                else 
-                    alert(" Error: " + resp["reason"]);
-            }        
-        };
-    
-        xhr.onerror = () => {
-            alert(" [ERROR] Network error.")
-        };
-    
-        // 
-    
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-CSRFToken', generated_token);
-        var body = { "url": url};
-        xhr.send(JSON.stringify(body));
-    
-    }; // end of send_url()
+    var payload = {url: url};
 
-    var query_url = (guess) => {
-        var url = prompt("Enter the URL to add:", guess);
-        if(url == null) return;
-        send_url(url);
-    }
+    ajax_post("/api/item", crfs_token, payload).then( res => {
+        if(res["result"] == "OK"){
+            dialog_notify.notify("Bookmark added successfuly");
+            location.reload();
+        } else {
+            dialog_notify.notify("Error: bookmark already exists");
+        }
 
-    if( navigator.clipboard == null 
-        || navigator.clipboard.readText == null ){
-        query_url("");
-        return;
-    }
-
-    navigator.clipboard.readText()
-        .then(text => { guess = text; 
-                        console.log("Text =  " + text);
-                        query_url(guess);
-        
-             })
-        .catch(err => { console.error(" Error: = " + err);
-             query_url("");
-            });
-
-    
+    });
 }
 
 
@@ -666,9 +674,7 @@ class YoutubeThumb extends HTMLElement {
                    <img src="https://img.youtube.com/vi/${video}/sddefault.jpg" />                             
                  </a>
             </div>
-            `;
-                                    
-            
+            `;                                               
     }
 }
 customElements.define('youtube-thumb', YoutubeThumb);
