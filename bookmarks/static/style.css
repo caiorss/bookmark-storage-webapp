@@ -39,7 +39,7 @@
 }
 
 .dialog-bulk-action button {
-    width: 100%;
+    background-color: cadetblue;
 }
 
 #the-canvas {
