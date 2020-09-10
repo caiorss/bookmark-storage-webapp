@@ -31,6 +31,16 @@
     
 }
 
+.dialog-bulk-action {
+    position: fixed;
+/*     top:      20px;
+    left:     10px; */
+    background-color: aqua;
+}
+
+.dialog-bulk-action button {
+    background-color: cadetblue;
+}
 
 #the-canvas {
     border: 1px solid black;
@@ -63,10 +73,18 @@ h1 {
     color: white; 
     font-family: medieval_old_english; 
 }
+
 h2 { color: white; 
     font-family: medieval_old_english; 
 }
-h3 { color: white }
+
+h3 { 
+    
+    color:      rgb(221, 89, 89); 
+    font-family:  medieval_old_english;
+    margin-left:  20px;
+}
+
 h4 { color: white }
 h5 { color: white }
 

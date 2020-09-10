@@ -4,14 +4,26 @@
 
 <a class="btn btn-info" href="/search/new"  title="Saved search">Add saved search</a>
 
+<a id="btn-create-new-collection" class="btn btn-info" href="#"  
+    title="New collection">New collection</a>
+
 <div id="bookmark-list" class="container">       
 
     {% for collection in object_list %}
-    
-    <div class = "well item ">   
-        <a target="_blank" href="/items?filter=collection&A0={{ collection.id }}" title="{{ collection.description }}" > {{ collection.title }} </a>
-        <p> {{ collection.description }} </p>
-    </div>                            
+        
+        <div class = "well item ">   
+
+            <a target="_blank" href="/items?filter=collection&A0={{ collection.id }}" 
+                               title="{{ collection.description }}"> 
+                {{ collection.title }} 
+            </a>
+
+            </br>
+            <p> {{ collection.description }} </p>
+                        
+            <a class="btn btn-info" href="javascript:collection_delete({{collection.id}}, '{{ collection.title }}' )"  
+                                    title="Delete current collection.">Delete</a>
+        </div>                            
     {% endfor %}
     
 </div>

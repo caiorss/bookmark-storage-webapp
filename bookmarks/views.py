@@ -45,6 +45,10 @@ from functools import reduce
 import PyPDF2
 import io 
 
+# --- Imports for REST APIs -----------------------#
+from django.http import JsonResponse
+import json 
+
 # Template files 
 tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
@@ -144,8 +148,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         title = (self.filter_dispatch.get(view) or self.null_view).title 
         
-        if(view == "doctype"):
+        if view == "doctype":
             title = title + ": " + (self.request.GET.get("A0") or "")
+
+        if view == "collection":
+            coll_id = self.request.GET.get("A0")
+            coll = Collection.objects.get(id = coll_id, owner = self.request.user)
+            title = title + ":" + coll.title 
 
         context["page_title"] = title 
 
@@ -210,7 +219,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def filter_collection(self):
         coll_id: int = self.query_param_as_int("A0")
         c: Collection = ds.get_object_or_404(Collection, id = coll_id)
-        return c.item.all()
+        return c.item.all().order_by("id").reverse()
 
     def filter_search(self):
         search = self.request.GET.get('query')
@@ -463,6 +472,7 @@ def rest_item_create(request: WSGIRequest):
     update_item_from_metadata(item.id)
     return  JsonResponse({ "result": "OK" })
 
+
 def rest_item(request: WSGIRequest):
     print(f" [INFO] request.method == {request.method} ")
     method: str = request.method
@@ -471,6 +481,53 @@ def rest_item(request: WSGIRequest):
     if method.lower() == "post":
         return rest_item_create(request)
     return Http404("Error: method not allowed for this endpoint")
+
+
+def rest_bulk_action(request: WSGIRequest):
+    
+    print(" [TRACE] rest_bulk_action() called Ok.")
+    assert( request.method == "POST" and request.is_ajax() )
+
+    body = json.loads(request.body.decode("utf-8"))
+    print(f" [TRACE] type(body) = {type(body)} ")
+    items_id = body["items"]
+
+    action: str = body["action"]
+
+    print(" [TRACE] Request body = ", body, " Items = ", items_id)
+
+    for id in items_id:
+        print(f" [TRACE] id = {id} - {type(id)}")
+        try:
+            item: SiteBookmark = SiteBookmark.objects.get(id = id)
+            
+            if action == "DELETE": 
+                item.deleted = True; item.save()
+
+            if action == "RESTORE":
+                item.deleted = False; item.save()
+            
+            if action == "ADD_STARRED":
+                item.deleted = False
+                item.starred = True
+                item.save()
+
+            if action == "REM_STARRED":
+                #item.deleted = False
+                item.starred = False 
+                item.save()
+
+            print(" [TRACE] Item = ", item)
+        except SiteBookmark.DoesNotExist:
+            return JsonResponse({"result": "ERROR", "reason": "Item not found"})    
+
+    # if request.method != "POST" or (not request.is_ajax()):
+    #    return Http404("Error: invalid request for this endpoint")
+
+    return JsonResponse({  "result": "OK"
+                         , "data":    body })
+
+
 
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
@@ -547,12 +604,127 @@ class SavedSearchUpdate(LoginRequiredMixin, UpdateView):
 
 class CollectionList(LoginRequiredMixin, ListView):
     template_name = "collection_list.html"
-    model = Collection
+    # model = Collection
     # queryset = Collection.objects.order_by("title")
+
+    def get_queryset(self):
+        # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
+        user: AbstractBaseUser = self.request.user
+        return Collection.objects.filter(owner = user, deleted = False).order_by("id").reverse()    
 
 class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = Collection
-    fields = ['title', 'description', 'item', 'starred', 'deleted']
+    fields = ['title', 'description', 'starred', 'deleted']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
+
+# Endpoints: /api/collection 
+class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
+    """Provides AJAX (REST) API response containing all user collections. """
+    # Overrident from class View 
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        from django.core import serializers
+        query = Collection.objects.filter(owner = self.request.user).values() 
+        res   = [ { "id": q["id"], "title": q["title"]} for q in query  ]
+        # print(" [TRACE] data = ", res)
+        return JsonResponse( res , safe = False)
+
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        body = json.loads(request.body.decode("utf-8"))
+        print(f" [TRACE] type(body) = {type(body)} ")
+        items_id: List[int] = body["items"]
+        collectionID: int   = body["collectionID"]
+        action: str         = body["action"]
+
+        print(f" [TRACE] collectionID = {collectionID} ; items_id = {items_id} ")
+
+        collection = Collection.objects.get(id = collectionID, owner = request.user)
+        print(f" [TRACE] collection = {collection} ")
+
+        for id in items_id:
+            item = SiteBookmark.objects.get(id = id, owner = request.user)
+            print(" [TRACE] item = ", item)
+            collection.item.add(item)
+            collection.save()
+
+        return JsonResponse(body, safe = False)
+        
+# Endpoint: /api/collections/new         
+class Ajax_Collection_New(LoginRequiredMixin, django.views.View):
+    """ Create new collection """
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))        
+
+        title       = body["title"]
+        description = body["description"]
+
+        new_collection = Collection.objects.create(title = title, description = description)
+        new_collection.owner = request.user 
+        new_collection.save()
+        
+        #items_id: List[int] = body["items"]
+        #collectionID: int   = body["collectionID"]
+        #action:       str   = body["action"]
+        print(" Collection_New = ", body)
+        return JsonResponse({ "result": "OK" }, safe = False)        
+
+# Endpoint: /api/collections/del         
+class Ajax_Collection_Delete(LoginRequiredMixin, django.views.View):
+    """ Create new collection """
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))        
+
+        coll_id = body["collection_id"]
+        
+        coll: Collection = Collection.objects.get(id = coll_id, owner = request.user)
+
+        # --- Soft-Delete --------------------//
+        coll.delete()
+        # coll.deleted = True 
+        # coll.save()
+        
+        print(" Delete collection = ", body)
+        return JsonResponse({ "result": "OK" }, safe = False)        
+
+class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
+    """ Create new collection """
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))        
+
+        coll_id = body["collection_id"]
+        url     = body["url"]
+        url_: str = dutils.remove_url_obfuscation(url)   
+        assert url_ is not None  
+
+        coll: Collection = Collection.objects.get(id = coll_id, owner = request.user)
+        exists = False
+
+        item = None 
+
+        try:
+            # Check whether URL already exists in the database         
+            item  = SiteBookmark.objects.filter(owner = request.user).get(url = url)
+            exists = True 
+        except SiteBookmark.DoesNotExist:
+            pass         
+        
+        if not exists:
+            item = SiteBookmark.objects.create(url = url_, owner = request.user)
+            item.save()
+            update_item_from_metadata(item.id)        
+        
+        coll.item.add(item)
+        coll.save()
+        return JsonResponse({ "result": "OK" }, safe = False)        
