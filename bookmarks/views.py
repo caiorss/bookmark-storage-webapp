@@ -605,7 +605,7 @@ class CollectionList(LoginRequiredMixin, ListView):
 class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = Collection
-    fields = ['title', 'description', 'item', 'starred', 'deleted']
+    fields = ['title', 'description', 'starred', 'deleted']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
 
