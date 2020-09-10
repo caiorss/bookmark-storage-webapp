@@ -26,9 +26,10 @@ class DownloadedFile(NamedTuple):
     fileHash:     str 
     fileData:     bytes 
 
-def download_file(url: str):
+def download_file(url: str) -> DownloadedFile:
     import mimetypes
-
+    import django.utils.text
+    
     req = urllib.request.Request(
         url, 
         data=None, 
@@ -47,12 +48,21 @@ def download_file(url: str):
     header_disposion = u.getheader("Content-Disposition")
     ext = mimetypes.guess_extension(f_mime)
 
+    # Example: 
+    # This block turns the URLL https://www.appinf.com/download/PortableSystems.pdf
+    # int the base name: PortableSystems 
+    basename_ = os.path.splitext( os.path.basename( urlparse(url).path ) )[0]
+
+    # Convert string in to a file name friendly string. 
+    # See: https://docs.djangoproject.com/en/2.1/ref/utils/#django.utils.text.slugify
+    basename  = django.utils.text.slugify(basename_)
+
     if header_disposion is not None:
-        f_name = header_disposion.split(";")[1].strip().strip("filename=").strip("\"")
-    elif f_mime is not None and ext is not None:        
-        f_name: str = "archive" + ext 
+        f_name: str = header_disposion.split(";")[1].strip().strip("filename=").strip("\"")
+    elif f_mime is not None and ext is not None:
+        f_name: str = basename + ext 
     else: 
-        f_name: str = "archive"
+        f_name: str = basename
 
     return DownloadedFile( fileName     = f_name
                          , fileMimeType = f_mime
