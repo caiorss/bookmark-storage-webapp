@@ -619,4 +619,27 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
         res   = [ { "id": q["id"], "title": q["title"]} for q in query  ]
         # print(" [TRACE] data = ", res)
         return JsonResponse( res , safe = False)
+
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "POST" and request.is_ajax() )
+
+        body = json.loads(request.body.decode("utf-8"))
+        print(f" [TRACE] type(body) = {type(body)} ")
+        items_id: List[int] = body["items"]
+        collectionID: int   = body["collectionID"]
+        action: str         = body["action"]
+
+        print(f" [TRACE] collectionID = {collectionID} ; items_id = {items_id} ")
+
+        collection = Collection.objects.get(id = collectionID, owner = request.user)
+        print(f" [TRACE] collection = {collection} ")
+
+        for id in items_id:
+            item = SiteBookmark.objects.get(id = id, owner = request.user)
+            print(" [TRACE] item = ", item)
+            collection.item.add(item)
+            collection.save()
+
+        return JsonResponse(body, safe = False)
+        
         
