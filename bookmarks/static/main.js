@@ -1,3 +1,4 @@
+import {NotificationDialog, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
 
 /** @brief Performs Http POST request to some endpoint. 
  *  @param {string} url         - Http request (REST API) endpoint 
@@ -52,8 +53,10 @@ function dom_querySelectorAll(css_selector)
 function dom_onClicked(css_selector, callback)
 {
     var elem = document.querySelector(css_selector);
-    console.assert(elem, "dom_onClicked() => Element with css_selector not found in DOM");
-    elem.addEventListener("click", callback);
+    if(elem){
+        console.assert(elem, "dom_onClicked() => Element with css_selector not found in DOM");
+        elem.addEventListener("click", callback);
+    }
 }
 
 /* Insert HTML code fragment to some DOM element. 
@@ -169,185 +172,9 @@ function LocalStorageString(name, value)
 
 
 
-
-// ----------- Keyboard Navigation ------------------ //
-
-navigation_enabled_flag = "navigation_enabled";
-
-flagKeyboardShortcut = new LocalStorageFlag("navigation_enabled", false);
-
-
-function KeyDispatcher() {
-    this._disp = {};
-    this._toggle_key_code = 27; /* ESC */
-
-    this.add_key = (keycode, callback) => {  this._disp[keycode] = callback; };
-
-    this.process_key = (e) => {
-	if(e.which == this._toggle_key_code)
-	    enable_keyboard_shortcut(flagKeyboardShortcut.toggle());
-	    
-	console.log(" [TRACE] User typed key = " + e.which);
-	var callback = this._disp[e.which];
-	if(flagKeyboardShortcut.get() && callback != null){ callback(); }
-    };
-    
-    this._ctor = (() => {
-	                  document.onkeyup = this.process_key;
-	                  console.log(" [TRACE] Constructed OK.");
-			})();
-}
-
-
-function show_keybind_help()
-{
-    alert([  " Keyboard Navigation Enabled. Ok "
-            ,"\n Keybindings: "
-            ," === General ==========================="
-            ,"  => (?) - Show this messagebox"
-            ,"  => (t) - Toggle sidebar"
-            ,"  => (y) - Toggle items information table."
-            ," === Items ============================="
-            ," => (j) - Focus on previous bookmark"
-            ," => (k) - Focus on next bookmark"            
-            ," => (o) - Open Selected bookmark in a new tab and switch to it."
-            ," => (i) - Open Selected bookmark in a new tab. (DON'T switch to it)"
-            ," === Results Paging ====================="
-            ,"  => (b) - Show previous 15 results (paging)."
-            ,"  => (n) - Show next 15 results (paging)."            
-            ," === Pages =============================="
-            ,"  => (1) - Show all items ordered by newest."
-            ,"  => (2) - Show all items ordered by oldest."
-            ,"  => (3) - List only starred items."
-            ,"  => (4) - List saved searches"
-            ,"  => (5) - List music bookmarks."
-          ].join("\n"));
-}
-
-function Counter(value, max){
-    this.value = value;
-    this.max   = max;
-    this.get = () => this.value;
-    this.increment = () => { if(this.value < max) this.value++; return this.value; }
-    this.decrement = () => { if(this.value > 0  ) this.value--; return this.value; }
-}
-
-counter = new Counter(-1, 14);
-
-// Shows whether keyboard shortcuts are enabled or disabled.
-function set_keyboard_indicator(flag)
-{
-    var q = document.querySelector("#keyboard-status");
-    q.textContent = flag ? "Keyboard shortcuts enabled" : "Keyboard shortcuts disabled ";
-    q.style.background = flag ? "green" : "blue";
-};
-
-function enable_keyboard_shortcut(navigation_enabled)
-{
-    // navigation_enabled = !navigation_enabled;      
-    flagKeyboardShortcut.set(navigation_enabled);
-    set_keyboard_indicator(navigation_enabled);
-};
-
-
-function isMobileDevice() {
-    try{ 
-         document.createEvent("TouchEvent");
-         //alert('Is mobile device OK');
-         return true; 
-        }
-    catch(e){ 
-        //alert('NOT MOBILE Device');
-        return false;        
-    }
-};
-
-kdb = new KeyDispatcher();
-kdb.add_key(84 /* t */,() => {
-    // console.log(" [TRACE] Toggle menu bar.");
-     toggle_sidebar();
-     var q = document.querySelector(".sidebar-nav a")
-     q.focus();    
-});
-
-kdb.add_key(89 /* y */, toggle_items_table_info);
-kdb.add_key(191 /* '/' forward slash */, show_keybind_help);
-
-kdb.add_key(78 /* n */, () => {
-    var q = document.querySelector("#page-next-button");
-    if(q != null) window.location.href = q.href;
-});
-
-kdb.add_key(66 /* b */, () => {
-    var q = document.querySelector("#page-prev-button");
-    if(q != null) window.location.href = q.href;
-
-});
-
-// Show latest or newest added bookmarks
-kdb.add_key(49 /* 1 */, () => {
-    window.location.href = "/items?filter=latest";
-});
-
-kdb.add_key(50 /* 2 */, () => {
-    window.location.href = "/items?filter=oldest";
-});
-
-kdb.add_key(50 /* 3 */, () => {
-    window.location.href = "/items?filter=starred";;
-});
-
-kdb.add_key(51 /* 4 */, () => {
-    window.location.href = "/search/list";
-});
-
-// Select previous link 
-kdb.add_key(74 /* j */, () => {
-    var links = document.querySelectorAll(".item-bookmark-link");
-    var e = links[counter.decrement()];
-    e.focus();
-    //counter.decrement();        
-    //console.log(" [TRACE] current item = " + counter.get());
-    //if(current_item < links.length){ current_item = current_item + 1; }   
-});
-
-kdb.add_key(75 /* k */, () => {
-    var links = document.querySelectorAll(".item-bookmark-link");      
-    var e = links[counter.increment()];
-    e.focus();
-    //counter.increment();
-    //console.log(" [TRACE] current item = " + counter.get());
-});
-
-// Open current bookmark when user types 'O'
-kdb.add_key(79 /* o */, () => {
-    var elem = document.activeElement;
-    if(elem.className == "item-bookmark-link")
-    {
-        var win = window.open(elem.href, '_blank');
-        win.focus();
-    }        
-});
-
-// Open current bookmark when user types 'O'
-kdb.add_key(83 /* s */, () => {
-    var elem = document.querySelector("#search-entry-box");
-    elem.focus();
-    enable_keyboard_shortcut(false);    
-});
-
-// Shortcut for adding new item.
-kdb.add_key(187 /* + */, () => {
-    enable_keyboard_shortcut(false);
-    window.location.href = "/items/new";
-    
-});
-
-
-
 // ---- Executed after document (DOM objects) is loaded ---------- //
 
-flagItemDetailsVisible = new LocalStorageFlag("itemsTableVisible", true);
+let flagItemDetailsVisible = new LocalStorageFlag("itemsTableVisible", true);
 
 
 function set_theme(mode)
@@ -382,7 +209,7 @@ function set_theme(mode)
 }
 
 
-site_theme = new LocalStorageString("site_theme");
+let site_theme = new LocalStorageString("site_theme");
 
 function selection_changed(mode)
 {
@@ -427,334 +254,17 @@ async function ajax_perform_bulk_operation(action)
     location.reload();
 }
 
-class DialogFormBuilder extends HTMLElement 
-{
-   
-    constructor()
-    {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.node = document.createElement("dialog");
-
-        this.submit_callback = () => { alert("Submit Clicked"); }
-
-        console.log(" Node = ", this.node);
-
-        var html = `
-            <div>                
-                <h4 id="dialog-title">Dialog Title</h4>
-
-                <span id="dialog-description">Dialog description</span>
-                <table> 
-                    <tbody>
-
-                    </tbody>
-                </table>
-                <button id="btn-cancel">Close</button>
-                <button id="btn-submit">Submit</button>
-             </div>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-        this.node.appendChild(elem);
-
-        var self = this;
-
-        var btn_cancel = this.node.querySelector("#btn-cancel");
-        btn_cancel.addEventListener("click", () =>  self.node.close() );
-
-        var btn_submit = this.node.querySelector("#btn-submit");
-        btn_submit.addEventListener("click", () =>  self.submit_callback() );
-
-        console.log(" Node = ", this.node);
-    }
-
-    connectedCallback(){
-        this.shadowRoot.innerHTML = `
-            <style>
-                dialog {
-                    position: fixed; 
-                    top:      20px;
-                    
-                    background-color: darkgray                    
-                    color: black;
-
-                    border-radius: 20px;
-                    z-index: 2;
-                }
-            </style>            
-        `;
-
-        this.shadowRoot.appendChild(this.node);
-    }
-
-    attach(dom_node)
-    {
-        dom_node.appendChild(this);
-    }
-
-    attach_body()
-    {
-        document.body.appendChild(this)
-    }
-
-    setTitle(title)
-    {
-        var label = this.shadowRoot.querySelector("#dialog-title");
-        label.textContent = title;
-        return this;
-    }
-
-    setText(text)
-    {
-        var desc = this.shadowRoot.querySelector("#dialog-description");
-        desc.textContent = text;
-        return this;
-    }
-
-    get_root() {
-        return this.node;
-    }
-
-    add_row_widget(label, widget)
-    {
-        var anchor = this.node.querySelector("tbody");
-        
-        var th_label = document.createElement("th");
-        th_label.textContent = label;
-        
-        var th_widget = document.createElement("th");
-        th_widget.appendChild(widget);
-
-        var tr = document.createElement("tr");
-        tr.appendChild(th_label);
-        tr.appendChild(th_widget);
-
-        // Add row to table.
-        anchor.appendChild(tr);
-
-        return widget;
-    }
-
-    add_row_input(label)
-    {
-        var widget = document.createElement("input");
-        return this.add_row_widget(label, widget);
-    }
-
-    show(){ this.node.showModal(true); }
-    hide(){ this.node.close();         }
-
-    setVisible(flag){
-        if(flag) 
-            this.node.showModal(true);
-        else 
-            this.node.close();
-    }
-
-    onSubmit(callback){
-        this.submit_callback = callback;
-    }
-
-}
-
-customElements.define('dialog-formbuilder', DialogFormBuilder);
-
-
-class Dialog_GenericNotification extends HTMLElement
-{
-    
-    constructor()
-    {
-        super()
-
-        this.node = document.createElement("dialog");
-
-        this.submit_callback = (flag) => { alert("Submit Clicked"); }
-
-        var html = `
-            <div>    
-                <div>            
-                    <h4 id="dialog-title">Dialog Title</h4>
-                    <span id="dialog-text">Dialog Text</span>
-                
-                </div id="dialog-body"> 
-                <div>
-                
-                </div>
-                <div>
-                    <button id="btn-close">Close</button>
-                    <button id="btn-submit">Submit</button>
-                </div>
-             </div>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-        this.node.appendChild(elem);
-
-        var self = this;
-        this.node.querySelector("#btn-close").addEventListener("click", () => { 
-            self.node.close();
-            this.submit_callback(false);
-        });
-        this.node.querySelector("#btn-submit").addEventListener("click", () => { 
-            self.submit_callback() 
-            this.submit_callback(true);
-        });
-    }
-
-    connectedCallback()
-    {
-        this.shadowRoot.innerHTML = `
-            <style>
-                dialog {
-                    position: fixed; 
-                    top:      20px;
-                    
-                    background-color: darkgray                    
-                    color: black;
-
-                    border-radius: 20px;
-                    z-index: 2;
-                }
-            </style>            
-        `;
-
-        this.shadowRoot.appendChild(this.node);
-    }
-
-    attach_body()
-    {
-        document.body.appendChild(this)
-    }
-
-    setTitle(title)
-    {
-        var label = this.node.querySelector("#dialog-title");
-        label.textContent = title;
-        return this;
-    }
-
-    setText(text)
-    {
-        var desc = this.node.querySelector("#dialog-text");
-        desc.textContent = text;
-        return this;
-    }
-
-    setButtonCloseLabel(text)
-    {
-        var desc = this.node.querySelector("#btn-close");
-        desc.textContent = text;
-    }
-
-    setButtonSubmitLabel(text)
-    {
-        var desc = this.node.querySelector("#btn-submit");
-        desc.textContent = text;
-    }
-
-    onSubmit(callback) {
-        this.submit_callback = callback;
-    }
-
-    /** Hides/show submit submit button. */
-    setSubmitVisible(flag) {
-        var btn = this.node.querySelector("#btn-submit");
-
-        if(!flag){            
-            btn.style.visibility = "hidden";
-            btn.style.display    = "none";
-            return;
-        }
-        btn.style.visibility = "visible";
-        btn.style.display    = "block";
-    }
-
-    show() { this.node.showModal(true); }
-    hide() { this.node.close();         }
-    close(){ this.node.close();         }
-
-    setVisible(flag) 
-    {
-        if(flag) 
-            this.node.showModal(true);
-        else
-            this.node.close(); 
-    }
-
-
-} // --- End of class Dialog_GenericNotification -------------//
-
-customElements.define('dialog-generic', Dialog_GenericNotification);
-
-
-class Dialog_OkCancel extends Dialog_GenericNotification
-{
-    constructor(){
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.setTitle("Are you sure?")
-        this.setText("Are you sure you want to delete this item?");
-        this.setButtonSubmitLabel("OK");
-        this.setButtonCloseLabel("Cancel");
-
-        this.onSubmit( (flag) => {
-            console.log(" [INFO] User clicked submit ? = ", flag);
-            this.close();
-        });
-    }
-}
-
-customElements.define('dialog-okcancel', Dialog_OkCancel);
-
-
-/**
- * Usage: 
- * ```
- *   var c = new NotificationDialog();
- *   c.attach(document.body);
- *   // Timeout 1 second (= 1000 milliseconds)
- *   c.notify("My notifcation", 1000);
- * ```
- */
-class NotificationDialog extends Dialog_GenericNotification 
-{
-    constructor() {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.onSubmit((flag) => {});
-        this.setSubmitVisible(false);
-    }
-
-    notify(text, timeout = 1500)
-    {
-        this.setText(text);
-        this.setVisible(true);
-        var self = this;
-        setTimeout(() => self.setVisible(false) , timeout);
-    }
-
-}
-
-customElements.define('dialog-notification', NotificationDialog);
-
 
 //----------------------------------------------//
 //    D I A L O G S                             // 
 //----------------------------------------------//
 
-dialog_notify = new NotificationDialog();
+let dialog_notify = new NotificationDialog();
 
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
+
+    console.trace(" [TRACE] Starting DOM initialization. OK. ");
 
     dialog_notify.attach_body();
     dialog_notify.id = "dialog-notify";
@@ -763,11 +273,12 @@ document.addEventListener("DOMContentLoaded", () => {
     var flag = flagItemDetailsVisible.get();
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
-    set_keyboard_indicator(flagKeyboardShortcut.get());
+    
+    // set_keyboard_indicator(flagKeyboardShortcut.get());
 
-    var q = document.querySelector("#div-keyboard-status");
+/*     var q = document.querySelector("#div-keyboard-status");
     if(isMobileDevice()){ DOM_toggle(q); }
-
+ */
     var elem_item_detail = document.querySelector("#item-details");
      
 
@@ -818,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ajax_get("/api/collections", crfs_token).then( colls => {
         for(let n  in colls){
             var opt   = document.createElement("option");
-            console.log(" row = ", colls[n]);
+            // console.log(" row = ", colls[n]);
             opt.text  = colls[n]["title"];
             opt.value = colls[n]["id"];
             selectbox.add(opt, -1);    
@@ -850,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    dialog_CreateCollection = new DialogFormBuilder();
+    let dialog_CreateCollection = new DialogFormBuilder();
     dialog_CreateCollection.attach_body();
     dialog_CreateCollection.setTitle("Create new collection");
     dialog_CreateCollection.setText("Enter the following informations:");
@@ -881,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dialog_CreateCollection.show();
     });
 
-    dialog_collection_delete = new Dialog_OkCancel();
+    let dialog_collection_delete = new Dialog_OkCancel();
     dialog_collection_delete.setTitle("Delete collection");
     dialog_collection_delete.attach_body();
     
@@ -914,6 +425,9 @@ function toggle_sidebar()
     DOM_toggle(s);
 }
 
+// Allows accessing this variable from html templates 
+window["toggle_sidebar"] = toggle_sidebar;
+
 function toggle_items_table_info()
 {
     flagItemDetailsVisible.toggle();
@@ -921,6 +435,8 @@ function toggle_items_table_info()
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
 }
+
+window["toggle_items_table_info"] = toggle_items_table_info;
 
 function toggle_action_menu(actionID)
 {
