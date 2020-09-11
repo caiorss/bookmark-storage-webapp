@@ -1,140 +1,3 @@
-export class DialogFormBuilder extends HTMLElement 
-{
-   
-    constructor()
-    {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.node = document.createElement("dialog");
-
-        this.submit_callback = () => { alert("Submit Clicked"); }
-
-        console.log(" Node = ", this.node);
-
-        var html = `
-            <div>                
-                <h4 id="dialog-title">Dialog Title</h4>
-
-                <span id="dialog-description">Dialog description</span>
-                <table> 
-                    <tbody>
-
-                    </tbody>
-                </table>
-                <button id="btn-cancel">Close</button>
-                <button id="btn-submit">Submit</button>
-             </div>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-        this.node.appendChild(elem);
-
-        var self = this;
-
-        var btn_cancel = this.node.querySelector("#btn-cancel");
-        btn_cancel.addEventListener("click", () =>  self.node.close() );
-
-        var btn_submit = this.node.querySelector("#btn-submit");
-        btn_submit.addEventListener("click", () =>  self.submit_callback() );
-
-        console.log(" Node = ", this.node);
-    }
-
-    connectedCallback(){
-        this.shadowRoot.innerHTML = `
-            <style>
-                dialog {
-                    position: fixed; 
-                    top:      20px;
-                    
-                    background-color: darkgray                    
-                    color: black;
-
-                    border-radius: 20px;
-                    z-index: 2;
-                }
-            </style>            
-        `;
-
-        this.shadowRoot.appendChild(this.node);
-    }
-
-    attach(dom_node)
-    {
-        dom_node.appendChild(this);
-    }
-
-    attach_body()
-    {
-        document.body.appendChild(this)
-    }
-
-    setTitle(title)
-    {
-        var label = this.shadowRoot.querySelector("#dialog-title");
-        label.textContent = title;
-        return this;
-    }
-
-    setText(text)
-    {
-        var desc = this.shadowRoot.querySelector("#dialog-description");
-        desc.textContent = text;
-        return this;
-    }
-
-    get_root() {
-        return this.node;
-    }
-
-    add_row_widget(label, widget)
-    {
-        var anchor = this.node.querySelector("tbody");
-        
-        var th_label = document.createElement("th");
-        th_label.textContent = label;
-        
-        var th_widget = document.createElement("th");
-        th_widget.appendChild(widget);
-
-        var tr = document.createElement("tr");
-        tr.appendChild(th_label);
-        tr.appendChild(th_widget);
-
-        // Add row to table.
-        anchor.appendChild(tr);
-
-        return widget;
-    }
-
-    add_row_input(label)
-    {
-        var widget = document.createElement("input");
-        return this.add_row_widget(label, widget);
-    }
-
-    show(){ this.node.showModal(true); }
-    hide(){ this.node.close();         }
-
-    setVisible(flag){
-        if(flag) 
-            this.node.showModal(true);
-        else 
-            this.node.close();
-    }
-
-    onSubmit(callback){
-        this.submit_callback = callback;
-    }
-
-}
-
-customElements.define('dialog-formbuilder', DialogFormBuilder);
-
-
 export class Dialog_GenericNotification extends HTMLElement
 {
     
@@ -315,4 +178,141 @@ export class NotificationDialog extends Dialog_GenericNotification
 }
 
 customElements.define('dialog-notification', NotificationDialog);
+
+
+export class DialogFormBuilder extends HTMLElement 
+{
+   
+    constructor()
+    {
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.node = document.createElement("dialog");
+
+        this.submit_callback = () => { alert("Submit Clicked"); }
+
+        console.log(" Node = ", this.node);
+
+        var html = `
+            <div>                
+                <h4 id="dialog-title">Dialog Title</h4>
+
+                <span id="dialog-description">Dialog description</span>
+                <table> 
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <button id="btn-cancel">Close</button>
+                <button id="btn-submit">Submit</button>
+             </div>
+        `.trim();
+
+        var el       = document.createElement("template");
+        el.innerHTML = html;
+        var elem     = el.content.firstChild;
+        this.node.appendChild(elem);
+
+        var self = this;
+
+        var btn_cancel = this.node.querySelector("#btn-cancel");
+        btn_cancel.addEventListener("click", () =>  self.node.close() );
+
+        var btn_submit = this.node.querySelector("#btn-submit");
+        btn_submit.addEventListener("click", () =>  self.submit_callback() );
+
+        console.log(" Node = ", this.node);
+    }
+
+    connectedCallback(){
+        this.shadowRoot.innerHTML = `
+            <style>
+                dialog {
+                    position: fixed; 
+                    top:      20px;
+                    
+                    background-color: darkgray                    
+                    color: black;
+
+                    border-radius: 20px;
+                    z-index: 2;
+                }
+            </style>            
+        `;
+
+        this.shadowRoot.appendChild(this.node);
+    }
+
+    attach(dom_node)
+    {
+        dom_node.appendChild(this);
+    }
+
+    attach_body()
+    {
+        document.body.appendChild(this)
+    }
+
+    setTitle(title)
+    {
+        var label = this.shadowRoot.querySelector("#dialog-title");
+        label.textContent = title;
+        return this;
+    }
+
+    setText(text)
+    {
+        var desc = this.shadowRoot.querySelector("#dialog-description");
+        desc.textContent = text;
+        return this;
+    }
+
+    get_root() {
+        return this.node;
+    }
+
+    add_row_widget(label, widget)
+    {
+        var anchor = this.node.querySelector("tbody");
+        
+        var th_label = document.createElement("th");
+        th_label.textContent = label;
+        
+        var th_widget = document.createElement("th");
+        th_widget.appendChild(widget);
+
+        var tr = document.createElement("tr");
+        tr.appendChild(th_label);
+        tr.appendChild(th_widget);
+
+        // Add row to table.
+        anchor.appendChild(tr);
+
+        return widget;
+    }
+
+    add_row_input(label)
+    {
+        var widget = document.createElement("input");
+        return this.add_row_widget(label, widget);
+    }
+
+    show(){ this.node.showModal(true); }
+    hide(){ this.node.close();         }
+
+    setVisible(flag){
+        if(flag) 
+            this.node.showModal(true);
+        else 
+            this.node.close();
+    }
+
+    onSubmit(callback){
+        this.submit_callback = callback;
+    }
+
+}
+
+customElements.define('dialog-formbuilder', DialogFormBuilder);
 
