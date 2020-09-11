@@ -39,7 +39,7 @@ export class Dialog_GenericNotification extends HTMLElement
         });
         this.node.querySelector("#btn-submit").addEventListener("click", () => { 
             self.submit_callback() 
-            this.submit_callback(true);
+            this.submit_callback(true);            
         });
     }
 
@@ -116,6 +116,17 @@ export class Dialog_GenericNotification extends HTMLElement
         this.node.querySelector("#dialog-body").appendChild(domElement);
     }
 
+    insertBodyHtml(html)
+    {
+
+        var el = document.createElement("template");
+        el.innerHTML = html;
+        var elem = el.content.firstChild;
+        this.node.querySelector("#dialog-body")
+                 .appendChild(elem);
+        return elem;
+    }
+
     show() { this.node.showModal(true); }
     hide() { this.node.close();         }
     close(){ this.node.close();         }
@@ -154,6 +165,8 @@ export class Dialog_OkCancel extends Dialog_GenericNotification
 
 customElements.define('dialog-okcancel', Dialog_OkCancel);
 
+
+
 /**
  * Usage: 
  * ```
@@ -184,6 +197,53 @@ export class NotificationDialog extends Dialog_GenericNotification
 }
 
 customElements.define('dialog-notification', NotificationDialog);
+
+
+export class Dialog_Prompt extends Dialog_GenericNotification
+{
+    constructor(){
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.setTitle("Prompt:");
+        // this.setText("Are you sure you want to delete this item?");
+        this.setButtonSubmitLabel("Submit");
+        this.setButtonCloseLabel("Cancel");
+
+        this.input = this.insertBodyHtml(`<input id="question-entry"></input>`);
+        this.node.style["width"] = "400px";
+        this.input.style["width"] = "100%";
+
+        this.onSubmit( (flag) => {
+            console.log(" [INFO] User clicked submit ? = ", flag);
+            this.close();
+        });
+    }
+
+    get_answer() {
+        return this.input.value;
+    }
+
+    prompt(title, question, callback)
+    {
+        this.setTitle(title);
+        this.setText(question);
+        this.input.value = "";
+
+        this.onSubmit(flag => {
+            if(!flag) return;
+            let answer = this.input.value;
+            if(answer == ""){ this.close(); return;}
+            callback(answer);            
+            this.close();
+        });
+        this.show();
+    }
+}
+
+customElements.define('dialog-prompt', Dialog_Prompt);
+window["Dialog_Prompt"] = Dialog_Prompt;
+
 
 
 export class DialogFormBuilder extends Dialog_GenericNotification 
@@ -242,4 +302,5 @@ export class DialogFormBuilder extends Dialog_GenericNotification
 }
 
 customElements.define('dialog-formbuilder', DialogFormBuilder);
+
 
