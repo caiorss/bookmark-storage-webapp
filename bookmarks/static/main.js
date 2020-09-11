@@ -663,6 +663,19 @@ class Dialog_GenericNotification extends HTMLElement
         this.submit_callback = callback;
     }
 
+    /** Hides/show submit submit button. */
+    setSubmitVisible(flag) {
+        var btn = this.node.querySelector("#btn-submit");
+
+        if(!flag){            
+            btn.style.visibility = "hidden";
+            btn.style.display    = "none";
+            return;
+        }
+        btn.style.visibility = "visible";
+        btn.style.display    = "block";
+    }
+
     show() { this.node.showModal(true); }
     hide() { this.node.close();         }
     close(){ this.node.close();         }
@@ -717,7 +730,8 @@ class NotificationDialog extends Dialog_GenericNotification
         super()
         this.attachShadow( { mode: 'open' } )
 
-        this.onSubmit((flag) => {})
+        this.onSubmit((flag) => {});
+        this.setSubmitVisible(false);
     }
 
     notify(text, timeout = 1500)
