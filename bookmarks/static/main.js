@@ -53,8 +53,11 @@ function dom_querySelectorAll(css_selector)
 function dom_onClicked(css_selector, callback)
 {
     var elem = document.querySelector(css_selector);
-    if(elem){
-        console.assert(elem, "dom_onClicked() => Element with css_selector not found in DOM");
+
+    if(!elem) { 
+        console.warn(` dom_onClicked() => CSS selector ${css_selector} not found.`); 
+    }
+    if(elem){        
         elem.addEventListener("click", callback);
     }
 }
