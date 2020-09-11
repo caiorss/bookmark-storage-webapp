@@ -705,52 +705,10 @@ customElements.define('dialog-okcancel', Dialog_OkCancel);
  *   c.notify("My notifcation", 1000);
  * ```
  */
-class NotificationDialog extends HTMLElement 
+class NotificationDialog extends Dialog_GenericNotification 
 {
     constructor() {
         super()
-        this.attachShadow( { mode: 'open' } )            
-    }
-
-    connectedCallback() {
-        var text = this.getAttribute("text");
-        console.log("text = ", text);
-        this.shadowRoot.innerHTML = `
-            <style>
-                dialog {
-                    position: fixed; 
-                    top:      20px;
-                    
-                    background-color: darkgray                    
-                    color: black;
-
-                    border-radius: 20px;
-                    z-index: 2;
-                }
-
-            </style>
-        
-            <dialog id="notify-dialog"> 
-              <div>
-                 <h4>Notification</h4>
-                 <span id="text-display">Notification text here</span>
-               </div>
-            </dialog>
-            `;                                               
-    }
-
-    setText(text){
-        var node = this.shadowRoot.querySelector("#text-display");
-        console.assert(node, "It must be attached to some DOM element");
-        node.textContent = text;
-    }
-
-    setVisible(flag){
-        var node = this.shadowRoot.querySelector("#notify-dialog");
-        if(flag)
-            node.showModal();
-        else 
-            node.close();
     }
 
     notify(text, timeout = 1500)
@@ -761,10 +719,6 @@ class NotificationDialog extends HTMLElement
         setTimeout(() => self.setVisible(false) , timeout);
     }
 
-    // Attach to DOM element such as document.body
-    attach(dom_node){
-        dom_node.appendChild(this)
-    }
 }
 
 customElements.define('dialog-notification', NotificationDialog);
@@ -781,7 +735,7 @@ dialog_notify = new NotificationDialog();
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
 
-    dialog_notify.attach(document.body);
+    dialog_notify.attach_body();
     dialog_notify.id = "dialog-notify";
     // dialog_notify.notify("Page created Ok", 900);
 
