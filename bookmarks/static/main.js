@@ -667,6 +667,14 @@ class Dialog_GenericNotification extends HTMLElement
     hide() { this.node.close();         }
     close(){ this.node.close();         }
 
+    setVisible(flag) 
+    {
+        if(flag) 
+            this.node.showModal(true);
+        else
+            this.node.close(); 
+    }
+
 
 } // --- End of class Dialog_GenericNotification -------------//
 
@@ -694,8 +702,6 @@ class Dialog_OkCancel extends Dialog_GenericNotification
 customElements.define('dialog-okcancel', Dialog_OkCancel);
 
 
-
-
 /**
  * Usage: 
  * ```
@@ -709,6 +715,9 @@ class NotificationDialog extends Dialog_GenericNotification
 {
     constructor() {
         super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.onSubmit((flag) => {})
     }
 
     notify(text, timeout = 1500)
@@ -722,8 +731,6 @@ class NotificationDialog extends Dialog_GenericNotification
 }
 
 customElements.define('dialog-notification', NotificationDialog);
-
-
 
 
 //----------------------------------------------//
