@@ -446,6 +446,7 @@ function toggle_action_menu(actionID)
     var elem = document.querySelector(actionID);
     DOM_toggle(elem);
 }
+window["toggle_action_menu"] = toggle_action_menu;
 
 function open_url_newtab(url)
 {
