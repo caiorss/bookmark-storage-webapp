@@ -492,6 +492,8 @@ function api_item_add(crfs_token)
     });
 }
 
+window["api_item_add"] = api_item_add;
+
 
 class YoutubeThumb extends HTMLElement {
     constructor() {
