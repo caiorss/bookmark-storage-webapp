@@ -1,4 +1,5 @@
-import {NotificationDialog, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
+import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
+
 
 /** @brief Performs Http POST request to some endpoint. 
  *  @param {string} url         - Http request (REST API) endpoint 
@@ -264,6 +265,8 @@ async function ajax_perform_bulk_operation(action)
 
 let dialog_notify = new NotificationDialog();
 
+let dialog_prompt = new Dialog_Prompt();
+
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -271,6 +274,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dialog_notify.attach_body();
     dialog_notify.id = "dialog-notify";
+
+    dialog_prompt.attach_body();
+
     // dialog_notify.notify("Page created Ok", 900);
 
     var flag = flagItemDetailsVisible.get();
@@ -457,42 +463,48 @@ function open_url_newtab(url)
 
 function api_item_add(crfs_token)
 {
-    var url = prompt("Enter the URL to add:", "");
-    if(url == null) return;
+    dialog_prompt.prompt( "New bookmark entry"
+                        , "Enter the URL to be added.", (url) => {
+                            
+        console.log("User entered the URL: ", url);
 
-    var query_params = new URLSearchParams(window.location.search);
-    if(query_params.get("filter") == "collection")
-    {
-        console.trace(" [TRACE] Add item to collection")
+        if(url == null) return;
 
-        var collection_id = query_params.get("A0");
-        var data = { url: url, collection_id: collection_id };
+        var query_params = new URLSearchParams(window.location.search);
+        if(query_params.get("filter") == "collection")
+        {
+            console.trace(" [TRACE] Add item to collection")
 
-        var token = window["generated_token"];
-        ajax_post("/api/collections/add_item", token, data).then( res => {
+            var collection_id = query_params.get("A0");
+            var data = { url: url, collection_id: collection_id };
+
+            var token = window["generated_token"];
+            ajax_post("/api/collections/add_item", token, data).then( res => {
+                if(res["result"] == "OK"){
+                    dialog_notify.notify("Bookmark added successfuly", 2000);
+                    location.reload();
+                } else {
+                    dialog_notify.notify("Error: bookmark already exists", 2000);
+                }
+        
+            }).catch(err => { 
+                dialog_notify.notify(" Error: " + err)
+            });
+
+            return;
+        }
+
+
+        var payload = {url: url};
+        ajax_post("/api/item", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
                 dialog_notify.notify("Bookmark added successfuly", 2000);
                 location.reload();
             } else {
                 dialog_notify.notify("Error: bookmark already exists", 2000);
             }
-    
-        }).catch(err => { 
-            dialog_notify.notify(" Error: " + err)
+
         });
-
-        return;
-    }
-
-
-    var payload = {url: url};
-    ajax_post("/api/item", crfs_token, payload).then( res => {
-        if(res["result"] == "OK"){
-            dialog_notify.notify("Bookmark added successfuly", 2000);
-            location.reload();
-        } else {
-            dialog_notify.notify("Error: bookmark already exists", 2000);
-        }
 
     });
 }
