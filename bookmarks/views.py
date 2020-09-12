@@ -629,7 +629,7 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     # Overrident from class View 
     def get(self, request: WSGIRequest, *args, **kwargs):
         from django.core import serializers
-        query = Collection.objects.filter(owner = self.request.user).values() 
+        query = Collection.objects.filter(owner = self.request.user, deleted = False).values() 
         res   = [ { "id": q["id"], "title": q["title"]} for q in query  ]
         # print(" [TRACE] data = ", res)
         return JsonResponse( res , safe = False)
