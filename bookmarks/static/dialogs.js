@@ -211,8 +211,13 @@ export class Dialog_Prompt extends Dialog_GenericNotification
         this.setButtonCloseLabel("Cancel");
 
         this.input = this.insertBodyHtml(`<input id="question-entry"></input>`);
-        this.node.style["width"] = "400px";
-        this.input.style["width"] = "100%";
+        
+        if(screen.width <= 500)
+            this.node.style["width"] = "80%";
+        else 
+            this.node.style["width"] = "500px";
+        
+        this.input.style["width"] = "90%";
 
         this.onSubmit( (flag) => {
             console.log(" [INFO] User clicked submit ? = ", flag);
