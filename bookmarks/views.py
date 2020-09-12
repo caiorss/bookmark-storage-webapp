@@ -623,16 +623,19 @@ class CollectionCreate(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
 
+def queryset2Json(queryset: QuerySet, columns: List[str]) -> JsonResponse:
+    """ Turn queryset object into a key-value pair json response. """
+    kv_pairs      = [ [ (c, row[c]) for c in columns] for row in queryset.values()]
+    list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
+    return JsonResponse(list_of_dicts, safe =False)    
+
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """
     # Overrident from class View 
     def get(self, request: WSGIRequest, *args, **kwargs):
-        from django.core import serializers
-        query = Collection.objects.filter(owner = self.request.user, deleted = False).values() 
-        res   = [ { "id": q["id"], "title": q["title"]} for q in query  ]
-        # print(" [TRACE] data = ", res)
-        return JsonResponse( res , safe = False)
+        query = Collection.objects.filter(owner = self.request.user, deleted = False)
+        return queryset2Json(query, ["id", "title"])
 
     def post(self, request: WSGIRequest, *args, **kwargs):
         assert( request.method == "POST" and request.is_ajax() )
