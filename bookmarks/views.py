@@ -629,6 +629,12 @@ def queryset2Json(queryset: QuerySet, columns: List[str]) -> JsonResponse:
     list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
     return JsonResponse(list_of_dicts, safe =False)    
 
+def querylist2Json(querylist, columns: List[str]) -> JsonResponse:
+    """ Turn queryset object into a key-value pair json response. """
+    kv_pairs      = [ [ (c, getattr(row, c) ) for c in columns] for row in querylist]
+    list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
+    return JsonResponse(list_of_dicts, safe =False)    
+
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """
@@ -735,3 +741,78 @@ class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
         coll.item.add(item)
         coll.save()
         return JsonResponse({ "result": "OK" }, safe = False)        
+
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
+class ViewPaginatorMixin(object):
+    min_limit = 1
+    max_limit = 10
+
+    def paginate(self, object_list, columns, page=1, limit=10, **kwargs):
+        try:
+            page = int(page)
+            if page < 1:
+                page = 1
+        except (TypeError, ValueError):
+            page = 1
+
+        try:
+            limit = int(limit)
+            if limit < self.min_limit:
+                limit = self.min_limit
+            if limit > self.max_limit:
+                limit = self.max_limit
+        except (ValueError, TypeError):
+            limit = self.max_limit
+
+        paginator = Paginator(object_list, limit)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        
+        # print(" [INFO] type(objects) = ", type(objects))
+
+        kv_pairs = [ [ (c, getattr(row, c) ) for c in columns] for row in objects]
+        results  = list(map(lambda x: dict(x), kv_pairs))        
+
+        data = {
+            'prev_page': objects.has_previous() and objects.previous_page_number() or None,
+            'next_page': objects.has_next() and objects.next_page_number() or None,
+            'data':      results
+        }
+        
+        return data
+
+
+class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View):
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        search = request.GET.get('query', "")
+        print(" [TRACE] search = ", search)
+
+        mode   = request.GET.get('mode', "")
+        page   = int(request.GET.get("page", "1"))
+
+        if not search:
+            return Http404("Error: missing search parameter")
+
+        words = shlex.split(search)
+        lam = lambda x, y: x | y
+        if  mode == "OR":
+            lam = lambda x, y: x | y
+        if mode == "AND":
+            lam = lambda x, y: x & y
+        # q = Q(title__contains =   search) | Q(url__contains =  search)       
+        q1 = reduce(lam, [ Q(url__contains=w) for w in words])
+        q2 = reduce(lam, [ Q(title__contains=w) for w in words])
+        
+        queryset = SiteBookmark.objects.filter(owner = self.request.user)\
+            .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
+        
+        results = self.paginate(queryset, ["id", "title"], page, 10)
+        results["total"] = queryset.count()
+
+        return JsonResponse(results, safe = False)
