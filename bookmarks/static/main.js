@@ -1,96 +1,6 @@
 import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
 
-
-/** @brief Performs Http POST request to some endpoint. 
- *  @param {string} url         - Http request (REST API) endpoint 
- *  @param {string} crfs_token  - Django CRFSS token from global variable (generated_token)
- *  @param {object} data        - HTTP request body, aka payload  
- */
-async function ajax_post(url, crfs_token, data)
-{
-
-    var payload = JSON.stringify(data);
-
-    const resp = await fetch(url, {
-          method:  'POST'
-        , headers: {    'Content-Type':     'application/json'
-                      , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':      crfs_token 
-                   }
-        , body: payload
-    });
-    return resp.json();
-}
-
-async function ajax_get(url, crfs_token, data)
-{
-
-    var payload = JSON.stringify(data);
-
-    const resp = await fetch(url, {
-          method:  'GET'
-        , headers: {    'Content-Type':     'application/json'
-                      , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':      crfs_token 
-                   }});
-    return resp.json();
-}
-
-/** Reload current page. (same as hit F5 in the web browser) */
-function dom_page_refresh()
-{
-    location.reload();
-}
-
-
-/** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
- * 
- */
-function dom_querySelectorAll(css_selector, dom_node = null)
-{
-    var node  = document;
-    if(dom_node != null){ node = dom_node; }
-    return Array.prototype.slice.call(node.querySelectorAll(css_selector));
-}
-
-function dom_onClicked(css_selector, callback)
-{
-    var elem = document.querySelector(css_selector);
-
-    if(!elem) { 
-        console.warn(` dom_onClicked() => CSS selector ${css_selector} not found.`); 
-    }
-    if(elem){        
-        elem.addEventListener("click", callback);
-    }
-}
-
-/* Insert HTML code fragment to some DOM element. 
- *  
- *  Usage example: 
- * 
- *     var anchor = document.querySelector("#element-dom-id");
- *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);   
- ******************************************************************/
-function dom_insert_html(anchor_element, html)
-{
-    var el = document.createElement("template");
-    el.innerHTML = html.trim();
-    var elem = el.content.firstChild;
-    anchor_element.appendChild(elem);
-    return elem;
-}
-
-function dom_insert_html_at_selector(selector, html)
-{
-    var el = document.createElement("template");
-    el.innerHTML = html.trim();
-    var elem = el.content.firstChild;
-
-    var anchor_element = document.querySelector(selector);
-    anchor_element.appendChild(elem);
-    return elem;
-}
+import * as utils from "/static/utils.js";
 
 function DOM_select(selector)
 {
@@ -243,7 +153,7 @@ const ACTION_REM_STARRED = "REM_STARRED";
 function get_selected_items_for_bulk_operation()
 {
     // Get ID of selected bookmarks 
-    return dom_querySelectorAll(".bulk-checkbox")
+    return utils.dom_querySelectorAll(".bulk-checkbox")
                             .filter(x => x.checked)
                             .map(x => parseInt(x.id));
 }
@@ -262,7 +172,7 @@ async function ajax_perform_bulk_operation(action)
       , items:    selected_items
     };
 
-    var resp = await ajax_post("/api/bulk", crfs_token, payload);
+    var resp = await utils.ajax_post("/api/bulk", crfs_token, payload);
     console.log("Response = ",  resp);
 
     //return resp;
@@ -352,7 +262,10 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             this.search_items();
         })
 
-        this.onSubmit(() => this.add_items_to_collection() );
+        this.onSubmit((flag) => {
+          if(!flag){ return};
+          this.add_items_to_collection() 
+        });
 
         console.log(" [TRACE] x = ", x);
     }
@@ -362,7 +275,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
         console.trace(" [onSubmit()] Called Ok. ");
 
         // Get IDs from bookmark items selected (where checkbox is checked).
-        var checked_items_id = dom_querySelectorAll(".bookmark-checkbox", this.div_search_results)
+        var checked_items_id = utils.dom_querySelectorAll(".bookmark-checkbox", this.div_search_results)
                                   .filter(x => x.checked )
                                   .map( x => parseInt(x.value) );
 
@@ -383,9 +296,9 @@ class Dialog_Search_Item extends Dialog_GenericNotification
            ,action:       ACTION_COLLECTION_ADD
        };
 
-       let res = await ajax_post("/api/collections", token, payload);
+       let res = await utils.ajax_post("/api/collections", token, payload);
        console.log(" [TRACE] respose OK = ", res);
-       dom_page_refresh();
+       utils.dom_page_refresh();
 
     }
 
@@ -410,7 +323,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
         if(query == "") return;
 
         console.log(" Encoded query = ", encoded_query);
-        let q = await ajax_get(`/api/search?query=${encoded_query}&page=${this.page}`);
+        let q = await utils.ajax_get(`/api/search?query=${encoded_query}&page=${this.page}`);
         console.log(q);
         let data = q["data"];
         console.log(" data = ", data);
@@ -424,7 +337,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             let title = row["title"];
             let url   = row["url"];
 
-            dom_insert_html(this.div_search_results,
+            utils.dom_insert_html(this.div_search_results,
                 `<div class="div-row-result">
                     <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
                     <a target="_blank" href="${url}">[${id}] ${title}</a>
@@ -463,7 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if(query_params.get("filter") == "collection")
     { 
-        var btn_add_items = dom_insert_html_at_selector("#div-additional-buttons", `
+        var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
         <a id="btn-experimental" class="btn btn-info" 
             href="#" title="Search items win">Add multiple items</a>
         `);
@@ -500,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     var body = document.body;
 
-    var dialog = dom_insert_html(body, `
+    var dialog = utils.dom_insert_html(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
                 <button id="btn-bulk-add-starred"> Add items to starred items</button> 
@@ -523,17 +436,17 @@ document.addEventListener("DOMContentLoaded", () => {
     var btn = dialog.querySelector("#btn-dialog-close");
     btn.addEventListener("click", () => dialog.close() );
 
-    dom_onClicked("#btn-bulk-actions",     () => dialog.showModal() );
-    dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
-    dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
-    dom_onClicked("#btn-bulk-delete",      () => ajax_perform_bulk_operation(ACTION_DELETE) );
-    dom_onClicked("#btn-bulk-restore",     () => ajax_perform_bulk_operation(ACTION_RESTORE) );
+    utils.dom_onClicked("#btn-bulk-actions",     () => dialog.showModal() );
+    utils.dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
+    utils.dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
+    utils.dom_onClicked("#btn-bulk-delete",      () => ajax_perform_bulk_operation(ACTION_DELETE) );
+    utils.dom_onClicked("#btn-bulk-restore",     () => ajax_perform_bulk_operation(ACTION_RESTORE) );
 
     var selectbox  = dialog.querySelector("#selector-collection-add");
     var crfs_token = window["generated_token"];
     
     // Fill selection box with all user collections 
-    ajax_get("/api/collections", crfs_token).then( colls => {
+    utils.ajax_get("/api/collections", crfs_token).then( colls => {
         for(let n  in colls){
             var opt   = document.createElement("option");
             // console.log(" row = ", colls[n]);
@@ -548,7 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ACTION_COLLECTION_ADD = "ADD";
     const ACTION_COLLECTION_NEW = "NEW";
     
-    dom_onClicked("#btn-bulk-add-to-collection", () => {
+    utils.dom_onClicked("#btn-bulk-add-to-collection", () => {
         var items = get_selected_items_for_bulk_operation();
         var selectionbox = document.querySelector("#selector-collection-add");
         var collectionID = selectionbox[selectionbox.selectedIndex]["value"];
@@ -563,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         var crfs_token = window["generated_token"];
-        ajax_post("/api/collections", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/collections", crfs_token, payload).then( res => {
             console.log(" Response = ", res);
         });
     });
@@ -595,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     });
 
-    dom_onClicked("#btn-create-new-collection", () => { 
+    utils.dom_onClicked("#btn-create-new-collection", () => { 
         // alert(" Clicked at create new collection Ok. ");
         dialog_CreateCollection.show();
     });
@@ -610,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dialog_collection_delete.onSubmit( flag => {
             if(!flag) return;
 
-            var p = ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
+            var p = utils.ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
 
             p.then( res => {
                 if(res["result"] == "OK"){
@@ -681,7 +594,7 @@ function api_item_add(crfs_token)
 
             var token = window["generated_token"];
 
-            ajax_post("/api/collections/add_item", token, data).then( res => {
+            utils.ajax_post("/api/collections/add_item", token, data).then( res => {
                 if(res["result"] == "OK"){
                     dialog_notify.notify("Bookmark added successfuly", 2000);
                     location.reload();
@@ -698,7 +611,7 @@ function api_item_add(crfs_token)
 
 
         var payload = {url: url};
-        ajax_post("/api/item", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/item", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
                 dialog_notify.notify("Bookmark added successfuly", 2000);
                 location.reload();
