@@ -75,7 +75,7 @@ function dom_onClicked(css_selector, callback)
 function dom_insert_html(anchor_element, html)
 {
     var el = document.createElement("template");
-    el.innerHTML = html;
+    el.innerHTML = html.trim();
     var elem = el.content.firstChild;
     anchor_element.appendChild(elem);
     return elem;
