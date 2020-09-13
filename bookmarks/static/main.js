@@ -449,14 +449,31 @@ window["dialog_search_item"] = dialog_search_item;
 
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-
-    console.trace(" [TRACE] Starting DOM initialization. OK. ");
+    // ----------- Attach modal dialogs to body --------------------// 
 
     dialog_notify.attach_body();
     dialog_notify.id = "dialog-notify";
 
     dialog_prompt.attach_body();
     dialog_search_item.attach_body();
+    
+    // ---------- DOM html modifications ------------------//
+
+    var query_params = new URLSearchParams(window.location.search);
+    
+    if(query_params.get("filter") == "collection")
+    { 
+        var btn_add_items = dom_insert_html_at_selector("#div-additional-buttons", `
+        <a id="btn-experimental" class="btn btn-info" 
+            href="#" title="Search items win">Add multiple items</a>
+        `);
+
+        btn_add_items.addEventListener("click", () => dialog_search_item.show());         
+    }
+
+    console.trace(" [TRACE] Starting DOM initialization. OK. ");
+
+    // ---------- Event handlers ----------------------------------// 
 
     // dialog_notify.notify("Page created Ok", 900);
 
@@ -606,6 +623,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
     };
+
+
+
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
 
