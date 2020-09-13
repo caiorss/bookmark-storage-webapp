@@ -53,6 +53,11 @@ body {
     background-color: var(--main-background-color);
     color:           var(--foreground-color);
     font-family:     'Lato', sans-serif;  
+
+    /* Disable annoying pull-down frefresh in mobile browser 
+     * (for instance ,android browsers)
+     */
+    overscroll-behavior-y: contain;
 }
 
 a { color: var(--hyperlink-color); }

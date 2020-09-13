@@ -56,6 +56,10 @@ export class Dialog_GenericNotification extends HTMLElement
 
         this.shadowRoot.innerHTML = `
             <style>
+                body {
+                    overscroll-behavior-y: contain;
+                }
+
                 dialog {
                     position: fixed; 
                     top:      20px;
