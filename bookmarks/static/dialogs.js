@@ -50,6 +50,10 @@ export class Dialog_GenericNotification extends HTMLElement
 
     connectedCallback()
     {
+        var window_width = window.innerWidth > 600 ? "500px" : "90%";
+        var window_height = window.innerHeight > 1000 ? "600px" : "95%";
+        //alert(" Window width = ", window_width);
+
         this.shadowRoot.innerHTML = `
             <style>
                 dialog {
@@ -58,8 +62,10 @@ export class Dialog_GenericNotification extends HTMLElement
                     
                     background-color: darkgray                    
                     color: black;
-                    width: 500px;
-                    max-height: 600px;
+
+                    width:  ${window_width};
+                    max-width:  ${window_width};
+                    max-height: ${window_height};
 
                     border-radius: 20px;
                     z-index: 2;

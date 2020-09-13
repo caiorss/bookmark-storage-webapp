@@ -201,6 +201,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
                         <span>Search bookmark:</span>
                         </br>
                         <input id="input-search"> </input>
+                        </br>
                         <button id="btn-search">Search</button>
                         <button id="btn-clean">Clean</button>
 
@@ -218,8 +219,8 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             #div-search-results {
                 overflow-y: scroll;
                 background-color: gray;
-
-                height: 400px;
+                max-height:  350px;
+                height: 350px;
             }
 
             .div-row-result {
@@ -346,7 +347,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
         });
     }
 
-}
+} /* --- End of class - Dialog_Search_Item ------ */
 
 customElements.define('dialog-search-item', Dialog_Search_Item);
 window["Dialog_Search_Item"] = Dialog_Search_Item;
