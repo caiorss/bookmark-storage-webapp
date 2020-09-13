@@ -275,9 +275,177 @@ async function ajax_perform_bulk_operation(action)
 //    D I A L O G S                             // 
 //----------------------------------------------//
 
+
+class Dialog_Search_Item extends Dialog_GenericNotification
+{
+    constructor()
+    {
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.setTitle("Search bookmarks");
+        this.setText("");
+
+        var x = this.insertBodyHtml(`
+                    <div>
+                        <span>Search bookmark:</span>
+                        </br>
+                        <input id="input-search"> </input>
+                        <button id="btn-search">Search</button>
+                        <button id="btn-clean">Clean</button>
+
+                        <button id="btn-prev" title="Previous results"> <<= </button>
+                        <button id="btn-next" title="Next results"> =>> </button>
+
+                        <br>
+                        <span id="search-result-info"></span>
+
+                        <div id="div-search-results">
+                        </div>
+                    </div>`);
+
+        this.setCustomStyle(`
+            #div-search-results {
+                overflow-y: scroll;
+                background-color: gray;
+
+                height: 400px;
+            }
+
+            .div-row-result {
+                background-color: cyan;
+                padding: 10px;
+                border: 10px;
+                border-radius: 20px;
+            }
+        `);
+        this.page  = 1;
+
+        this.onClose(() => {
+            this.reset()
+            console.log(" [INFO] Window closed ok. ");
+        });
+
+        this.input_search = x.querySelector("#input-search");
+        this.btn_search = x.querySelector("#btn-search");
+        this.div_search_results = x.querySelector("#div-search-results");
+        this.label = x.querySelector("#search-result-info");
+
+
+        x.querySelector("#btn-clean").addEventListener("click", () => this.reset());
+
+        x.querySelector("#btn-prev").addEventListener("click", () => {
+            this.page = this.page - 1;
+            if(this.page < 1){ this.page = 1;}
+            this.search_items();
+        });
+
+        x.querySelector("#btn-next").addEventListener("click", () => {
+            this.page = this.page + 1;
+            this.search_items();
+        });
+
+        this.btn_search.addEventListener("click", () => {
+            let query = this.input_search.value.trim();
+            if(query == "") return;
+            console.log(" Searching data. OK. ", query);
+            this.search_items();
+        })
+
+        this.onSubmit(() => this.add_items_to_collection() );
+
+        console.log(" [TRACE] x = ", x);
+    }
+
+    async add_items_to_collection()
+    {
+        console.trace(" [onSubmit()] Called Ok. ");
+
+        // Get IDs from bookmark items selected (where checkbox is checked).
+        var checked_items_id = dom_querySelectorAll(".bookmark-checkbox", this.div_search_results)
+                                  .filter(x => x.checked )
+                                  .map( x => parseInt(x.value) );
+
+        if(checked_items_id.length == 0){ return; }
+
+        console.log(" [TRACE] checked_items_id = ", checked_items_id);
+
+        var query_params = new URLSearchParams(window.location.search);
+        if(query_params.get("filter") != "collection"){ return; }
+        var collectionID = query_params.get("A0");
+
+        var token = window["generated_token"];
+        const ACTION_COLLECTION_ADD = "ADD";
+
+        var payload = {
+            items:        checked_items_id
+           ,collectionID: collectionID
+           ,action:       ACTION_COLLECTION_ADD
+       };
+
+       let res = await ajax_post("/api/collections", token, payload);
+       console.log(" [TRACE] respose OK = ", res);
+       dom_page_refresh();
+
+    }
+
+    get_query()
+    {
+        return this.input_search.value.trim();
+    }
+
+    reset() {
+        console.log(" [TRACE] Dialog_Search_Item.reset() called. Ok ");
+        this.input_search.value = "";
+        this.label.textContent = "Found: ";
+        this.div_search_results.innerHTML = "";
+    }
+
+    async search_items()
+    {
+
+        var query = this.input_search.value.trim();
+        var encoded_query = encodeURIComponent(query);
+
+        if(query == "") return;
+
+        console.log(" Encoded query = ", encoded_query);
+        let q = await ajax_get(`/api/search?query=${encoded_query}&page=${this.page}`);
+        console.log(q);
+        let data = q["data"];
+        console.log(" data = ", data);
+
+        this.div_search_results.innerHTML = "";
+
+        this.label.textContent = `Found: ${q["total"]} results / page: ${this.page}`
+
+        data.map( row => {
+            let id    = row["id"];
+            let title = row["title"];
+            let url   = row["url"];
+
+            dom_insert_html(this.div_search_results,
+                `<div class="div-row-result">
+                    <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
+                    <a target="_blank" href="${url}">[${id}] ${title}</a>
+                </div>
+                `);
+        });
+    }
+
+}
+
+customElements.define('dialog-search-item', Dialog_Search_Item);
+window["Dialog_Search_Item"] = Dialog_Search_Item;
+
+
+
 let dialog_notify = new NotificationDialog();
 
 let dialog_prompt = new Dialog_Prompt();
+
+var dialog_search_item = new Dialog_Search_Item();
+window["dialog_search_item"] = dialog_search_item;
 
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
