@@ -493,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog_CreateCollection.onSubmit( (is_ok) => {        
         if(!is_ok) return;
  
-        var p = ajax_post("/api/collections/new", window["generated_token"], {
+        var p = utils.ajax_post("/api/collections/new", window["generated_token"], {
               title: input_title.value 
             , description: input_description.value
         });
