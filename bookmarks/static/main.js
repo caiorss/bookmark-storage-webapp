@@ -456,6 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog_notify.id = "dialog-notify";
 
     dialog_prompt.attach_body();
+    dialog_search_item.attach_body();
 
     // dialog_notify.notify("Page created Ok", 900);
 
@@ -606,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-});
+}); // ---- End of DOMContentLoaded() envent handler  ------ //
 
 
 function toggle_sidebar()
@@ -659,6 +660,7 @@ function api_item_add(crfs_token)
             var data = { url: url, collection_id: collection_id };
 
             var token = window["generated_token"];
+
             ajax_post("/api/collections/add_item", token, data).then( res => {
                 if(res["result"] == "OK"){
                     dialog_notify.notify("Bookmark added successfuly", 2000);
