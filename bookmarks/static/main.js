@@ -46,9 +46,11 @@ function dom_page_refresh()
 /** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
  * 
  */
-function dom_querySelectorAll(css_selector)
+function dom_querySelectorAll(css_selector, dom_node = null)
 {
-    return Array.prototype.slice.call(document.querySelectorAll(css_selector));
+    var node  = document;
+    if(dom_node != null){ node = dom_node; }
+    return Array.prototype.slice.call(node.querySelectorAll(css_selector));
 }
 
 function dom_onClicked(css_selector, callback)
