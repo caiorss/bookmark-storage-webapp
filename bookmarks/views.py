@@ -800,7 +800,7 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
             return Http404("Error: missing search parameter")
 
         words = shlex.split(search)
-        lam = lambda x, y: x | y
+        lam = lambda x, y: x & y
         if  mode == "OR":
             lam = lambda x, y: x | y
         if mode == "AND":
@@ -812,7 +812,7 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
         queryset = SiteBookmark.objects.filter(owner = self.request.user)\
             .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
         
-        results = self.paginate(queryset, ["id", "title"], page, 10)
+        results = self.paginate(queryset, ["id", "title", "url"], page, 20)
         results["total"] = queryset.count()
 
         return JsonResponse(results, safe = False)
