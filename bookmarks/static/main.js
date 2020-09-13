@@ -378,11 +378,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if(query_params.get("filter") == "collection")
     { 
         var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
-        <a id="btn-experimental" class="btn btn-info" 
-            href="#" title="Search items win">Add multiple items</a>
+        <a  class="btn btn-info"  href="#" title="Search items win">Add multiple items</a>
         `);
 
         btn_add_items.addEventListener("click", () => dialog_search_item.show());         
+
+        var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
+            <a id="btn-experimental" class="btn btn-info"
+                href="/collection/list" title="Search items win">View all collections</a>
+        `);
+
     }
 
     console.trace(" [TRACE] Starting DOM initialization. OK. ");
