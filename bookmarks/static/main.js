@@ -81,6 +81,16 @@ function dom_insert_html(anchor_element, html)
     return elem;
 }
 
+function dom_insert_html_at_selector(selector, html)
+{
+    var el = document.createElement("template");
+    el.innerHTML = html.trim();
+    var elem = el.content.firstChild;
+
+    var anchor_element = document.querySelector(selector);
+    anchor_element.appendChild(elem);
+    return elem;
+}
 
 function DOM_select(selector)
 {
