@@ -614,7 +614,8 @@ class CollectionList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
         user: AbstractBaseUser = self.request.user
-        return Collection.objects.filter(owner = user, deleted = False).order_by("id").reverse()    
+        return Collection.objects.filter(owner = user, deleted = False)\
+            .order_by(Lower("title")) #.reverse()    
 
 class CollectionCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
