@@ -9,6 +9,10 @@ export class Dialog_GenericNotification extends HTMLElement
 
         this.submit_callback = (flag) => { alert("Submit Clicked"); }
 
+        this.close_callback = () => { };
+
+        this.custom_style = "";
+
         var html = `
             <div>    
                 <div>            
@@ -43,8 +47,13 @@ export class Dialog_GenericNotification extends HTMLElement
         });
     }
 
+
     connectedCallback()
     {
+        var window_width = window.innerWidth > 600 ? "500px" : "90%";
+        var window_height = window.innerHeight > 1000 ? "600px" : "95%";
+        //alert(" Window width = ", window_width);
+
         this.shadowRoot.innerHTML = `
             <style>
                 dialog {
@@ -54,11 +63,17 @@ export class Dialog_GenericNotification extends HTMLElement
                     background-color: darkgray                    
                     color: black;
 
+                    width:  ${window_width};
+                    max-width:  ${window_width};
+                    max-height: ${window_height};
+
                     border-radius: 20px;
                     z-index: 2;
                 }
+
+                ${this.custom_style}
             </style>            
-        `;
+        `.trim();
 
         this.shadowRoot.appendChild(this.node);
     }
@@ -82,6 +97,11 @@ export class Dialog_GenericNotification extends HTMLElement
         return this;
     }
 
+    setCustomStyle(style)
+    {
+        this.custom_style = style;
+    }
+
     setButtonCloseLabel(text)
     {
         var desc = this.node.querySelector("#btn-close");
@@ -96,6 +116,10 @@ export class Dialog_GenericNotification extends HTMLElement
 
     onSubmit(callback) {
         this.submit_callback = callback;
+    }
+
+    onClose(callback) {
+        this.close_callback = callback;
     }
 
     /** Hides/show submit submit button. */
@@ -120,23 +144,24 @@ export class Dialog_GenericNotification extends HTMLElement
     {
 
         var el = document.createElement("template");
-        el.innerHTML = html;
+        el.innerHTML = html.trim();
         var elem = el.content.firstChild;
         this.node.querySelector("#dialog-body")
                  .appendChild(elem);
+        // console.log(" [INFO] insertBodyHtml() = ", elem);
         return elem;
     }
 
     show() { this.node.showModal(true); }
-    hide() { this.node.close();         }
-    close(){ this.node.close();         }
+    hide() { this.node.close(); this.close_callback();   }
+    close(){ this.node.close(); this.close_callback();   }
 
     setVisible(flag) 
     {
         if(flag) 
-            this.node.showModal(true);
+            this.show();
         else
-            this.node.close(); 
+            this.close();
     }
 
 

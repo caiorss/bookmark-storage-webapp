@@ -1,84 +1,6 @@
 import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
 
-
-/** @brief Performs Http POST request to some endpoint. 
- *  @param {string} url         - Http request (REST API) endpoint 
- *  @param {string} crfs_token  - Django CRFSS token from global variable (generated_token)
- *  @param {object} data        - HTTP request body, aka payload  
- */
-async function ajax_post(url, crfs_token, data)
-{
-
-    var payload = JSON.stringify(data);
-
-    const resp = await fetch(url, {
-          method:  'POST'
-        , headers: {    'Content-Type':     'application/json'
-                      , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':      crfs_token 
-                   }
-        , body: payload
-    });
-    return resp.json();
-}
-
-async function ajax_get(url, crfs_token, data)
-{
-
-    var payload = JSON.stringify(data);
-
-    const resp = await fetch(url, {
-          method:  'GET'
-        , headers: {    'Content-Type':     'application/json'
-                      , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':      crfs_token 
-                   }});
-    return resp.json();
-}
-
-/** Reload current page. (same as hit F5 in the web browser) */
-function dom_page_refresh()
-{
-    location.reload();
-}
-
-
-/** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
- * 
- */
-function dom_querySelectorAll(css_selector)
-{
-    return Array.prototype.slice.call(document.querySelectorAll(css_selector));
-}
-
-function dom_onClicked(css_selector, callback)
-{
-    var elem = document.querySelector(css_selector);
-
-    if(!elem) { 
-        console.warn(` dom_onClicked() => CSS selector ${css_selector} not found.`); 
-    }
-    if(elem){        
-        elem.addEventListener("click", callback);
-    }
-}
-
-/* Insert HTML code fragment to some DOM element. 
- *  
- *  Usage example: 
- * 
- *     var anchor = document.querySelector("#element-dom-id");
- *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);   
- ******************************************************************/
-function dom_insert_html(anchor_element, html)
-{
-    var el = document.createElement("template");
-    el.innerHTML = html;
-    var elem = el.content.firstChild;
-    anchor_element.appendChild(elem);
-    return elem;
-}
-
+import * as utils from "/static/utils.js";
 
 function DOM_select(selector)
 {
@@ -231,7 +153,7 @@ const ACTION_REM_STARRED = "REM_STARRED";
 function get_selected_items_for_bulk_operation()
 {
     // Get ID of selected bookmarks 
-    return dom_querySelectorAll(".bulk-checkbox")
+    return utils.dom_querySelectorAll(".bulk-checkbox")
                             .filter(x => x.checked)
                             .map(x => parseInt(x.id));
 }
@@ -250,7 +172,7 @@ async function ajax_perform_bulk_operation(action)
       , items:    selected_items
     };
 
-    var resp = await ajax_post("/api/bulk", crfs_token, payload);
+    var resp = await utils.ajax_post("/api/bulk", crfs_token, payload);
     console.log("Response = ",  resp);
 
     //return resp;
@@ -263,19 +185,209 @@ async function ajax_perform_bulk_operation(action)
 //    D I A L O G S                             // 
 //----------------------------------------------//
 
+
+class Dialog_Search_Item extends Dialog_GenericNotification
+{
+    constructor()
+    {
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.setTitle("Search bookmarks");
+        this.setText("");
+
+        var x = this.insertBodyHtml(`
+                    <div>
+                        <span>Search bookmark:</span>
+                        </br>
+                        <input id="input-search"> </input>
+                        </br>
+                        <button id="btn-search">Search</button>
+                        <button id="btn-clean">Clean</button>
+
+                        <button id="btn-prev" title="Previous results"> <<= </button>
+                        <button id="btn-next" title="Next results"> =>> </button>
+
+                        <br>
+                        <span id="search-result-info"></span>
+
+                        <div id="div-search-results">
+                        </div>
+                    </div>`);
+
+        this.setCustomStyle(`
+            #div-search-results {
+                overflow-y: scroll;
+                background-color: gray;
+                max-height:  350px;
+                height: 350px;
+            }
+
+            .div-row-result {
+                background-color: cyan;
+                padding: 10px;
+                border: 10px;
+                border-radius: 20px;
+            }
+        `);
+        this.page  = 1;
+
+        this.onClose(() => {
+            this.reset()
+            console.log(" [INFO] Window closed ok. ");
+        });
+
+        this.input_search = x.querySelector("#input-search");
+        this.btn_search = x.querySelector("#btn-search");
+        this.div_search_results = x.querySelector("#div-search-results");
+        this.label = x.querySelector("#search-result-info");
+
+
+        x.querySelector("#btn-clean").addEventListener("click", () => this.reset());
+
+        x.querySelector("#btn-prev").addEventListener("click", () => {
+            this.page = this.page - 1;
+            if(this.page < 1){ this.page = 1;}
+            this.search_items();
+        });
+
+        x.querySelector("#btn-next").addEventListener("click", () => {
+            this.page = this.page + 1;
+            this.search_items();
+        });
+
+        this.btn_search.addEventListener("click", () => {
+            let query = this.input_search.value.trim();
+            if(query == "") return;
+            console.log(" Searching data. OK. ", query);
+            this.search_items();
+        })
+
+        this.onSubmit((flag) => {
+          if(!flag){ return};
+          this.add_items_to_collection() 
+        });
+
+        console.log(" [TRACE] x = ", x);
+    }
+
+    async add_items_to_collection()
+    {
+        console.trace(" [onSubmit()] Called Ok. ");
+
+        // Get IDs from bookmark items selected (where checkbox is checked).
+        var checked_items_id = utils.dom_querySelectorAll(".bookmark-checkbox", this.div_search_results)
+                                  .filter(x => x.checked )
+                                  .map( x => parseInt(x.value) );
+
+        if(checked_items_id.length == 0){ return; }
+
+        console.log(" [TRACE] checked_items_id = ", checked_items_id);
+
+        var query_params = new URLSearchParams(window.location.search);
+        if(query_params.get("filter") != "collection"){ return; }
+        var collectionID = query_params.get("A0");
+
+        var token = window["generated_token"];
+        const ACTION_COLLECTION_ADD = "ADD";
+
+        var payload = {
+            items:        checked_items_id
+           ,collectionID: collectionID
+           ,action:       ACTION_COLLECTION_ADD
+       };
+
+       let res = await utils.ajax_post("/api/collections", token, payload);
+       console.log(" [TRACE] respose OK = ", res);
+       utils.dom_page_refresh();
+
+    }
+
+    get_query()
+    {
+        return this.input_search.value.trim();
+    }
+
+    reset() {
+        console.log(" [TRACE] Dialog_Search_Item.reset() called. Ok ");
+        this.input_search.value = "";
+        this.label.textContent = "Found: ";
+        this.div_search_results.innerHTML = "";
+    }
+
+    async search_items()
+    {
+
+        var query = this.input_search.value.trim();
+        var encoded_query = encodeURIComponent(query);
+
+        if(query == "") return;
+
+        console.log(" Encoded query = ", encoded_query);
+        let q = await utils.ajax_get(`/api/search?query=${encoded_query}&page=${this.page}`);
+        console.log(q);
+        let data = q["data"];
+        console.log(" data = ", data);
+
+        this.div_search_results.innerHTML = "";
+
+        this.label.textContent = `Found: ${q["total"]} results / page: ${this.page}`
+
+        data.map( row => {
+            let id    = row["id"];
+            let title = row["title"];
+            let url   = row["url"];
+
+            utils.dom_insert_html(this.div_search_results,
+                `<div class="div-row-result">
+                    <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
+                    <a target="_blank" href="${url}">[${id}] ${title}</a>
+                </div>
+                `);
+        });
+    }
+
+} /* --- End of class - Dialog_Search_Item ------ */
+
+customElements.define('dialog-search-item', Dialog_Search_Item);
+window["Dialog_Search_Item"] = Dialog_Search_Item;
+
+
+
 let dialog_notify = new NotificationDialog();
 
 let dialog_prompt = new Dialog_Prompt();
 
+var dialog_search_item = new Dialog_Search_Item();
+window["dialog_search_item"] = dialog_search_item;
+
 // Callback executed after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-
-    console.trace(" [TRACE] Starting DOM initialization. OK. ");
+    // ----------- Attach modal dialogs to body --------------------// 
 
     dialog_notify.attach_body();
     dialog_notify.id = "dialog-notify";
 
     dialog_prompt.attach_body();
+    dialog_search_item.attach_body();
+    
+    // ---------- DOM html modifications ------------------//
+
+    var query_params = new URLSearchParams(window.location.search);
+    
+    if(query_params.get("filter") == "collection")
+    { 
+        var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
+        <a id="btn-experimental" class="btn btn-info" 
+            href="#" title="Search items win">Add multiple items</a>
+        `);
+
+        btn_add_items.addEventListener("click", () => dialog_search_item.show());         
+    }
+
+    console.trace(" [TRACE] Starting DOM initialization. OK. ");
+
+    // ---------- Event handlers ----------------------------------// 
 
     // dialog_notify.notify("Page created Ok", 900);
 
@@ -302,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     var body = document.body;
 
-    var dialog = dom_insert_html(body, `
+    var dialog = utils.dom_insert_html(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
                 <button id="btn-bulk-add-starred"> Add items to starred items</button> 
@@ -325,17 +437,17 @@ document.addEventListener("DOMContentLoaded", () => {
     var btn = dialog.querySelector("#btn-dialog-close");
     btn.addEventListener("click", () => dialog.close() );
 
-    dom_onClicked("#btn-bulk-actions",     () => dialog.showModal() );
-    dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
-    dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
-    dom_onClicked("#btn-bulk-delete",      () => ajax_perform_bulk_operation(ACTION_DELETE) );
-    dom_onClicked("#btn-bulk-restore",     () => ajax_perform_bulk_operation(ACTION_RESTORE) );
+    utils.dom_onClicked("#btn-bulk-actions",     () => dialog.showModal() );
+    utils.dom_onClicked("#btn-bulk-add-starred", () => ajax_perform_bulk_operation(ACTION_ADD_STARRED) );
+    utils.dom_onClicked("#btn-bulk-rem-starred", () => ajax_perform_bulk_operation(ACTION_REM_STARRED) );
+    utils.dom_onClicked("#btn-bulk-delete",      () => ajax_perform_bulk_operation(ACTION_DELETE) );
+    utils.dom_onClicked("#btn-bulk-restore",     () => ajax_perform_bulk_operation(ACTION_RESTORE) );
 
     var selectbox  = dialog.querySelector("#selector-collection-add");
     var crfs_token = window["generated_token"];
     
     // Fill selection box with all user collections 
-    ajax_get("/api/collections", crfs_token).then( colls => {
+    utils.ajax_get("/api/collections", crfs_token).then( colls => {
         for(let n  in colls){
             var opt   = document.createElement("option");
             // console.log(" row = ", colls[n]);
@@ -350,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ACTION_COLLECTION_ADD = "ADD";
     const ACTION_COLLECTION_NEW = "NEW";
     
-    dom_onClicked("#btn-bulk-add-to-collection", () => {
+    utils.dom_onClicked("#btn-bulk-add-to-collection", () => {
         var items = get_selected_items_for_bulk_operation();
         var selectionbox = document.querySelector("#selector-collection-add");
         var collectionID = selectionbox[selectionbox.selectedIndex]["value"];
@@ -365,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         var crfs_token = window["generated_token"];
-        ajax_post("/api/collections", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/collections", crfs_token, payload).then( res => {
             console.log(" Response = ", res);
         });
     });
@@ -397,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     });
 
-    dom_onClicked("#btn-create-new-collection", () => { 
+    utils.dom_onClicked("#btn-create-new-collection", () => { 
         // alert(" Clicked at create new collection Ok. ");
         dialog_CreateCollection.show();
     });
@@ -412,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dialog_collection_delete.onSubmit( flag => {
             if(!flag) return;
 
-            var p = ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
+            var p = utils.ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
 
             p.then( res => {
                 if(res["result"] == "OK"){
@@ -426,7 +538,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-});
+
+
+
+}); // ---- End of DOMContentLoaded() envent handler  ------ //
 
 
 function toggle_sidebar()
@@ -479,7 +594,8 @@ function api_item_add(crfs_token)
             var data = { url: url, collection_id: collection_id };
 
             var token = window["generated_token"];
-            ajax_post("/api/collections/add_item", token, data).then( res => {
+
+            utils.ajax_post("/api/collections/add_item", token, data).then( res => {
                 if(res["result"] == "OK"){
                     dialog_notify.notify("Bookmark added successfuly", 2000);
                     location.reload();
@@ -496,7 +612,7 @@ function api_item_add(crfs_token)
 
 
         var payload = {url: url};
-        ajax_post("/api/item", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/item", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
                 dialog_notify.notify("Bookmark added successfuly", 2000);
                 location.reload();
