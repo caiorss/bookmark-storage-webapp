@@ -219,7 +219,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def filter_collection(self):
         coll_id: int = self.query_param_as_int("A0")
         c: Collection = ds.get_object_or_404(Collection, id = coll_id)
-        return c.item.all().order_by("id").reverse()
+        return c.item.all().order_by("link_to_items").reverse()
 
     def filter_search(self):
         search = self.request.GET.get('query')
