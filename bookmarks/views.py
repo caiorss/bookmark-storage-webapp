@@ -668,8 +668,13 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
         return JsonResponse(body, safe = False)
         
 # Endpoint: /api/collections/new         
-class Ajax_Collection_New(LoginRequiredMixin, django.views.View):
+class Ajax_Collections(LoginRequiredMixin, django.views.View):
     """ Create new collection """
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        query = Collection.objects.filter(owner = self.request.user, deleted = False)
+        return queryset2Json(query, ["id", "title"])
+
     def post(self, request: WSGIRequest, *args, **kwargs):
         assert( request.method == "POST" and request.is_ajax() )
 
@@ -689,11 +694,13 @@ class Ajax_Collection_New(LoginRequiredMixin, django.views.View):
         print(" Collection_New = ", body)
         return JsonResponse({ "result": "OK" }, safe = False)        
 
-# Endpoint: /api/collections/del         
-class Ajax_Collection_Delete(LoginRequiredMixin, django.views.View):
-    """ Create new collection """
-    def post(self, request: WSGIRequest, *args, **kwargs):
-        assert( request.method == "POST" and request.is_ajax() )
+
+    def put(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "PUT" and request.is_ajax() )    
+
+
+    def delete(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "DELETE" and request.is_ajax() )
 
         req: WSGIRequest = self.request
         body = json.loads(req.body.decode("utf-8"))        
