@@ -536,7 +536,10 @@ utils.dom_onContentLoaded(() => {
         dialog_collection_delete.onSubmit( flag => {
             if(!flag) return;
 
-            var p = utils.ajax_post("/api/collections/del", window["generated_token"], { "collection_id": collection_id });
+            var p = utils.ajax_request("/api/collections"
+                                    , window["generated_token"]
+                                    , utils.HTTP_DELETE
+                                    , { "collection_id": collection_id });
 
             p.then( res => {
                 if(res["result"] == "OK"){
