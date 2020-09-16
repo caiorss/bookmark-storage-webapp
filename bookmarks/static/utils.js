@@ -34,6 +34,12 @@ export async function ajax_get(url, crfs_token, data)
     return resp.json();
 }
 
+/** Event fired after content is loaded. */
+export function dom_onContentLoaded(callback)
+{
+    document.addEventListener("DOMContentLoaded", callback);
+}
+
 /** Reload current page. (same as hit F5 in the web browser) */
 export function dom_page_refresh()
 {

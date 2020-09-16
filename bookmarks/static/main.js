@@ -317,6 +317,9 @@ class Dialog_Search_Item extends Dialog_GenericNotification
 
     async search_items()
     {
+        var query_params = new URLSearchParams(window.location.search);
+        if(query_params.get("filter") != "collection"){ return; }
+        var collectionID = query_params.get("A0");
 
         var query = this.input_search.value.trim();
         var encoded_query = encodeURIComponent(query);
@@ -324,7 +327,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
         if(query == "") return;
 
         console.log(" Encoded query = ", encoded_query);
-        let q = await utils.ajax_get(`/api/search?query=${encoded_query}&page=${this.page}`);
+        let q = await utils.ajax_get(`/api/search?query=${encoded_query}&page=${this.page}&coll=${collectionID}`);
         console.log(q);
         let data = q["data"];
         console.log(" data = ", data);
@@ -362,13 +365,17 @@ var dialog_search_item = new Dialog_Search_Item();
 window["dialog_search_item"] = dialog_search_item;
 
 // Callback executed after DOM is fully loaded
-document.addEventListener("DOMContentLoaded", () => {
+utils.dom_onContentLoaded(() => {
+
     // ----------- Attach modal dialogs to body --------------------// 
 
     dialog_notify.attach_body();
+    dialog_notify.setTitle("User Notification.");
     dialog_notify.id = "dialog-notify";
+    dialog_notify.attach_body();
 
     dialog_prompt.attach_body();
+
     dialog_search_item.attach_body();
     
     // ---------- DOM html modifications ------------------//
@@ -384,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn_add_items.addEventListener("click", () => dialog_search_item.show());         
 
         var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
-            <a id="btn-experimental" class="btn btn-info"
+            <a id="btn-experimental" class="btn btn-info" 
                 href="/collection/list" title="Search items win">View all collections</a>
         `);
 
@@ -542,8 +549,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
     };
-
-
 
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
