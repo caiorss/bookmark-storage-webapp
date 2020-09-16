@@ -1,4 +1,5 @@
-import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification, DialogFormBuilder} from "/static/dialogs.js";
+import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification
+      , DialogForm, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
 
@@ -494,36 +495,49 @@ utils.dom_onContentLoaded(() => {
         });
     });
 
-    let dialog_CreateCollection = new DialogFormBuilder();
-    dialog_CreateCollection.attach_body();
-    dialog_CreateCollection.setTitle("Create new collection");
-    dialog_CreateCollection.setText("Enter the following informations:");
+    let dialog_collection_edit = new DialogForm();
+    dialog_collection_edit.attach_body();
+    dialog_collection_edit.setTitle("Create new collection");
+    dialog_collection_edit.setText("Enter the following informations:");
+    dialog_collection_edit.add_row_input("title", "Title:");
+    dialog_collection_edit.add_row_input("desc", "Description:");
 
-    var input_title       = dialog_CreateCollection.add_row_input("Title:");
-    var input_description = dialog_CreateCollection.add_row_input("Description:");
 
-    dialog_CreateCollection.onSubmit( (is_ok) => {        
-        if(!is_ok) return;
- 
-        var p = utils.ajax_post("/api/collections/new", window["generated_token"], {
-              title: input_title.value 
-            , description: input_description.value
-        });
-
-        p.then( res => {
-            if(res["result"] == "OK"){
-                dialog_notify.notify("Bookmark added successfuly");
-                location.reload();
-            } else {
-                dialog_notify.notify("Error: bookmark already exists");
-            }
-    
-        })
-    });
-
-    utils.dom_onClicked("#btn-create-new-collection", () => { 
+    async function collection_create_new()
+    {
         // alert(" Clicked at create new collection Ok. ");
-        dialog_CreateCollection.show();
+        dialog_collection_edit.show();
+
+        let sender = await dialog_collection_edit.onConfirm();
+        let title = sender.get_widget("title").value;
+        let desc  = sender.get_widget("desc").value;
+
+        console.log(" [INFO] Creating collection with title = ", title);
+
+        let res = await utils.ajax_request(  "/api/collections"
+                                           , window["generated_token"]
+                                           , utils.HTTP_POST
+                                           , {
+                                               title:       title 
+                                             , description: desc 
+                                          });
+
+        if(res["result"] == "OK")
+        {
+            dialog_notify.notify("Bookmark added successfuly");
+            location.reload();
+        } else {
+            dialog_notify.notify("Error: bookmark already exists");
+        }
+    
+        dialog.close();
+    }
+
+
+    utils.dom_onClicked("#btn-create-new-collection", () => {         
+        collection_create_new();
+        console.log(" I was clicked OK. ");
+
     });
 
     let dialog_collection_delete = new Dialog_OkCancel();
@@ -552,6 +566,73 @@ utils.dom_onContentLoaded(() => {
 
         });
     };
+
+    async function collection_edit(collection_id, collection_title) 
+    {
+        dialog_collection_edit.setTitle("Edit Collection");
+        // alert(" Clicked at create new collection Ok. ");
+        dialog_collection_edit.show();
+
+        let entry_title = dialog_collection_edit.get_widget("title");
+        entry_title.value = collection_title;
+
+        let sender = await dialog_collection_edit.onConfirm();
+        let title  = sender.get_widget("title").value;
+
+        console.log(" Collection title = ", title);
+
+        //let desc  = sender.get_widget("desc").value;
+
+        console.log(" [INFO] Creating collection with title = ", title);
+
+        let res = await utils.ajax_request(  "/api/collections"
+                                           , window["generated_token"]
+                                           , utils.HTTP_PUT
+                                           , {
+                                                 id:    collection_id
+                                               , title: title 
+                                             //, description: desc 
+                                          });
+
+        if(res["result"] == "OK")
+        {
+            dialog_notify.notify("Bookmark added successfuly");
+            location.reload();
+        } else {
+            dialog_notify.notify("Error: bookmark already exists");
+        }
+    
+        dialog.close();        
+    }
+
+
+    window["collection_edit"] = (collection_id, collection_title) => {     
+        
+        collection_edit(collection_id, collection_title);
+        
+        return;
+        dialog_collection_delete.show();
+        dialog_collection_delete.onSubmit( flag => {
+            if(!flag) return;
+
+            var p = utils.ajax_request(  "/api/collections"
+                                        , window["generated_token"]
+                                        , utils.HTTP_PUT
+                                        , { "collection_id": collection_id }
+                                      );
+
+            p.then( res => {
+                if(res["result"] == "OK"){
+                    dialog_notify.notify("Bookmark updated successfuly");
+                    location.reload();
+                } else {
+                    dialog_notify.notify("Error: bookmark already exists");
+                }
+            });
+
+        });
+    };
+
 
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
