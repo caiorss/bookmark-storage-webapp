@@ -796,6 +796,9 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
 
         mode   = request.GET.get('mode', "")
         page   = int(request.GET.get("page", "1"))
+        coll_id   = int(request.GET.get("coll"))
+
+        collection = Collection.objects.get(owner = request.user, id = coll_id)
 
         if not search:
             return Http404("Error: missing search parameter")
@@ -811,7 +814,8 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
         q2 = reduce(lam, [ Q(title__contains=w) for w in words])
         
         queryset = SiteBookmark.objects.filter(owner = self.request.user)\
-            .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
+            .filter(q1 | q2)\
+            .exclude( deleted = True).order_by("id").reverse()
         
         results = self.paginate(queryset, ["id", "title", "url"], page, 20)
         results["total"] = queryset.count()
