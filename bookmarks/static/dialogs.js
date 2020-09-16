@@ -278,7 +278,6 @@ customElements.define('dialog-prompt', Dialog_Prompt);
 window["Dialog_Prompt"] = Dialog_Prompt;
 
 
-
 export class DialogFormBuilder extends Dialog_GenericNotification 
 {
    
@@ -336,4 +335,87 @@ export class DialogFormBuilder extends Dialog_GenericNotification
 
 customElements.define('dialog-formbuilder', DialogFormBuilder);
 
+
+export class DialogForm extends Dialog_GenericNotification 
+{
+   
+    constructor()
+    {
+        super()
+        this.attachShadow( { mode: 'open' } )
+        this.created_widgets = {}
+
+        this.confirm_callback = (response) => {};
+
+/*         this.onSubmit((is_ok) => {
+            if(!is_ok) { 
+                this.confirm_callback(null); 
+                return;
+            }
+
+            this.confirm_callback(this);
+        });
+ */
+
+        var html = `
+                <table> 
+                    <tbody>
+
+                    </tbody>
+                </table>
+        `.trim();
+
+        var el       = document.createElement("template");
+        el.innerHTML = html;
+        var elem     = el.content.firstChild;
+                
+       this.appendBodyWidget(elem);
+
+    }
+
+    get_widget(key){
+        return this.created_widgets[key];
+    }
+
+    onConfirm()
+    {
+        var p = new Promise( (resolve, reject) => {
+            this.onSubmit( (flag) => { 
+                if(!flag) reject();
+                if(flag)  resolve(this);
+             })
+        });
+        return p; 
+    }
+
+    add_row_widget(key, label, widget)
+    {
+        var anchor = this.node.querySelector("tbody");
+        
+        var th_label = document.createElement("th");
+        th_label.textContent = label;
+        
+        var th_widget = document.createElement("th");
+        th_widget.appendChild(widget);
+
+        var tr = document.createElement("tr");
+        tr.appendChild(th_label);
+        tr.appendChild(th_widget);
+
+        // Add row to table.
+        anchor.appendChild(tr);
+
+        this.created_widgets[key] = widget;
+        return widget;
+    }
+
+    add_row_input(key, label)
+    {
+        var widget = document.createElement("input");
+        return this.add_row_widget(key, label, widget);        
+    }
+
+}
+
+customElements.define('dialog-form', DialogForm);
 
