@@ -42,7 +42,6 @@ export class Dialog_GenericNotification extends HTMLElement
             this.submit_callback(false);
         });
         this.node.querySelector("#btn-submit").addEventListener("click", () => { 
-            self.submit_callback() 
             this.submit_callback(true);            
         });
     }
