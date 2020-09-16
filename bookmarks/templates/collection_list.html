@@ -18,9 +18,14 @@
                 {{ collection.title }} 
             </a>
 
+
+            
             </br>
             <p> {{ collection.description }} </p>
-                        
+  
+            <a class="btn btn-info" href="javascript:collection_edit({{collection.id}}, '{{ collection.title }}' )"  
+                                    title="Edit current collection.">Edit</a>            
+
             <a class="btn btn-info" href="javascript:collection_delete({{collection.id}}, '{{ collection.title }}' )"  
                                     title="Delete current collection.">Delete</a>
         </div>                            
