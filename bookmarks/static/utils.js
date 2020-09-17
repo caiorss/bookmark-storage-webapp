@@ -20,10 +20,8 @@ export  async function ajax_post(url, crfs_token, data)
     return resp.json();
 }
 
-export async function ajax_get(url, crfs_token, data)
+export async function ajax_get(url, crfs_token)
 {
-
-    var payload = JSON.stringify(data);
 
     const resp = await fetch(url, {
           method:  'GET'
@@ -32,6 +30,33 @@ export async function ajax_get(url, crfs_token, data)
                       , 'X-CSRFToken':      crfs_token 
                    }});
     return resp.json();
+}
+
+// Http method for creating new resource
+export const HTTP_POST   = "POST";
+// Http method for updating an existing resource  
+export const HTTP_PUT    = "PUT";
+// Http method for getting a resource             
+export const HTTP_GET    = "GET";
+// Http method for deleting a resource 
+export const HTTP_DELETE = "DELETE";
+
+export async function ajax_request(url, crfs_token, method, data =  null)
+{
+    let params = {
+        method:        method 
+      , headers: {    'Content-Type':     'application/json'
+                    , 'X-Requested-With': 'XMLHttpRequest'
+                    , 'X-CSRFToken':      crfs_token 
+                 }
+    };
+
+    if(data != null){ 
+      params["body"] = JSON.stringify(data); 
+    }
+
+    const resp = await fetch(url, params);
+    return resp.json(); 
 }
 
 /** Event fired after content is loaded. */
