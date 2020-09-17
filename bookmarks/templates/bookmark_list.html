@@ -11,7 +11,10 @@
     {% for bookmark in object_list %}
         <div class = "well item item_div">   
 
-            <h5>                        
+            <h5>  
+        
+                 <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" /> 
+
                   <a  class="item-bookmark-link"
                       target='_blank' 
                       title="{{bookmark.brief}}" 
@@ -32,13 +35,19 @@
             
 
             <ul>
-              <li>
-                  <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" />
-
+              <li>                  
                   <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
                     title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a>
+                    
+              </li>
+              <li>
+                  Starred: 
 
-                    {{ bookmark.starred }}    
+                   {%if bookmark.starred %}
+                      <input type="checkbox" class="checkbox-starred" value="{{ bookmark.id }}" checked/> 
+                   {% else %}
+                      <input type="checkbox" class="checkbox-starred" value="{{ bookmark.id }}"/> 
+                   {% endif %}
               </li>
             </ul>
 
