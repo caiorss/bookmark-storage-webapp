@@ -609,28 +609,6 @@ utils.dom_onContentLoaded(() => {
     window["collection_edit"] = (collection_id, collection_title) => {     
         
         collection_edit(collection_id, collection_title);
-        
-        return;
-        dialog_collection_delete.show();
-        dialog_collection_delete.onSubmit( flag => {
-            if(!flag) return;
-
-            var p = utils.ajax_request(  "/api/collections"
-                                        , window["generated_token"]
-                                        , utils.HTTP_PUT
-                                        , { "collection_id": collection_id }
-                                      );
-
-            p.then( res => {
-                if(res["result"] == "OK"){
-                    dialog_notify.notify("Bookmark updated successfuly");
-                    location.reload();
-                } else {
-                    dialog_notify.notify("Error: bookmark already exists");
-                }
-            });
-
-        });
     };
 
 
