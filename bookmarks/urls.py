@@ -41,11 +41,11 @@ urlpatterns = [
   ,path('collection/new',  views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
   # ----------------- REST API ------------------------#
-  ,path("api/item",            views.rest_item)  
-  ,path("api/bulk",            views.rest_bulk_action)  
+  ,path("api/item",                 views.rest_item)  
+  ,path("api/bulk",                 views.rest_bulk_action)  
   #,path("api/collections",     views.Ajax_Collection_List.as_view())  
-  ,path("api/collections",         views.Ajax_Collections.as_view())  
-  ,path("api/collections/items",   views.Ajax_Collection_List.as_view())  
+  ,path("api/collections",          views.Ajax_Collections.as_view())  
+  ,path("api/collections/items",    views.Ajax_Collection_List.as_view())  
 
   ,path("api/collections/add_item", views.Ajax_Collection_AddItem.as_view())  
   ,path("api/search",               views.Ajax_ItemSearch.as_view())
