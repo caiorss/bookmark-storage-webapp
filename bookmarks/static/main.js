@@ -368,6 +368,10 @@ window["dialog_search_item"] = dialog_search_item;
 // Callback executed after DOM is fully loaded
 utils.dom_onContentLoaded(() => {
 
+    utils.dom_querySelectorAll(".checkbox-starred").forEach( x => {
+        x.addEventListener("click", () => alert("Error: not implemented yet.") );
+    });
+
     // ----------- Attach modal dialogs to body --------------------// 
 
     dialog_notify.attach_body();
