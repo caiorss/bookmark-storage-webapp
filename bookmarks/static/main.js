@@ -298,7 +298,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
            ,action:       ACTION_COLLECTION_ADD
        };
 
-       let res = await utils.ajax_post("/api/collections", token, payload);
+       let res = await utils.ajax_post("/api/collections/items", token, payload);
        console.log(" [TRACE] respose OK = ", res);
        utils.dom_page_refresh();
 
