@@ -666,6 +666,7 @@ function open_url_newtab(url)
     var win = window.open(url, '_blank');
     win.focus();
 }
+window["open_url_newtab"] = open_url_newtab;
 
 function api_item_add(crfs_token)
 {
