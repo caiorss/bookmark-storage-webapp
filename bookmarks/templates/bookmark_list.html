@@ -64,7 +64,10 @@
                    </a>    
                {% endif %}
 
-            <table class="action-menu-table" id="action-menu-{{ bookmark.id }}" style="visibility: hidden; display: none;"  >              
+            <table class="action-menu-table" 
+                   id="action-menu-{{ bookmark.id }}" 
+                   value="{{ bookmark.id}}"
+                   style="visibility: hidden; display: none;"  >              
 
               <tr>
                 <th> 
