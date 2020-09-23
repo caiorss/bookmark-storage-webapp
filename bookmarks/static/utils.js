@@ -110,6 +110,18 @@ export function dom_append_html(anchor_element, html)
     return elem;
 }
 
+/**  Insert html fragment as first child of some DOM element.
+ * 
+ */
+export function dom_insert_html(anchor_element, html)
+{
+    var el = document.createElement("template");
+    el.innerHTML = html.trim();
+    var elem = el.content.firstChild;
+    anchor_element.insertBefore(elem, anchor_element.childNodes[0]);
+    return elem;
+}
+
 export function dom_insert_html_at_selector(selector, html)
 {
     var el = document.createElement("template");
