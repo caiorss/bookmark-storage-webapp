@@ -342,7 +342,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             let title = row["title"];
             let url   = row["url"];
 
-            utils.dom_insert_html(this.div_search_results,
+            utils.dom_append_html(this.div_search_results,
                 `<div class="div-row-result">
                     <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
                     <a target="_blank" href="${url}">[${id}] ${title}</a>
@@ -402,10 +402,10 @@ utils.dom_onContentLoaded(() => {
 
         let collectionID = query_params.get("A0");
 
-        utils.dom_querySelectorAll(".item").forEach( x => {
+        utils.dom_querySelectorAll(".item-additional-buttons").forEach( x => {
             let itemID = x.getAttribute("value");
             console.assert(itemID, "Not supposed to be null");
-            utils.dom_insert_html(x, `
+            utils.dom_append_html(x, `
                 <a  class="btn-sm btn-info" 
                     href  = "javascript:collection_remove_item(${collectionID}, ${itemID})" 
                     title = "Remove item from collection."
@@ -446,7 +446,7 @@ utils.dom_onContentLoaded(() => {
 
     var body = document.body;
 
-    var dialog = utils.dom_insert_html(body, `
+    var dialog = utils.dom_append_html(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
                 <button id="btn-bulk-add-starred"> Add items to starred items</button> 

@@ -94,14 +94,14 @@ export function dom_onClicked(css_selector, callback)
     }
 }
 
-/* Insert HTML code fragment to some DOM element. 
+/* Append HTML code fragment to some DOM element. 
  *  
  *  Usage example: 
  * 
  *     var anchor = document.querySelector("#element-dom-id");
- *     var div = dom_insert_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);   
+ *     var div = dom_append_html(anchor, `<div> <h1>Title</h1> <button>My button</button></div>`);   
  ******************************************************************/
-export function dom_insert_html(anchor_element, html)
+export function dom_append_html(anchor_element, html)
 {
     var el = document.createElement("template");
     el.innerHTML = html.trim();
