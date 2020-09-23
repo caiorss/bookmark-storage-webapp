@@ -396,9 +396,24 @@ utils.dom_onContentLoaded(() => {
         btn_add_items.addEventListener("click", () => dialog_search_item.show());         
 
         var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
-            <a id="btn-experimental" class="btn btn-info" 
+            <a id="btn-experimental" class="btn-sm btn-primary" 
                 href="/collection/list" title="Search items win">View all collections</a>
         `);
+
+        let collectionID = query_params.get("A0");
+
+        utils.dom_querySelectorAll(".item").forEach( x => {
+            let itemID = x.getAttribute("value");
+            console.assert(itemID, "Not supposed to be null");
+            utils.dom_insert_html(x, `
+                <a  class="btn-sm btn-info" 
+                    href  = "javascript:collection_remove_item(${collectionID}, ${itemID})" 
+                    title = "Remove item from collection."
+                >
+                    Remove from collection
+                </a>        
+            `);
+        });
 
     }
 
@@ -700,8 +715,30 @@ function api_item_add(crfs_token)
 
     });
 }
-
 window["api_item_add"] = api_item_add;
+
+async function collection_remove_item(collectionID, itemID)
+{
+
+    let res = await utils.ajax_request(  "/api/collections/items"
+                                        , window["generated_token"]
+                                        , utils.HTTP_DELETE
+                                        , {
+                                                collection_id: collectionID
+                                              , item_id:       itemID 
+                                          });
+
+    if(res["result"] == "OK"){
+        dialog_notify.notify("Bookmark added successfuly", 2000);
+        location.reload();
+    } else {
+        dialog_notify.notify("Error: bookmark already exists", 2000);
+    }
+                            
+
+}
+
+window["collection_remove_item"] = collection_remove_item;
 
 
 class YoutubeThumb extends HTMLElement {
