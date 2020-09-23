@@ -667,7 +667,32 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
 
         return JsonResponse(body, safe = False)
         
-# Endpoint: /api/collections/new         
+    def delete(self, request: WSGIRequest, *args, **kwargs):
+        assert( request.method == "DELETE" and request.is_ajax() )
+
+        req: WSGIRequest = self.request
+        body = json.loads(req.body.decode("utf-8"))
+
+        coll_id = body["collection_id"]
+        item_id = body["item_id"]
+
+        coll: Collection   = Collection.objects.get(id = coll_id, owner = request.user)
+        item: SiteBookmark = coll.item.get(id = item_id)
+        coll.item.remove(item)
+
+        print(f" [TRACE] item = ${item} ")
+
+        print(" Delete collection = ", body)
+        return JsonResponse({ "result": "OK" }, safe = False)
+
+
+
+# REST API Endpoint: /api/collections
+#   POST   /api/collections => Create new collection
+#   GET    /api/collections => Get some collection
+#   DELETE /api/collections => Delete current collection
+#   PUT    /api/collections => Update current collection
+#
 class Ajax_Collections(LoginRequiredMixin, django.views.View):
     """ Create new collection """
 
