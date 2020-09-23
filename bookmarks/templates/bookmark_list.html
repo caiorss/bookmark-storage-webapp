@@ -69,6 +69,13 @@
                    value="{{ bookmark.id}}"
                    style="visibility: hidden; display: none;"  >              
 
+             <tr>
+                <th> 
+                  <a class="btn-sm btn-primary" title="Quick rename item" 
+                      href="javascript:item_quick_rename({{ bookmark.id }}, '{{ bookmark.title }}' )">Rename</a>
+                </th>
+              </tr>
+
               <tr>
                 <th> 
                   <a class="btn-sm btn-primary" title="Fetch bookmark metdata automatically" 

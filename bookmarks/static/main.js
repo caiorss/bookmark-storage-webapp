@@ -743,6 +743,27 @@ async function collection_remove_item(collectionID, itemID)
 
 window["collection_remove_item"] = collection_remove_item;
 
+async function item_quick_rename(item_id, old_itemm_title)
+{
+    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
+                                                            , "Old title: " + old_itemm_title);
+    
+    console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
+
+    var payload = { item_id: item_id, title: new_item_title};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_post("/api/item/rename", token, payload);
+        
+    if(resp["result"] == "OK"){
+        dialog_notify.notify("Item renamed Ok.", 2000);
+        location.reload();
+    } else {
+        dialog_notify.notify("Error: failed to rename item.", 2000);
+    }    
+
+}
+
+window["item_quick_rename"] = item_quick_rename;
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

@@ -272,6 +272,31 @@ export class Dialog_Prompt extends Dialog_GenericNotification
         });
         this.show();
     }
+
+    prompt_promise(title, question)
+    {
+        this.setTitle(title);
+        this.setText(question);
+        this.input.value = "";
+        this.show();
+
+        let p = new Promise( (resolve, reject) => {
+            this.onSubmit( flag => {
+                if(!flag) reject();
+
+                let answer = this.input.value;
+                if(answer == ""){ 
+                    reject(); 
+                    this.close(); 
+                    return;
+                }
+                if(flag) resolve(answer);
+                this.close();
+            });
+        });
+
+        return p;
+    }
 }
 
 customElements.define('dialog-prompt', Dialog_Prompt);

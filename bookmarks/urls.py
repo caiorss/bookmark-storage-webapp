@@ -42,6 +42,7 @@ urlpatterns = [
 
   # ----------------- REST API ------------------------#
   ,path("api/item",                 views.rest_item)  
+  ,path("api/item/rename",          views.Ajax_Item_Rename.as_view())
   ,path("api/bulk",                 views.rest_bulk_action)  
   #,path("api/collections",     views.Ajax_Collection_List.as_view())  
   ,path("api/collections",          views.Ajax_Collections.as_view())  
