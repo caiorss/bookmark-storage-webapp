@@ -402,16 +402,18 @@ utils.dom_onContentLoaded(() => {
 
         let collectionID = query_params.get("A0");
 
-        utils.dom_querySelectorAll(".item-additional-buttons").forEach( x => {
+        utils.dom_querySelectorAll(".action-menu-table").forEach( x => {
             let itemID = x.getAttribute("value");
             console.assert(itemID, "Not supposed to be null");
             utils.dom_append_html(x, `
-                <a  class="btn-sm btn-info" 
-                    href  = "javascript:collection_remove_item(${collectionID}, ${itemID})" 
-                    title = "Remove item from collection."
-                >
-                    Remove from collection
-                </a>        
+               <th>
+                    <a  class="btn-sm btn-info" 
+                        href  = "javascript:collection_remove_item(${collectionID}, ${itemID})" 
+                        title = "Remove item from collection."
+                    >
+                        Remove from collection
+                    </a>        
+                </th>
             `);
         });
 
