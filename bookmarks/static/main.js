@@ -670,10 +670,12 @@ function open_url_newtab(url)
 }
 window["open_url_newtab"] = open_url_newtab;
 
+/** @description Add new bookmark to collection  */
 function api_item_add(crfs_token)
 {
+    dialog_prompt.setText("Enter the new URL to be added.");
     dialog_prompt.prompt( "New bookmark entry"
-                        , "Enter the URL to be added.", (url) => {
+                        , "", (url) => {
                             
         console.log("User entered the URL: ", url);
 
@@ -746,7 +748,8 @@ window["collection_remove_item"] = collection_remove_item;
 async function item_quick_rename(item_id, old_itemm_title)
 {
     let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
-                                                            , "Old title: " + old_itemm_title);
+                                                            , old_itemm_title
+                                                           );
     
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 

@@ -253,15 +253,21 @@ export class Dialog_Prompt extends Dialog_GenericNotification
         });
     }
 
-    get_answer() {
+    setInput(text)
+    {
+        this.input.value = text;
+    }
+
+    get_answer() 
+    {
         return this.input.value;
     }
 
     prompt(title, question, callback)
     {
         this.setTitle(title);
-        this.setText(question);
-        this.input.value = "";
+        this.setInput(question);
+        // this.input.value = "";
 
         this.onSubmit(flag => {
             if(!flag) return;
@@ -276,8 +282,8 @@ export class Dialog_Prompt extends Dialog_GenericNotification
     prompt_promise(title, question)
     {
         this.setTitle(title);
-        this.setText(question);
-        this.input.value = "";
+        this.setInput(question);
+        // this.input.value = "";
         this.show();
 
         let p = new Promise( (resolve, reject) => {
