@@ -72,7 +72,7 @@
              <tr>
                 <th> 
                   <a class="btn-sm btn-primary" title="Quick rename item" 
-                      href="javascript:item_quick_rename({{ bookmark.id }}, '{{ bookmark.title }}' )">Rename</a>
+                      href='javascript:item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
                 </th>
               </tr>
 
