@@ -9,7 +9,7 @@
 <div id="bookmark-list" class="container">   
 
     {% for bookmark in object_list %}
-        <div class = "well item item_div">   
+        <div class = "well item item_div" value="{{ bookmark.id}}">   
 
             <h5>  
         
@@ -51,6 +51,8 @@
               </li>
             </ul>
 
+            <div class="item-additional-buttons"></div>
+
             <a class="btn-sm btn-primary" 
                title="Actions for current bookmark" 
                href="javascript:toggle_action_menu('#action-menu-{{ bookmark.id }}')">Toggle Actions</a>
@@ -62,7 +64,17 @@
                    </a>    
                {% endif %}
 
-            <table class="action-menu-table" id="action-menu-{{ bookmark.id }}" style="visibility: hidden; display: none;"  >              
+            <table class="action-menu-table" 
+                   id="action-menu-{{ bookmark.id }}" 
+                   value="{{ bookmark.id}}"
+                   style="visibility: hidden; display: none;"  >              
+
+             <tr>
+                <th> 
+                  <a class="btn-sm btn-primary" title="Quick rename item" 
+                      href='javascript:item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
+                </th>
+              </tr>
 
               <tr>
                 <th> 

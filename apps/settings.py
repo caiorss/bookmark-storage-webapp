@@ -34,20 +34,22 @@ SITE_URL = "http://127.0.0.1:8000"
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+      'django.contrib.admin'
+    , 'django.contrib.auth'
+    , 'django.contrib.contenttypes'
+    , 'django.contrib.sessions'
+    , 'django.contrib.messages'
+    , 'django.contrib.staticfiles'
+
+    , 'rest_framework'
 
     # Main app 
-    'bookmarks',
+    , 'bookmarks'
     
     # DJango-pdb: note - require installing
     # $ pip install django-pdb
     # Reference: https://github.com/HassenPy/django-pdb
-    'django_pdb'
+    , 'django_pdb'
 ]
 
 MIDDLEWARE = [

@@ -342,7 +342,7 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             let title = row["title"];
             let url   = row["url"];
 
-            utils.dom_insert_html(this.div_search_results,
+            utils.dom_append_html(this.div_search_results,
                 `<div class="div-row-result">
                     <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
                     <a target="_blank" href="${url}">[${id}] ${title}</a>
@@ -390,15 +390,32 @@ utils.dom_onContentLoaded(() => {
     if(query_params.get("filter") == "collection")
     { 
         var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
-        <a  class="btn btn-info"  href="#" title="Search items win">Add multiple items</a>
+        <a  class="btn-sm btn-primary"  href="#" title="Search items win">Add multiple items</a>
         `);
 
         btn_add_items.addEventListener("click", () => dialog_search_item.show());         
 
         var btn_add_items = utils.dom_insert_html_at_selector("#div-additional-buttons", `
-            <a id="btn-experimental" class="btn btn-info" 
+            <a id="btn-experimental" class="btn-sm btn-primary" 
                 href="/collection/list" title="Search items win">View all collections</a>
         `);
+
+        let collectionID = query_params.get("A0");
+
+        utils.dom_querySelectorAll(".action-menu-table").forEach( x => {
+            let itemID = x.getAttribute("value");
+            console.assert(itemID, "Not supposed to be null");
+            utils.dom_append_html(x, `
+               <th>
+                    <a  class="btn-sm btn-info" 
+                        href  = "javascript:collection_remove_item(${collectionID}, ${itemID})" 
+                        title = "Remove item from collection."
+                    >
+                        Remove from collection
+                    </a>        
+                </th>
+            `);
+        });
 
     }
 
@@ -431,7 +448,7 @@ utils.dom_onContentLoaded(() => {
 
     var body = document.body;
 
-    var dialog = utils.dom_insert_html(body, `
+    var dialog = utils.dom_append_html(body, `
         <dialog class="dialog-bulk-action"> 
             <div>
                 <button id="btn-bulk-add-starred"> Add items to starred items</button> 
@@ -651,11 +668,14 @@ function open_url_newtab(url)
     var win = window.open(url, '_blank');
     win.focus();
 }
+window["open_url_newtab"] = open_url_newtab;
 
+/** @description Add new bookmark to collection  */
 function api_item_add(crfs_token)
 {
+    dialog_prompt.setText("Enter the new URL to be added.");
     dialog_prompt.prompt( "New bookmark entry"
-                        , "Enter the URL to be added.", (url) => {
+                        , "", (url) => {
                             
         console.log("User entered the URL: ", url);
 
@@ -700,9 +720,53 @@ function api_item_add(crfs_token)
 
     });
 }
-
 window["api_item_add"] = api_item_add;
 
+async function collection_remove_item(collectionID, itemID)
+{
+
+    let res = await utils.ajax_request(  "/api/collections/items"
+                                        , window["generated_token"]
+                                        , utils.HTTP_DELETE
+                                        , {
+                                                collection_id: collectionID
+                                              , item_id:       itemID 
+                                          });
+
+    if(res["result"] == "OK"){
+        dialog_notify.notify("Bookmark added successfuly", 2000);
+        location.reload();
+    } else {
+        dialog_notify.notify("Error: bookmark already exists", 2000);
+    }
+                            
+
+}
+
+window["collection_remove_item"] = collection_remove_item;
+
+async function item_quick_rename(item_id, old_itemm_title)
+{
+    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
+                                                            , old_itemm_title
+                                                           );
+    
+    console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
+
+    var payload = { item_id: item_id, title: new_item_title};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_post("/api/item/rename", token, payload);
+        
+    if(resp["result"] == "OK"){
+        dialog_notify.notify("Item renamed Ok.", 2000);
+        location.reload();
+    } else {
+        dialog_notify.notify("Error: failed to rename item.", 2000);
+    }    
+
+}
+
+window["item_quick_rename"] = item_quick_rename;
 
 class YoutubeThumb extends HTMLElement {
     constructor() {
