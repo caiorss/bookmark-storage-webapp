@@ -747,15 +747,6 @@ window["collection_remove_item"] = collection_remove_item;
 
 async function item_quick_rename(item_id, old_item_title)
 {
-
-/*     let dialog = new Dialog2_Prompt("Change item title", "", old_item_title);
-    // dialog.attach_body();
-
- /*    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
-                                                            , old_item_title
-                                                           ); */    
-    // let new_item_title = await dialog.prompt(); 
-
     let new_item_title = await Dialog2_Prompt.prompt("Change item title:", "", old_item_title);
 
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
