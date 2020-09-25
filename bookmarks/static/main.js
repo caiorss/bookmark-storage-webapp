@@ -1,5 +1,5 @@
-import {NotificationDialog, Dialog_Prompt, Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
-      , DialogForm, DialogFormBuilder} from "/static/dialogs.js";
+import {Dialog_Prompt, Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
+      , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
 
@@ -356,10 +356,6 @@ class Dialog_Search_Item extends Dialog_GenericNotification
 customElements.define('dialog-search-item', Dialog_Search_Item);
 window["Dialog_Search_Item"] = Dialog_Search_Item;
 
-
-
-let dialog_notify = new NotificationDialog();
-
 let dialog_prompt = new Dialog_Prompt();
 
 var dialog_search_item = new Dialog_Search_Item();
@@ -373,11 +369,6 @@ utils.dom_onContentLoaded(() => {
     });
 
     // ----------- Attach modal dialogs to body --------------------// 
-
-    dialog_notify.attach_body();
-    dialog_notify.setTitle("User Notification.");
-    dialog_notify.id = "dialog-notify";
-    dialog_notify.attach_body();
 
     dialog_prompt.attach_body();
 
@@ -691,16 +682,17 @@ function api_item_add(crfs_token)
 
             var token = window["generated_token"];
 
-            utils.ajax_post("/api/collections/add_item", token, data).then( res => {
+            utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
                 if(res["result"] == "OK"){
-                    dialog_notify.notify("Bookmark added successfuly", 2000);
+                    let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
                     location.reload();
                 } else {
-                    dialog_notify.notify("Error: bookmark already exists", 2000);
+                    Dialog_Notify.notify("Error", "Error: Bookmark already exists.", 2000);
+                    //dialog_notify.notify("Error: bookmark already exists", 2000);
                 }
         
             }).catch(err => { 
-                dialog_notify.notify(" Error: " + err)
+                Dialog_Notify.notify("Error: " + err);
             });
 
             return;
@@ -710,10 +702,10 @@ function api_item_add(crfs_token)
         var payload = {url: url};
         utils.ajax_post("/api/item", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
-                dialog_notify.notify("Bookmark added successfuly", 2000);
+                Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
             } else {
-                dialog_notify.notify("Error: bookmark already exists", 2000);
+                Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
             }
 
         });
@@ -756,10 +748,10 @@ async function item_quick_rename(item_id, old_item_title)
     let resp = await utils.ajax_post("/api/item/rename", token, payload);
         
     if(resp["result"] == "OK"){
-        dialog_notify.notify("Item renamed Ok.", 2000);
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1000);
         location.reload();
     } else {
-        dialog_notify.notify("Error: failed to rename item.", 2000);
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
     }    
 
 }

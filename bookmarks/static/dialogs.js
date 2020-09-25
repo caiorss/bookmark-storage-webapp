@@ -190,39 +190,6 @@ export class Dialog_OkCancel extends Dialog_GenericNotification
 customElements.define('dialog-okcancel', Dialog_OkCancel);
 
 
-
-/**
- * Usage: 
- * ```
- *   var c = new NotificationDialog();
- *   c.attach(document.body);
- *   // Timeout 1 second (= 1000 milliseconds)
- *   c.notify("My notifcation", 1000);
- * ```
- */
-export class NotificationDialog extends Dialog_GenericNotification 
-{
-    constructor() {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.onSubmit((flag) => {});
-        this.setSubmitVisible(false);
-    }
-
-    notify(text, timeout = 1500)
-    {
-        this.setText(text);
-        this.setVisible(true);
-        var self = this;
-        setTimeout(() => self.setVisible(false) , timeout);
-    }
-
-}
-
-customElements.define('dialog-notification', NotificationDialog);
-
-
 export class Dialog_Prompt extends Dialog_GenericNotification
 {
     constructor(){
@@ -452,7 +419,7 @@ customElements.define('dialog-form', DialogForm);
 
 export class Dialog_Basic extends HTMLElement
 {
-    constructor(title = "Basic Dialog", text = "Dialog text", input = "")
+    constructor()
     {
         super()
         this.attachShadow( { mode: 'open' } )
@@ -464,8 +431,8 @@ export class Dialog_Basic extends HTMLElement
         var html = `
             <div>    
                 <div>            
-                    <h4 id="dialog-title">${title}</h4>
-                    <span id="dialog-text">${text}</span>
+                    <h4 id="dialog-title"></h4>
+                    <span id="dialog-text"></span>
                 </div>
 
                 <div id="dialog-body"> 
@@ -589,12 +556,72 @@ export class Dialog_Basic extends HTMLElement
     }
 
 
+    setButtonCloseLabel(text)
+    {
+        var desc = this.node.querySelector("#btn-close");
+        desc.textContent = text;
+    }
+
+    setButtonSubmitLabel(text)
+    {
+        var desc = this.node.querySelector("#btn-submit");
+        desc.textContent = text;
+    }    
+
+    /** Hides/show submit submit button. */
+    setSubmitVisible(flag) 
+    {
+        var btn = this.node.querySelector("#btn-submit");
+
+        if(!flag){            
+            btn.style.visibility = "hidden";
+            btn.style.display    = "none";
+            return;
+        }
+        btn.style.visibility = "visible";
+        btn.style.display    = "block";
+    }
+
 
 } // ---- Dialog_Basic class ---------------// 
 
 customElements.define('dialog-basic', Dialog_Basic);
 window["dialog-basic"] = Dialog_Basic;
 
+
+/** ============ Nortification Dialog ============= */
+
+
+export class Dialog_Notify extends Dialog_Basic
+{
+    constructor() 
+    {
+        super()
+        this.setSubmitVisible(false);
+    }
+
+    static notify(title, message, timeout = 2000)
+    {
+        let dialog = new Dialog_Notify();
+        dialog.setTitle(title);
+        dialog.setText(message);
+        dialog.show();
+
+        let p = new Promise( (resolve, reject) => {
+            setTimeout(() => {
+                dialog.hide();
+                dialog.detach_body();
+                resolve(true);
+            } , timeout);        
+    
+        });
+        return p;
+    }
+
+}
+
+customElements.define('dialog2-notify', Dialog_Notify);
+window["dialog2-notify"] = Dialog_Notify;
 
 /** Non-Stateful prompt dialog, similar to function prompt();
  */
