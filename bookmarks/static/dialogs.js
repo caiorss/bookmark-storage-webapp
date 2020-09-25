@@ -190,88 +190,6 @@ export class Dialog_OkCancel extends Dialog_GenericNotification
 customElements.define('dialog-okcancel', Dialog_OkCancel);
 
 
-export class Dialog_Prompt extends Dialog_GenericNotification
-{
-    constructor(){
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.setTitle("Prompt:");
-        // this.setText("Are you sure you want to delete this item?");
-        this.setButtonSubmitLabel("Submit");
-        this.setButtonCloseLabel("Cancel");
-
-        this.input = this.insertBodyHtml(`<input id="question-entry"></input>`);
-        
-        if(screen.width <= 500)
-            this.node.style["width"] = "80%";
-        else 
-            this.node.style["width"] = "500px";
-        
-        this.input.style["width"] = "90%";
-
-        this.onSubmit( (flag) => {
-            console.log(" [INFO] User clicked submit ? = ", flag);
-            this.close();
-        });
-    }
-
-    setInput(text)
-    {
-        this.input.value = text;
-    }
-
-    get_answer() 
-    {
-        return this.input.value;
-    }
-
-    prompt(title, question, callback)
-    {
-        this.setTitle(title);
-        this.setInput(question);
-        // this.input.value = "";
-
-        this.onSubmit(flag => {
-            if(!flag) return;
-            let answer = this.input.value;
-            if(answer == ""){ this.close(); return;}
-            callback(answer);            
-            this.close();
-        });
-        this.show();
-    }
-
-    prompt_promise(title, question)
-    {
-        this.setTitle(title);
-        this.setInput(question);
-        // this.input.value = "";
-        this.show();
-
-        let p = new Promise( (resolve, reject) => {
-            this.onSubmit( flag => {
-                if(!flag) reject();
-
-                let answer = this.input.value;
-                if(answer == ""){ 
-                    reject(); 
-                    this.close(); 
-                    return;
-                }
-                if(flag) resolve(answer);
-                this.close();
-            });
-        });
-
-        return p;
-    }
-}
-
-customElements.define('dialog-prompt', Dialog_Prompt);
-window["Dialog_Prompt"] = Dialog_Prompt;
-
-
 export class DialogFormBuilder extends Dialog_GenericNotification 
 {
    
@@ -620,8 +538,8 @@ export class Dialog_Notify extends Dialog_Basic
 
 }
 
-customElements.define('dialog2-notify', Dialog_Notify);
-window["dialog2-notify"] = Dialog_Notify;
+customElements.define('dialog-notify', Dialog_Notify);
+window["dialog-notify"] = Dialog_Notify;
 
 /** Non-Stateful prompt dialog, similar to function prompt();
  */

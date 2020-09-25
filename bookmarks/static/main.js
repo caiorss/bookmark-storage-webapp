@@ -1,4 +1,4 @@
-import {Dialog_Prompt, Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
+import {Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
       , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
@@ -356,7 +356,6 @@ class Dialog_Search_Item extends Dialog_GenericNotification
 customElements.define('dialog-search-item', Dialog_Search_Item);
 window["Dialog_Search_Item"] = Dialog_Search_Item;
 
-let dialog_prompt = new Dialog_Prompt();
 
 var dialog_search_item = new Dialog_Search_Item();
 window["dialog_search_item"] = dialog_search_item;
@@ -369,9 +368,6 @@ utils.dom_onContentLoaded(() => {
     });
 
     // ----------- Attach modal dialogs to body --------------------// 
-
-    dialog_prompt.attach_body();
-
     dialog_search_item.attach_body();
     
     // ---------- DOM html modifications ------------------//
