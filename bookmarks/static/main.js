@@ -1,4 +1,4 @@
-import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification
+import {NotificationDialog, Dialog_Prompt, Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
       , DialogForm, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
@@ -745,12 +745,19 @@ async function collection_remove_item(collectionID, itemID)
 
 window["collection_remove_item"] = collection_remove_item;
 
-async function item_quick_rename(item_id, old_itemm_title)
+async function item_quick_rename(item_id, old_item_title)
 {
-    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
-                                                            , old_itemm_title
-                                                           );
-    
+
+/*     let dialog = new Dialog2_Prompt("Change item title", "", old_item_title);
+    // dialog.attach_body();
+
+ /*    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
+                                                            , old_item_title
+                                                           ); */    
+    // let new_item_title = await dialog.prompt(); 
+
+    let new_item_title = await Dialog2_Prompt.prompt("Change item title:", "", old_item_title);
+
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 
     var payload = { item_id: item_id, title: new_item_title};    

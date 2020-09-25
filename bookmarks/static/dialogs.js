@@ -4,13 +4,9 @@ export class Dialog_GenericNotification extends HTMLElement
     constructor()
     {
         super()
-
         this.node = document.createElement("dialog");
-
         this.submit_callback = (flag) => { alert("Submit Clicked"); }
-
         this.close_callback = () => { };
-
         this.custom_style = "";
 
         var html = `
@@ -450,3 +446,140 @@ export class DialogForm extends Dialog_GenericNotification
 
 customElements.define('dialog-form', DialogForm);
 
+
+/** Non-Stateful prompt dialog, similar to function prompt();
+ */
+export class Dialog2_Prompt extends HTMLElement
+{
+    constructor(title, text, input = "")
+    {
+        super()
+        this.attachShadow( { mode: 'open' } )
+
+        this.node = document.createElement("dialog");
+        this._callback = (flag) => { alert("Submit Clicked"); }
+        this.custom_style = "";
+
+        var html = `
+            <div>    
+                <div>            
+                    <h4 id="dialog-title">${title}</h4>
+                    <span id="dialog-text">${text}</span>
+                </div>
+
+                <div id="dialog-body"> 
+                   <input id="dialog-input" value="${input}"></input>
+                </div>
+                <div>
+                    <button id="btn-close">Close</button>
+                    <button id="btn-submit">Submit</button>
+                </div>
+             </div>
+        `.trim();
+
+        var el = document.createElement("template");
+        el.innerHTML = html;
+        var elem = el.content.firstChild;
+        this.node.appendChild(elem);
+
+        this.input = this.node.querySelector("#dialog-input");
+
+        this.node.querySelector("#btn-close").addEventListener("click", () => { 
+            this._callback(false);
+            this.node.close();
+            this.detach_body();
+        });
+
+        this.node.querySelector("#btn-submit").addEventListener("click", () => {             
+            this._callback(true);            
+            this.node.close();
+            this.detach_body();
+        });
+
+       this.attach_body();
+       //dialog.attach_body();
+    }
+
+
+    connectedCallback()
+    {
+        var window_width = window.innerWidth > 600 ? "500px" : "90%";
+        var window_height = window.innerHeight > 1000 ? "600px" : "95%";
+        //alert(" Window width = ", window_width);
+
+        console.assert(this.shadowRoot, "Component supposed to be attached to DOM body");
+
+        this.shadowRoot.innerHTML = `
+            <style>
+                body {
+                    overscroll-behavior-y: contain;
+                }
+
+                dialog {
+                    position: fixed; 
+                    top:      20px;
+                    
+                    background-color: darkgray                    
+                    color: black;
+
+                    width:  ${window_width};
+                    max-width:  ${window_width};
+                    max-height: ${window_height};
+
+                    border-radius: 20px;
+                    z-index: 2;
+                }
+
+                input {
+                    width: 100%;
+                }
+
+            </style>            
+        `.trim();
+
+        this.shadowRoot.appendChild(this.node);
+    }
+
+    detach_body() 
+    {
+        this.parentNode.removeChild(this);
+    }
+
+    attach_body()
+    {
+        document.body.appendChild(this)
+    }
+
+    show() { this.node.showModal(true); }
+    hide() { this.node.close();         }
+    close(){ this.node.close();         }
+
+    run() 
+    {
+        this.show();
+        let p = new Promise( (resolve, reject) => {
+            this._callback = (flag) => {
+                if(!flag) reject();
+                let answer = this.input.value;
+                if(answer == "")
+                { 
+                    reject(); 
+                    return;
+                }
+                if(flag) resolve(answer);
+            };
+        });
+        return p;
+    }
+
+    static async prompt(title, text, input = "")
+    {
+        let dialog = new Dialog2_Prompt(title, text, input);
+        let response = await dialog.run();
+        return response;
+    }
+
+}
+
+customElements.define('dialog2-prompt', Dialog2_Prompt);
+window["dialog2-prompt"] = Dialog2_Prompt;
