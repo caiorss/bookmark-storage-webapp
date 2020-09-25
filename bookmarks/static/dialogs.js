@@ -447,11 +447,12 @@ export class DialogForm extends Dialog_GenericNotification
 customElements.define('dialog-form', DialogForm);
 
 
-/** Non-Stateful prompt dialog, similar to function prompt();
- */
-export class Dialog2_Prompt extends HTMLElement
+/* ---------- Generic Dialog ----------------- */ 
+
+
+export class Dialog_Basic extends HTMLElement
 {
-    constructor(title, text, input = "")
+    constructor(title = "Basic Dialog", text = "Dialog text", input = "")
     {
         super()
         this.attachShadow( { mode: 'open' } )
@@ -468,7 +469,6 @@ export class Dialog2_Prompt extends HTMLElement
                 </div>
 
                 <div id="dialog-body"> 
-                   <input id="dialog-input" value="${input}"></input>
                 </div>
                 <div>
                     <button id="btn-close">Close</button>
@@ -481,8 +481,6 @@ export class Dialog2_Prompt extends HTMLElement
         el.innerHTML = html;
         var elem = el.content.firstChild;
         this.node.appendChild(elem);
-
-        this.input = this.node.querySelector("#dialog-input");
 
         this.node.querySelector("#btn-close").addEventListener("click", () => { 
             this._callback(false);
@@ -559,24 +557,71 @@ export class Dialog2_Prompt extends HTMLElement
         this.show();
         let p = new Promise( (resolve, reject) => {
             this._callback = (flag) => {
-                if(!flag) reject();
-                let answer = this.input.value;
-                if(answer == "")
-                { 
-                    reject(); 
-                    return;
-                }
-                if(flag) resolve(answer);
+                resolve(flag);
             };
         });
         return p;
     }
 
+    insertBodyHtml(html)
+    {
+
+        var el = document.createElement("template");
+        el.innerHTML = html.trim();
+        var elem = el.content.firstChild;
+        this.node.querySelector("#dialog-body")
+                 .appendChild(elem);
+        // console.log(" [INFO] insertBodyHtml() = ", elem);
+        return elem;
+    }
+
+
+    setTitle(title)
+    {
+        this.node.querySelector("#dialog-title").textContent = title;
+        return this;
+    }
+
+    setText(text)
+    {
+        this.node.querySelector("#dialog-text").textContent = text;
+        return this;
+    }
+
+
+
+} // ---- Dialog_Basic class ---------------// 
+
+customElements.define('dialog-basic', Dialog_Basic);
+window["dialog-basic"] = Dialog_Basic;
+
+
+/** Non-Stateful prompt dialog, similar to function prompt();
+ */
+export class Dialog2_Prompt extends Dialog_Basic
+{
+    constructor(title, text, input = "")
+    {
+        super()
+        // this.attachShadow( { mode: 'open' } )
+
+        this.input = this.insertBodyHtml("<input id='dialog-input'></input>");
+        this.input.value = input;
+        //input = this.node.querySelector("#dialog-input");
+                
+        this.setTitle(title);
+        this.setText(text);
+        
+    }
+    
     static async prompt(title, text, input = "")
     {
         let dialog = new Dialog2_Prompt(title, text, input);
-        let response = await dialog.run();
-        return response;
+        let is_submit = await dialog.run();
+        if(is_submit && dialog.input.value != "") { 
+            return dialog.input.value; 
+        }
+        throw new Error("User clicked cancel");
     }
 
 }
