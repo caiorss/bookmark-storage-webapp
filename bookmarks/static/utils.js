@@ -68,7 +68,7 @@ export function dom_onContentLoaded(callback)
 /** Reload current page. (same as hit F5 in the web browser) */
 export function dom_page_refresh()
 {
-    location.reload();
+    document.location.reload(true);
 }
 
 
