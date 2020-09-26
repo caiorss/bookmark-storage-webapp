@@ -541,6 +541,33 @@ export class Dialog_Notify extends Dialog_Basic
 customElements.define('dialog-notify', Dialog_Notify);
 window["dialog-notify"] = Dialog_Notify;
 
+// ========== D I A L O G -  Y E S - N O ==========// 
+
+
+export class Dialog_YesNo extends Dialog_Basic
+{
+    constructor(){
+        super()
+        this.setButtonSubmitLabel("OK");
+        this.setButtonCloseLabel("Cancel");
+    }
+
+    static async prompt(title, message){
+        let dialog = new Dialog_YesNo();
+        dialog.setTitle(title);
+        dialog.setText(message);
+        let resp = await dialog.run();
+        return resp;
+    }
+}
+
+customElements.define('dialog-yesno', Dialog_YesNo);
+
+
+
+// =========== D I A L O G - P R O M P T ===============//
+
+
 /** Non-Stateful prompt dialog, similar to function prompt();
  */
 export class Dialog2_Prompt extends Dialog_Basic
