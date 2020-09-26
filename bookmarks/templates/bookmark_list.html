@@ -137,7 +137,10 @@
                 {% if bookmark.deleted != True  %}
                 <tr>
                   <th> 
-                    <a class="btn-sm btn-primary" title="Delete current item" href="{% url 'bookmarks:bookmark_delete' bookmark.id %}">Delete</a>                                                 
+                    <a  class="btn-sm btn-primary" 
+                        title="Delete current item" 
+                        href="javascript:item_delete( {{ bookmark.id }}, '{{ bookmark.modified_title | escape }}' ); "
+                     >Delete</a>                                                 
                   </th>
                 </tr>
                 {% endif %}

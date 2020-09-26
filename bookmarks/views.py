@@ -637,6 +637,44 @@ def querylist2Json(querylist, columns: List[str]) -> JsonResponse:
     list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
     return JsonResponse(list_of_dicts, safe =False)    
 
+
+class Ajax_Items(LoginRequiredMixin, django.views.View):
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        pass 
+    
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        """Create new bookmark entry in the database."""
+        body_unicode = request.body.decode("utf-8")
+        body         = json.loads(body_unicode)
+        url:  str    = body["url"]
+        url_: str    = dutils.remove_url_obfuscation(url)    
+        assert url_ is not None 
+        # Current logged user 
+        user: AbstractBaseUser = request.user
+        try:
+            # Check whether URL already exists in the database         
+            it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
+            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+        except SiteBookmark.DoesNotExist:
+            pass         
+        item = SiteBookmark.objects.create(url = url_, owner = user)
+        item.save()
+        # update_item_from_metadata(item.id)
+        return  JsonResponse({ "result": "OK" })
+
+    def delete(self, request: WSGIRequest, *args, **kwargs):
+        body_unicode  = request.body.decode("utf-8")
+        body          = json.loads(body_unicode)
+        item_id:  str = body["id"]        
+        item = SiteBookmark.objects.get(id = item_id, owner = request.user)
+        item.delete()
+        item.save()
+        return  JsonResponse({ "result": "OK" })
+
+    def put(self, request: WSGIRequest, *args, **kwargs):
+        pass     
+    
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """

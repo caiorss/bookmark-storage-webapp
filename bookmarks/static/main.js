@@ -1,4 +1,4 @@
-import {Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification
+import {Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification, Dialog_YesNo
       , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
@@ -753,6 +753,27 @@ async function item_quick_rename(item_id, old_item_title)
 }
 
 window["item_quick_rename"] = item_quick_rename;
+
+async function item_delete(item_id, item_title) 
+{
+    let response = await Dialog_YesNo.prompt( "Delete item"
+                                      , "Are you sure you want to delete item: " + item_title);
+
+    if(!response) return;
+
+    var payload = { id: item_id };    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_DELETE, payload);
+
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+    }    
+}
+
+window["item_delete"] = item_delete;
 
 class YoutubeThumb extends HTMLElement {
     constructor() {
