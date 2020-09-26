@@ -658,15 +658,10 @@ function open_url_newtab(url)
 window["open_url_newtab"] = open_url_newtab;
 
 /** @description Add new bookmark to collection  */
-function api_item_add(crfs_token)
+async function api_item_add(crfs_token)
 {
-    dialog_prompt.setText("Enter the new URL to be added.");
-    dialog_prompt.prompt( "New bookmark entry"
-                        , "", (url) => {
-                            
+        let url = await Dialog2_Prompt.prompt("Enter the new URL to be added", "");                            
         console.log("User entered the URL: ", url);
-
-        if(url == null) return;
 
         var query_params = new URLSearchParams(window.location.search);
         if(query_params.get("filter") == "collection")
@@ -705,9 +700,8 @@ function api_item_add(crfs_token)
             }
 
         });
-
-    });
 }
+
 window["api_item_add"] = api_item_add;
 
 async function collection_remove_item(collectionID, itemID)
