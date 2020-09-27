@@ -673,11 +673,31 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         return  JsonResponse({ "result": "OK" })
 
     def put(self, request: WSGIRequest, *args, **kwargs):
-        pass     
+        """ Performs partial data update. """
+        body = json.loads(request.body.decode("utf-8"))
+        action: str = body["action"]
+        item_id     = body["id"]
+        
+        if (not item_id) and (not title):
+            return Http404("Error: invalid request")
+        item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)
+        
+        if action == "rename":
+            title: str = body["title"]
+            item.title = title
+        
+        if action == "starred":
+            starred: bool = body["starred"]
+            item.starred = starred 
+
+        item.save()
+        return JsonResponse({ "result": "OK" }, safe = False)
+
     
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """
+
     # Overrident from class View 
     def get(self, request: WSGIRequest, *args, **kwargs):
         query = Collection.objects.filter(owner = self.request.user, deleted = False)
@@ -706,6 +726,7 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
         return JsonResponse(body, safe = False)
         
     def delete(self, request: WSGIRequest, *args, **kwargs):
+        """ Soft delete bookmark entry """
         assert( request.method == "DELETE" and request.is_ajax() )
 
         req: WSGIRequest = self.request
