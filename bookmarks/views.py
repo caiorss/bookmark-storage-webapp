@@ -687,8 +687,8 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             item.title = title
         
         if action == "starred":
-            starred: bool = body["starred"]
-            item.starred = starred 
+            value: bool = body["value"]
+            item.starred = value 
 
         item.save()
         return JsonResponse({ "result": "OK" }, safe = False)

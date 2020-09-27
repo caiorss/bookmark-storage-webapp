@@ -363,10 +363,6 @@ window["dialog_search_item"] = dialog_search_item;
 // Callback executed after DOM is fully loaded
 utils.dom_onContentLoaded(() => {
 
-    utils.dom_querySelectorAll(".checkbox-starred").forEach( x => {
-        x.addEventListener("click", () => alert("Error: not implemented yet.") );
-    });
-
     // ----------- Attach modal dialogs to body --------------------// 
     dialog_search_item.attach_body();
     
@@ -738,6 +734,28 @@ async function item_quick_rename(item_id, old_item_title)
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item marked as starred Ok.", 500);
+        // location.reload();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.", 500);
+    }    
+
+}
+
+window["item_quick_rename"] = item_quick_rename;
+
+
+
+async function item_set_starred(checkbox)
+{
+    let item_id = checkbox.getAttribute("value");
+    console.log(" [TRACE] item_set_starred() => Item_ID: ", item_id);
+
+    var payload = { action: "starred", id: item_id, value: checkbox.checked};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+        
+    if(resp["result"] == "OK"){
         let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1000);
         location.reload();
     } else {
@@ -746,7 +764,8 @@ async function item_quick_rename(item_id, old_item_title)
 
 }
 
-window["item_quick_rename"] = item_quick_rename;
+window["item_set_starred"] = item_set_starred;
+
 
 async function item_delete(item_id, item_title) 
 {

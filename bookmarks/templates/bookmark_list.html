@@ -38,15 +38,21 @@
               <li>                  
                   <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
                     title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a>
-                    
               </li>
               <li>
                   Starred: 
 
                    {%if bookmark.starred %}
-                      <input type="checkbox" class="checkbox-starred" value="{{ bookmark.id }}" checked/> 
+                      <input  type="checkbox" 
+                              class="checkbox-starred" 
+                              onchange="item_set_starred(this);"
+                              value="{{ bookmark.id }}"                               
+                              checked/> 
                    {% else %}
-                      <input type="checkbox" class="checkbox-starred" value="{{ bookmark.id }}"/> 
+                      <input type="checkbox" 
+                            class="checkbox-starred" 
+                             onchange="item_set_starred(this);"
+                             value="{{ bookmark.id }}"/> 
                    {% endif %}
               </li>
             </ul>
