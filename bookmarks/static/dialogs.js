@@ -1,10 +1,15 @@
+import dialogPolyfill from "/static/dialog-polyfill.esm.js";
+
+// window["dialogPolyfill"] = dialogPolyfill;
+
+
 export class Dialog_GenericNotification extends HTMLElement
 {
     
     constructor()
     {
         super()
-        this.node = document.createElement("dialog");
+        this.node = document.createElement("dialog");        
         this.submit_callback = (flag) => { alert("Submit Clicked"); }
         this.close_callback = () => { };
         this.custom_style = "";
@@ -343,6 +348,7 @@ export class Dialog_Basic extends HTMLElement
         this.attachShadow( { mode: 'open' } )
 
         this.node = document.createElement("dialog");
+        dialogPolyfill.registerDialog(this.node);
         this._callback = (flag) => { alert("Submit Clicked"); }
         this.custom_style = "";
 
