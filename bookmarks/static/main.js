@@ -733,9 +733,9 @@ async function item_quick_rename(item_id, old_item_title)
 
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 
-    var payload = { item_id: item_id, title: new_item_title};    
+    var payload = { action: "rename", id: item_id, title: new_item_title};    
     var token = window["generated_token"];
-    let resp = await utils.ajax_post("/api/item/rename", token, payload);
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
         let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1000);
