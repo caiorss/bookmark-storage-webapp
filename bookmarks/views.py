@@ -34,6 +34,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+#from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+import django.core.paginator as dj_paginator 
 
 import bs4 
 import urllib
@@ -852,7 +854,7 @@ class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
         coll.save()
         return JsonResponse({ "result": "OK" }, safe = False)        
 
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
 
 class ViewPaginatorMixin(object):
     min_limit = 1
@@ -875,12 +877,12 @@ class ViewPaginatorMixin(object):
         except (ValueError, TypeError):
             limit = self.max_limit
 
-        paginator = Paginator(object_list, limit)
+        paginator = dj_paginator.Paginator(object_list, limit)
         try:
             objects = paginator.page(page)
-        except PageNotAnInteger:
+        except dj_paginator.PageNotAnInteger:
             objects = paginator.page(1)
-        except EmptyPage:
+        except dj_paginator.EmptyPage:
             objects = paginator.page(paginator.num_pages)
         
         # print(" [INFO] type(objects) = ", type(objects))
