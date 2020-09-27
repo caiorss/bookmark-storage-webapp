@@ -734,10 +734,10 @@ async function item_quick_rename(item_id, old_item_title)
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item marked as starred Ok.", 500);
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 500);
         utils.dom_page_refresh();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.", 500);
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.", 500);
     }    
 
 }
@@ -756,10 +756,10 @@ async function item_set_starred(checkbox)
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1000);
+        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 1000);
         // location.reload();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+        Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
     }    
 
 }
