@@ -140,16 +140,16 @@
     
                   </th>                    
                 </tr>
-                {% if bookmark.deleted != True  %}
+                
                 <tr>
                   <th> 
                     <a  class="btn-sm btn-primary" 
                         title="Delete current item" 
-                        href="javascript:item_delete( {{ bookmark.id }}, '{{ bookmark.modified_title | escape }}' ); "
+                        href="javascript:item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escape }}' ); "
                      >Delete</a>                                                 
                   </th>
                 </tr>
-                {% endif %}
+                
             </table>                          
             
           <div class="item-details">

@@ -666,10 +666,11 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
     def delete(self, request: WSGIRequest, *args, **kwargs):
         body_unicode  = request.body.decode("utf-8")
         body          = json.loads(body_unicode)
-        item_id:  str = body["id"]        
+        item_id:  str = body["id"]  
+        mode:   str = body["mode"]      
         item = SiteBookmark.objects.get(id = item_id, owner = request.user)
-        item.delete()
-        item.save()
+        if mode == "soft": item.delete() 
+        if mode == "hard": item.hard_delete()
         return  JsonResponse({ "result": "OK" })
 
     def put(self, request: WSGIRequest, *args, **kwargs):

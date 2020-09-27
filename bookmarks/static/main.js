@@ -767,15 +767,18 @@ async function item_set_starred(checkbox)
 window["item_set_starred"] = item_set_starred;
 
 
-async function item_delete(item_id, item_title) 
+async function item_delete(flag, item_id, item_title) 
 {
-    let response = await Dialog_YesNo.prompt( "Delete item"
+    
+    let dialog_title = flag ? "Permanently delete item (Irreversible)." : "Delete item (move to trash)";
+
+    let response = await Dialog_YesNo.prompt( dialog_title
                                       , "Are you sure you want to delete item: " + item_title);
 
     if(!response) return;
-
-    var payload = { id: item_id };    
-    var token = window["generated_token"];
+    let mode = flag ? "hard" : "soft";
+    let payload = { id: item_id, mode: mode };    
+    let token = window["generated_token"];
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_DELETE, payload);
 
     if(resp["result"] == "OK"){
