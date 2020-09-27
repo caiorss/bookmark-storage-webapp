@@ -691,7 +691,7 @@ async function api_item_add(crfs_token)
 
 
         var payload = {url: url};
-        utils.ajax_post("/api/item", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/items", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
                 Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
