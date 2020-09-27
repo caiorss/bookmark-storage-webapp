@@ -929,20 +929,3 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
         results["total"] = queryset.count()
 
         return JsonResponse(results, safe = False)
-
-class Ajax_Item_Rename(LoginRequiredMixin, django.views.View):
-    """Quickly rename item."""
-
-    def post(self, request: WSGIRequest, *args, **kwargs):
-        req: WSGIRequest = self.request
-        body = json.loads(req.body.decode("utf-8"))
-        item_id = body["item_id"]
-        title   = body["title"]
-
-        if (not item_id) and (not title):
-            return Http404("Error: invalid request")
-
-        item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)
-        item.title = title
-        item.save()
-        return JsonResponse({ "result": "OK" }, safe = False)
