@@ -660,7 +660,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             pass         
         item = SiteBookmark.objects.create(url = url_, owner = user)
         item.save()
-        # update_item_from_metadata(item.id)
+        update_item_from_metadata(item.id)
         return  JsonResponse({ "result": "OK" })
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
