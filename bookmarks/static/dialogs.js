@@ -174,64 +174,6 @@ export class Dialog_GenericNotification extends HTMLElement
 customElements.define('dialog-generic', Dialog_GenericNotification);
 
 
-export class DialogFormBuilder extends Dialog_GenericNotification 
-{
-   
-    constructor()
-    {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.onSubmit(() => alert("Submit Clicked") );
-
-
-        var html = `
-                <table> 
-                    <tbody>
-
-                    </tbody>
-                </table>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-                
-       this.appendBodyWidget(elem);
-
-    }
-
-    add_row_widget(label, widget)
-    {
-        var anchor = this.node.querySelector("tbody");
-        
-        var th_label = document.createElement("th");
-        th_label.textContent = label;
-        
-        var th_widget = document.createElement("th");
-        th_widget.appendChild(widget);
-
-        var tr = document.createElement("tr");
-        tr.appendChild(th_label);
-        tr.appendChild(th_widget);
-
-        // Add row to table.
-        anchor.appendChild(tr);
-
-        return widget;
-    }
-
-    add_row_input(label)
-    {
-        var widget = document.createElement("input");
-        return this.add_row_widget(label, widget);
-    }
-
-}
-
-customElements.define('dialog-formbuilder', DialogFormBuilder);
-
-
 export class DialogForm extends Dialog_GenericNotification 
 {
    

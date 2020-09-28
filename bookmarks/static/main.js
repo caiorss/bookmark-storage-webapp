@@ -1,5 +1,6 @@
-import { Dialog_Basic, Dialog2_Prompt, Dialog_GenericNotification, Dialog_YesNo
-      , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
+import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
+      , DialogForm, Dialog_Notify
+        } from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
 
