@@ -418,13 +418,6 @@ utils.dom_onContentLoaded(() => {
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
     
-    // set_keyboard_indicator(flagKeyboardShortcut.get());
-
-/*     var q = document.querySelector("#div-keyboard-status");
-    if(isMobileDevice()){ DOM_toggle(q); }
- */
-    var elem_item_detail = document.querySelector("#item-details");
-     
 
     var theme_selection_box = document.querySelector("#theme-selector-box");
     theme_selection_box.onchange = selection_changed;
@@ -506,7 +499,7 @@ utils.dom_onContentLoaded(() => {
     });
 
     let dialog_collection_edit = new DialogForm();
-    dialog_collection_edit.attach_body();
+    dialog_collection_edit.detach_on_close(false);
     dialog_collection_edit.setTitle("Create new collection");
     dialog_collection_edit.setText("Enter the following informations:");
     dialog_collection_edit.add_row_input("title", "Title:");
@@ -516,7 +509,7 @@ utils.dom_onContentLoaded(() => {
     async function collection_create_new()
     {
         // alert(" Clicked at create new collection Ok. ");
-        dialog_collection_edit.show();
+        // dialog_collection_edit.show();
 
         let sender = await dialog_collection_edit.onConfirm();
         let title = sender.get_widget("title").value;

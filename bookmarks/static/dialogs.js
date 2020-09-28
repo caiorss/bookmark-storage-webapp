@@ -283,7 +283,7 @@ export class Dialog_Basic extends HTMLElement
         document.body.appendChild(this)
     }
 
-    show() { this.node.showModal(true); }
+    show() { this.node.showModal(); }
     hide() { this.node.close();         }
     close(){ this.node.close();         }
 
@@ -365,8 +365,75 @@ export class Dialog_Basic extends HTMLElement
 customElements.define('dialog-basic', Dialog_Basic);
 window["dialog-basic"] = Dialog_Basic;
 
+/* ========== Dialog Form ===================== */
 
-/** ============ Nortification Dialog ============= */
+
+export class DialogForm extends Dialog_Basic 
+{   
+    constructor()
+    {
+        super()
+       /*  this.attachShadow( { mode: 'open' } ) */
+        this.created_widgets = {}
+
+        var html = `
+                <table> 
+                    <tbody>
+
+                    </tbody>
+                </table>
+        `;
+        this.insertBodyHtml(html);
+
+    }
+
+    get_widget(key){
+        return this.created_widgets[key];
+    }
+
+    async onConfirm()
+    {
+        let answer = await this.run();
+        if(!answer) 
+            throw new Error("User cancelled promise");
+        else 
+            return this;
+    }
+
+    add_row_widget(key, label, widget)
+    {
+        var anchor = this.node.querySelector("tbody");
+        
+        var th_label = document.createElement("th");
+        th_label.textContent = label;
+        
+        var th_widget = document.createElement("th");
+        th_widget.appendChild(widget);
+
+        var tr = document.createElement("tr");
+        tr.appendChild(th_label);
+        tr.appendChild(th_widget);
+
+        // Add row to table.
+        anchor.appendChild(tr);
+
+        this.created_widgets[key] = widget;
+        return widget;
+    }
+
+    add_row_input(key, label)
+    {
+        var widget = document.createElement("input");
+        return this.add_row_widget(key, label, widget);        
+    }
+
+}
+
+customElements.define('dialog-form', DialogForm);
+
+
+
+/** ============ Notification Dialog ============= */
 
 
 export class Dialog_Notify extends Dialog_Basic
