@@ -1,49 +1,59 @@
-export class Dialog_GenericNotification extends HTMLElement
+import dialogPolyfill from "/static/dialog-polyfill.esm.js";
+// window["dialogPolyfill"] = dialogPolyfill;
+
+export class Dialog_Basic extends HTMLElement
 {
-    
     constructor()
     {
         super()
+        this.attachShadow( { mode: 'open' } )
 
         this.node = document.createElement("dialog");
+        dialogPolyfill.registerDialog(this.node);
+        this._promise_callback = (flag) => {  };
+        this._submit_callback = (falg) => {  };
+        this._custom_style = "";
 
-        this.submit_callback = (flag) => { alert("Submit Clicked"); }
-
-        this.close_callback = () => { };
-
-        this.custom_style = "";
+        /** Detach current dialog from document body when the window is closed. */
+        this._detach_on_close = true;
 
         var html = `
             <div>    
                 <div>            
-                    <h4 id="dialog-title">Dialog Title</h4>
-                    <span id="dialog-text">Dialog Text</span>
+                    <h4 id="dialog-title"></h4>
+                    <span id="dialog-text"></span>
                 </div>
 
                 <div id="dialog-body"> 
                 </div>
-
                 <div>
                     <button id="btn-close">Close</button>
                     <button id="btn-submit">Submit</button>
                 </div>
-
              </div>
         `.trim();
 
-        var el       = document.createElement("template");
+        var el = document.createElement("template");
         el.innerHTML = html;
-        var elem     = el.content.firstChild;
+        var elem = el.content.firstChild;
         this.node.appendChild(elem);
 
-        var self = this;
         this.node.querySelector("#btn-close").addEventListener("click", () => { 
-            self.node.close();
-            this.submit_callback(false);
+            this._promise_callback(false);
+            this._submit_callback(false);
+            this.node.close();
+            if(this._detach_on_close) this.detach_body();
         });
-        this.node.querySelector("#btn-submit").addEventListener("click", () => { 
-            this.submit_callback(true);            
+
+        this.node.querySelector("#btn-submit").addEventListener("click", () => {             
+            this._promise_callback(true);
+            this._submit_callback(true);
+            this.node.close();
+            if(this._detach_on_close) this.detach_body();
         });
+
+       this.attach_body();
+       //dialog.attach_body();
     }
 
 
@@ -52,6 +62,8 @@ export class Dialog_GenericNotification extends HTMLElement
         var window_width = window.innerWidth > 600 ? "500px" : "90%";
         var window_height = window.innerHeight > 1000 ? "600px" : "95%";
         //alert(" Window width = ", window_width);
+
+        console.assert(this.shadowRoot, "Component supposed to be attached to DOM body");
 
         this.shadowRoot.innerHTML = `
             <style>
@@ -73,12 +85,21 @@ export class Dialog_GenericNotification extends HTMLElement
                     border-radius: 20px;
                     z-index: 2;
                 }
-
-                ${this.custom_style}
+                ${this._custom_style}
             </style>            
         `.trim();
 
         this.shadowRoot.appendChild(this.node);
+    }
+
+    /** Set this flag to true in order to create a stateful dialog
+     * , which is removed when it is closed.
+     */
+    detach_on_close(flag){ this._detach_on_close = flag; }
+
+    detach_body() 
+    {
+        this.parentNode.removeChild(this);
     }
 
     attach_body()
@@ -86,61 +107,19 @@ export class Dialog_GenericNotification extends HTMLElement
         document.body.appendChild(this)
     }
 
-    setTitle(title)
+    show() { this.node.showModal(); }
+    hide() { this.node.close();         }
+    close(){ this.node.close();         }
+
+    run() 
     {
-        var label = this.node.querySelector("#dialog-title");
-        label.textContent = title;
-        return this;
-    }
-
-    setText(text)
-    {
-        var desc = this.node.querySelector("#dialog-text");
-        desc.textContent = text;
-        return this;
-    }
-
-    setCustomStyle(style)
-    {
-        this.custom_style = style;
-    }
-
-    setButtonCloseLabel(text)
-    {
-        var desc = this.node.querySelector("#btn-close");
-        desc.textContent = text;
-    }
-
-    setButtonSubmitLabel(text)
-    {
-        var desc = this.node.querySelector("#btn-submit");
-        desc.textContent = text;
-    }
-
-    onSubmit(callback) {
-        this.submit_callback = callback;
-    }
-
-    onClose(callback) {
-        this.close_callback = callback;
-    }
-
-    /** Hides/show submit submit button. */
-    setSubmitVisible(flag) {
-        var btn = this.node.querySelector("#btn-submit");
-
-        if(!flag){            
-            btn.style.visibility = "hidden";
-            btn.style.display    = "none";
-            return;
-        }
-        btn.style.visibility = "visible";
-        btn.style.display    = "block";
-    }
-
-    appendBodyWidget(domElement)
-    {
-        this.node.querySelector("#dialog-body").appendChild(domElement);
+        this.show();
+        let p = new Promise( (resolve, reject) => {
+            this._promise_callback = (flag) => {
+                resolve(flag);
+            };
+        });
+        return p;
     }
 
     insertBodyHtml(html)
@@ -155,252 +134,80 @@ export class Dialog_GenericNotification extends HTMLElement
         return elem;
     }
 
-    show() { this.node.showModal(true); }
-    hide() { this.node.close(); this.close_callback();   }
-    close(){ this.node.close(); this.close_callback();   }
-
-    setVisible(flag) 
+    setCustomStyle(style)
     {
-        if(flag) 
-            this.show();
-        else
-            this.close();
+        this._custom_style = style;
     }
 
-
-} // --- End of class Dialog_GenericNotification -------------//
-
-customElements.define('dialog-generic', Dialog_GenericNotification);
-
-
-export class Dialog_OkCancel extends Dialog_GenericNotification
-{
-    constructor(){
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.setTitle("Are you sure?")
-        this.setText("Are you sure you want to delete this item?");
-        this.setButtonSubmitLabel("OK");
-        this.setButtonCloseLabel("Cancel");
-
-        this.onSubmit( (flag) => {
-            console.log(" [INFO] User clicked submit ? = ", flag);
-            this.close();
-        });
-    }
-}
-
-customElements.define('dialog-okcancel', Dialog_OkCancel);
-
-
-
-/**
- * Usage: 
- * ```
- *   var c = new NotificationDialog();
- *   c.attach(document.body);
- *   // Timeout 1 second (= 1000 milliseconds)
- *   c.notify("My notifcation", 1000);
- * ```
- */
-export class NotificationDialog extends Dialog_GenericNotification 
-{
-    constructor() {
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.onSubmit((flag) => {});
-        this.setSubmitVisible(false);
-    }
-
-    notify(text, timeout = 1500)
+    setSubmitCallback(callback)
     {
-        this.setText(text);
-        this.setVisible(true);
-        var self = this;
-        setTimeout(() => self.setVisible(false) , timeout);
+        this._submit_callback = callback;
     }
 
-}
-
-customElements.define('dialog-notification', NotificationDialog);
-
-
-export class Dialog_Prompt extends Dialog_GenericNotification
-{
-    constructor(){
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.setTitle("Prompt:");
-        // this.setText("Are you sure you want to delete this item?");
-        this.setButtonSubmitLabel("Submit");
-        this.setButtonCloseLabel("Cancel");
-
-        this.input = this.insertBodyHtml(`<input id="question-entry"></input>`);
-        
-        if(screen.width <= 500)
-            this.node.style["width"] = "80%";
-        else 
-            this.node.style["width"] = "500px";
-        
-        this.input.style["width"] = "90%";
-
-        this.onSubmit( (flag) => {
-            console.log(" [INFO] User clicked submit ? = ", flag);
-            this.close();
-        });
-    }
-
-    setInput(text)
+    setTitle(title)
     {
-        this.input.value = text;
+        this.node.querySelector("#dialog-title").textContent = title;
+        return this;
     }
 
-    get_answer() 
+    setText(text)
     {
-        return this.input.value;
+        this.node.querySelector("#dialog-text").textContent = text;
+        return this;
     }
 
-    prompt(title, question, callback)
+
+    setButtonCloseLabel(text)
     {
-        this.setTitle(title);
-        this.setInput(question);
-        // this.input.value = "";
-
-        this.onSubmit(flag => {
-            if(!flag) return;
-            let answer = this.input.value;
-            if(answer == ""){ this.close(); return;}
-            callback(answer);            
-            this.close();
-        });
-        this.show();
+        var desc = this.node.querySelector("#btn-close");
+        desc.textContent = text;
     }
 
-    prompt_promise(title, question)
+    setButtonSubmitLabel(text)
     {
-        this.setTitle(title);
-        this.setInput(question);
-        // this.input.value = "";
-        this.show();
+        var desc = this.node.querySelector("#btn-submit");
+        desc.textContent = text;
+    }    
 
-        let p = new Promise( (resolve, reject) => {
-            this.onSubmit( flag => {
-                if(!flag) reject();
+    /** Hides/show submit submit button. */
+    setSubmitVisible(flag) 
+    {
+        var btn = this.node.querySelector("#btn-submit");
 
-                let answer = this.input.value;
-                if(answer == ""){ 
-                    reject(); 
-                    this.close(); 
-                    return;
-                }
-                if(flag) resolve(answer);
-                this.close();
-            });
-        });
-
-        return p;
+        if(!flag){            
+            btn.style.visibility = "hidden";
+            btn.style.display    = "none";
+            return;
+        }
+        btn.style.visibility = "visible";
+        btn.style.display    = "block";
     }
-}
-
-customElements.define('dialog-prompt', Dialog_Prompt);
-window["Dialog_Prompt"] = Dialog_Prompt;
 
 
-export class DialogFormBuilder extends Dialog_GenericNotification 
-{
-   
+} // ---- Dialog_Basic class ---------------// 
+
+customElements.define('dialog-basic', Dialog_Basic);
+window["dialog-basic"] = Dialog_Basic;
+
+/* ========== Dialog Form ===================== */
+
+
+export class DialogForm extends Dialog_Basic 
+{   
     constructor()
     {
         super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.onSubmit(() => alert("Submit Clicked") );
-
-
-        var html = `
-                <table> 
-                    <tbody>
-
-                    </tbody>
-                </table>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-                
-       this.appendBodyWidget(elem);
-
-    }
-
-    add_row_widget(label, widget)
-    {
-        var anchor = this.node.querySelector("tbody");
-        
-        var th_label = document.createElement("th");
-        th_label.textContent = label;
-        
-        var th_widget = document.createElement("th");
-        th_widget.appendChild(widget);
-
-        var tr = document.createElement("tr");
-        tr.appendChild(th_label);
-        tr.appendChild(th_widget);
-
-        // Add row to table.
-        anchor.appendChild(tr);
-
-        return widget;
-    }
-
-    add_row_input(label)
-    {
-        var widget = document.createElement("input");
-        return this.add_row_widget(label, widget);
-    }
-
-}
-
-customElements.define('dialog-formbuilder', DialogFormBuilder);
-
-
-export class DialogForm extends Dialog_GenericNotification 
-{
-   
-    constructor()
-    {
-        super()
-        this.attachShadow( { mode: 'open' } )
+       /*  this.attachShadow( { mode: 'open' } ) */
         this.created_widgets = {}
 
-        this.confirm_callback = (response) => {};
-
-/*         this.onSubmit((is_ok) => {
-            if(!is_ok) { 
-                this.confirm_callback(null); 
-                return;
-            }
-
-            this.confirm_callback(this);
-        });
- */
-
         var html = `
                 <table> 
                     <tbody>
 
                     </tbody>
                 </table>
-        `.trim();
-
-        var el       = document.createElement("template");
-        el.innerHTML = html;
-        var elem     = el.content.firstChild;
-                
-       this.appendBodyWidget(elem);
+        `;
+        this.insertBodyHtml(html);
 
     }
 
@@ -408,15 +215,13 @@ export class DialogForm extends Dialog_GenericNotification
         return this.created_widgets[key];
     }
 
-    onConfirm()
+    async onConfirm()
     {
-        var p = new Promise( (resolve, reject) => {
-            this.onSubmit( (flag) => { 
-                if(!flag) reject();
-                if(flag)  resolve(this);
-             })
-        });
-        return p; 
+        let answer = await this.run();
+        if(!answer) 
+            throw new Error("User cancelled promise");
+        else 
+            return this;
     }
 
     add_row_widget(key, label, widget)
@@ -450,3 +255,94 @@ export class DialogForm extends Dialog_GenericNotification
 
 customElements.define('dialog-form', DialogForm);
 
+
+
+/** ============ Notification Dialog ============= */
+
+
+export class Dialog_Notify extends Dialog_Basic
+{
+    constructor() 
+    {
+        super()
+        this.setSubmitVisible(false);
+    }
+
+    static notify(title, message, timeout = 2000)
+    {
+        let dialog = new Dialog_Notify();
+        dialog.setTitle(title);
+        dialog.setText(message);
+        dialog.show();
+
+        let p = new Promise( (resolve, reject) => {
+            setTimeout(() => {
+                dialog.hide();
+                dialog.detach_body();
+                resolve(true);
+            } , timeout);        
+    
+        });
+        return p;
+    }
+
+}
+
+customElements.define('dialog-notify', Dialog_Notify);
+window["dialog-notify"] = Dialog_Notify;
+
+// ========== D I A L O G -  Y E S - N O ==========// 
+
+
+export class Dialog_YesNo extends Dialog_Basic
+{
+    constructor(){
+        super()
+        this.setButtonSubmitLabel("OK");
+        this.setButtonCloseLabel("Cancel");
+    }
+
+    static async prompt(title, message){
+        let dialog = new Dialog_YesNo();
+        dialog.setTitle(title);
+        dialog.setText(message);
+        let resp = await dialog.run();
+        return resp;
+    }
+}
+
+customElements.define('dialog-yesno', Dialog_YesNo);
+
+
+
+// =========== D I A L O G - P R O M P T ===============//
+
+
+/** Non-Stateful prompt dialog, similar to function prompt();
+ */
+export class Dialog2_Prompt extends Dialog_Basic
+{
+    constructor(title, text, input = "")
+    {
+        super()
+        this.input = this.insertBodyHtml("<input id='dialog-input'></input>");
+        this.input.value = input;
+        this.setTitle(title);
+        this.setText(text);
+        this.setCustomStyle(`input { width: 100%; }`);
+    }
+    
+    static async prompt(title, text, input = "")
+    {
+        let dialog = new Dialog2_Prompt(title, text, input);
+        let is_submit = await dialog.run();
+        if(is_submit && dialog.input.value != "") { 
+            return dialog.input.value; 
+        }
+        throw new Error("User clicked cancel");
+    }
+
+}
+
+customElements.define('dialog2-prompt', Dialog2_Prompt);
+window["dialog2-prompt"] = Dialog2_Prompt;

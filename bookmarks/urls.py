@@ -41,8 +41,9 @@ urlpatterns = [
   ,path('collection/new',  views.CollectionCreate.as_view(), name = 'bookmark_collection_new')
 
   # ----------------- REST API ------------------------#
+  ,path("api/items",                views.Ajax_Items.as_view())  
+
   ,path("api/item",                 views.rest_item)  
-  ,path("api/item/rename",          views.Ajax_Item_Rename.as_view())
   ,path("api/bulk",                 views.rest_bulk_action)  
   #,path("api/collections",     views.Ajax_Collection_List.as_view())  
   ,path("api/collections",          views.Ajax_Collections.as_view())  

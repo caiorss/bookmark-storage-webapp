@@ -1,5 +1,6 @@
-import {NotificationDialog, Dialog_Prompt, Dialog_OkCancel, Dialog_GenericNotification
-      , DialogForm, DialogFormBuilder} from "/static/dialogs.js";
+import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
+      , DialogForm, Dialog_Notify
+        } from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
 
@@ -187,15 +188,17 @@ async function ajax_perform_bulk_operation(action)
 //----------------------------------------------//
 
 
-class Dialog_Search_Item extends Dialog_GenericNotification
+class Dialog_Search_Item extends Dialog_Basic
 {
     constructor()
     {
         super()
-        this.attachShadow( { mode: 'open' } )
+        // this.attachShadow( { mode: 'open' } )
 
         this.setTitle("Search bookmarks");
         this.setText("");
+
+        this.detach_on_close(false);
 
         var x = this.insertBodyHtml(`
                     <div>
@@ -230,13 +233,14 @@ class Dialog_Search_Item extends Dialog_GenericNotification
                 border: 10px;
                 border-radius: 20px;
             }
-        `);
+        `); 
+
         this.page  = 1;
 
-        this.onClose(() => {
+/*         this.onClose(() => {
             this.reset()
             console.log(" [INFO] Window closed ok. ");
-        });
+        }); */
 
         this.input_search = x.querySelector("#input-search");
         this.btn_search = x.querySelector("#btn-search");
@@ -264,10 +268,10 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             this.search_items();
         })
 
-        this.onSubmit((flag) => {
+        this.setSubmitCallback((flag) => {
           if(!flag){ return};
           this.add_items_to_collection() 
-        });
+        }); 
 
         console.log(" [TRACE] x = ", x);
     }
@@ -344,8 +348,10 @@ class Dialog_Search_Item extends Dialog_GenericNotification
 
             utils.dom_append_html(this.div_search_results,
                 `<div class="div-row-result">
-                    <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
-                    <a target="_blank" href="${url}">[${id}] ${title}</a>
+                    <li>
+                        <input type="checkbox" class="bookmark-checkbox" value="${id}" />
+                        <a target="_blank" href="${url}">[${id}] ${title}</a>
+                    </li>
                 </div>
                 `);
         });
@@ -357,30 +363,13 @@ customElements.define('dialog-search-item', Dialog_Search_Item);
 window["Dialog_Search_Item"] = Dialog_Search_Item;
 
 
-
-let dialog_notify = new NotificationDialog();
-
-let dialog_prompt = new Dialog_Prompt();
-
 var dialog_search_item = new Dialog_Search_Item();
 window["dialog_search_item"] = dialog_search_item;
 
 // Callback executed after DOM is fully loaded
 utils.dom_onContentLoaded(() => {
 
-    utils.dom_querySelectorAll(".checkbox-starred").forEach( x => {
-        x.addEventListener("click", () => alert("Error: not implemented yet.") );
-    });
-
     // ----------- Attach modal dialogs to body --------------------// 
-
-    dialog_notify.attach_body();
-    dialog_notify.setTitle("User Notification.");
-    dialog_notify.id = "dialog-notify";
-    dialog_notify.attach_body();
-
-    dialog_prompt.attach_body();
-
     dialog_search_item.attach_body();
     
     // ---------- DOM html modifications ------------------//
@@ -429,13 +418,6 @@ utils.dom_onContentLoaded(() => {
     var obs = document.querySelectorAll(".item-details");
     obs.forEach(x => DOM_set_visibility(x, flag));    
     
-    // set_keyboard_indicator(flagKeyboardShortcut.get());
-
-/*     var q = document.querySelector("#div-keyboard-status");
-    if(isMobileDevice()){ DOM_toggle(q); }
- */
-    var elem_item_detail = document.querySelector("#item-details");
-     
 
     var theme_selection_box = document.querySelector("#theme-selector-box");
     theme_selection_box.onchange = selection_changed;
@@ -517,7 +499,7 @@ utils.dom_onContentLoaded(() => {
     });
 
     let dialog_collection_edit = new DialogForm();
-    dialog_collection_edit.attach_body();
+    dialog_collection_edit.detach_on_close(false);
     dialog_collection_edit.setTitle("Create new collection");
     dialog_collection_edit.setText("Enter the following informations:");
     dialog_collection_edit.add_row_input("title", "Title:");
@@ -527,7 +509,7 @@ utils.dom_onContentLoaded(() => {
     async function collection_create_new()
     {
         // alert(" Clicked at create new collection Ok. ");
-        dialog_collection_edit.show();
+        // dialog_collection_edit.show();
 
         let sender = await dialog_collection_edit.onConfirm();
         let title = sender.get_widget("title").value;
@@ -545,10 +527,10 @@ utils.dom_onContentLoaded(() => {
 
         if(res["result"] == "OK")
         {
-            dialog_notify.notify("Bookmark added successfuly");
-            location.reload();
+            let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+            utils.dom_page_refresh();
         } else {
-            dialog_notify.notify("Error: bookmark already exists");
+            Dialog_Notify.notify("Error", "Failed to create collection.");
         }
     
         dialog.close();
@@ -561,31 +543,28 @@ utils.dom_onContentLoaded(() => {
 
     });
 
-    let dialog_collection_delete = new Dialog_OkCancel();
-    dialog_collection_delete.setTitle("Delete collection");
-    dialog_collection_delete.attach_body();
-    
-    window["collection_delete"] = (collection_id, collection_title) => {
-        dialog_collection_delete.setText(`Are you sure you want to delete the collection: '${collection_title}' `)
-        dialog_collection_delete.show();
-        dialog_collection_delete.onSubmit( flag => {
-            if(!flag) return;
 
-            var p = utils.ajax_request("/api/collections"
-                                    , window["generated_token"]
-                                    , utils.HTTP_DELETE
-                                    , { "collection_id": collection_id });
+    window["collection_delete"] =  async (collection_id, collection_title) => {
 
-            p.then( res => {
-                if(res["result"] == "OK"){
-                    dialog_notify.notify("Bookmark added successfuly");
-                    location.reload();
-                } else {
-                    dialog_notify.notify("Error: bookmark already exists");
-                }
-            });
+        let answer = await Dialog_YesNo.prompt(
+                      "Delete collection."
+                    , `Are you sure you want to delete the collection: '${collection_title}' ` );
 
-        });
+        if(!answer) { return; }
+
+        let resp = await utils.ajax_request("/api/collections"
+                                , window["generated_token"]
+                                , utils.HTTP_DELETE
+                                , { "collection_id": collection_id });
+
+
+        if(resp["result"] == "OK")
+        { 
+            Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+            utils.dom_page_refresh();
+        } else {
+            Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+        }
     };
 
     async function collection_edit(collection_id, collection_title) 
@@ -671,15 +650,10 @@ function open_url_newtab(url)
 window["open_url_newtab"] = open_url_newtab;
 
 /** @description Add new bookmark to collection  */
-function api_item_add(crfs_token)
+async function api_item_add(crfs_token)
 {
-    dialog_prompt.setText("Enter the new URL to be added.");
-    dialog_prompt.prompt( "New bookmark entry"
-                        , "", (url) => {
-                            
+        let url = await Dialog2_Prompt.prompt("Enter the new URL to be added", "");                            
         console.log("User entered the URL: ", url);
-
-        if(url == null) return;
 
         var query_params = new URLSearchParams(window.location.search);
         if(query_params.get("filter") == "collection")
@@ -691,16 +665,17 @@ function api_item_add(crfs_token)
 
             var token = window["generated_token"];
 
-            utils.ajax_post("/api/collections/add_item", token, data).then( res => {
+            utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
                 if(res["result"] == "OK"){
-                    dialog_notify.notify("Bookmark added successfuly", 2000);
+                    let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
                     location.reload();
                 } else {
-                    dialog_notify.notify("Error: bookmark already exists", 2000);
+                    Dialog_Notify.notify("Error", "Error: Bookmark already exists.", 2000);
+                    //dialog_notify.notify("Error: bookmark already exists", 2000);
                 }
         
             }).catch(err => { 
-                dialog_notify.notify(" Error: " + err)
+                Dialog_Notify.notify("Error: " + err);
             });
 
             return;
@@ -708,18 +683,17 @@ function api_item_add(crfs_token)
 
 
         var payload = {url: url};
-        utils.ajax_post("/api/item", crfs_token, payload).then( res => {
+        utils.ajax_post("/api/items", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
-                dialog_notify.notify("Bookmark added successfuly", 2000);
+                Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
             } else {
-                dialog_notify.notify("Error: bookmark already exists", 2000);
+                Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
             }
 
         });
-
-    });
 }
+
 window["api_item_add"] = api_item_add;
 
 async function collection_remove_item(collectionID, itemID)
@@ -733,40 +707,84 @@ async function collection_remove_item(collectionID, itemID)
                                               , item_id:       itemID 
                                           });
 
-    if(res["result"] == "OK"){
-        dialog_notify.notify("Bookmark added successfuly", 2000);
-        location.reload();
+    if(res["result"] == "OK")
+    {
+        let r = await Dialog_Notify.notify("Information", "Item removed from collection Ok.", 500);
+        utils.dom_page_refresh();
     } else {
-        dialog_notify.notify("Error: bookmark already exists", 2000);
-    }
-                            
-
+        Dialg.notify("Error: bookmark already exists", 500);
+    }                        
 }
 
 window["collection_remove_item"] = collection_remove_item;
 
-async function item_quick_rename(item_id, old_itemm_title)
+async function item_quick_rename(item_id, old_item_title)
 {
-    let new_item_title = await dialog_prompt.prompt_promise( "Change item title:"
-                                                            , old_itemm_title
-                                                           );
-    
+    let new_item_title = await Dialog2_Prompt.prompt("Change item title:", "", old_item_title);
+
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 
-    var payload = { item_id: item_id, title: new_item_title};    
+    var payload = { action: "rename", id: item_id, title: new_item_title};    
     var token = window["generated_token"];
-    let resp = await utils.ajax_post("/api/item/rename", token, payload);
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
-        dialog_notify.notify("Item renamed Ok.", 2000);
-        location.reload();
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 500);
+        utils.dom_page_refresh();
     } else {
-        dialog_notify.notify("Error: failed to rename item.", 2000);
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.", 500);
     }    
 
 }
 
 window["item_quick_rename"] = item_quick_rename;
+
+
+
+async function item_set_starred(checkbox)
+{
+    let item_id = checkbox.getAttribute("value");
+    console.log(" [TRACE] item_set_starred() => Item_ID: ", item_id);
+
+    var payload = { action: "starred", id: item_id, value: checkbox.checked};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+        
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 1000);
+        // location.reload();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
+    }    
+
+}
+
+window["item_set_starred"] = item_set_starred;
+
+
+async function item_delete(flag, item_id, item_title) 
+{
+    
+    let dialog_title = flag ? "Permanently delete item (Irreversible)." : "Delete item (move to trash)";
+
+    let response = await Dialog_YesNo.prompt( dialog_title
+                                      , "Are you sure you want to delete item: " + item_title);
+
+    if(!response) return;
+    let mode = flag ? "hard" : "soft";
+    let payload = { id: item_id, mode: mode };    
+    let token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_DELETE, payload);
+
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+    }    
+}
+
+window["item_delete"] = item_delete;
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

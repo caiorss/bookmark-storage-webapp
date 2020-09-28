@@ -171,6 +171,10 @@ class SiteBookmark(models.Model):
         self.starred = False 
         self.save()
 
+    # Remove item from database (Note: Irreversible)
+    def hard_delete(self):
+        super(SiteBookmark, self).delete()
+
     def __str__(self):
         return f""" 
            id = {self.id}     

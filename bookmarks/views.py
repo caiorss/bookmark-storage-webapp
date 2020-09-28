@@ -34,6 +34,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+#from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+import django.core.paginator as dj_paginator 
 
 import bs4 
 import urllib
@@ -637,9 +639,68 @@ def querylist2Json(querylist, columns: List[str]) -> JsonResponse:
     list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
     return JsonResponse(list_of_dicts, safe =False)    
 
+
+class Ajax_Items(LoginRequiredMixin, django.views.View):
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        pass 
+    
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        """Create new bookmark entry in the database."""
+        body_unicode = request.body.decode("utf-8")
+        body         = json.loads(body_unicode)
+        url:  str    = body["url"]
+        url_: str    = dutils.remove_url_obfuscation(url)    
+        assert url_ is not None 
+        # Current logged user 
+        user: AbstractBaseUser = request.user
+        try:
+            # Check whether URL already exists in the database         
+            it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
+            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+        except SiteBookmark.DoesNotExist:
+            pass         
+        item = SiteBookmark.objects.create(url = url_, owner = user)
+        item.save()
+        update_item_from_metadata(item.id)
+        return  JsonResponse({ "result": "OK" })
+
+    def delete(self, request: WSGIRequest, *args, **kwargs):
+        body_unicode  = request.body.decode("utf-8")
+        body          = json.loads(body_unicode)
+        item_id:  str = body["id"]  
+        mode:   str = body["mode"]      
+        item = SiteBookmark.objects.get(id = item_id, owner = request.user)
+        if mode == "soft": item.delete() 
+        if mode == "hard": item.hard_delete()
+        return  JsonResponse({ "result": "OK" })
+
+    def put(self, request: WSGIRequest, *args, **kwargs):
+        """ Performs partial data update. """
+        body = json.loads(request.body.decode("utf-8"))
+        action: str = body["action"]
+        item_id     = body["id"]
+        
+        if (not item_id) and (not title):
+            return Http404("Error: invalid request")
+        item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)
+        
+        if action == "rename":
+            title: str = body["title"]
+            item.title = title
+        
+        if action == "starred":
+            value: bool = body["value"]
+            item.starred = value 
+
+        item.save()
+        return JsonResponse({ "result": "OK" }, safe = False)
+
+    
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """
+
     # Overrident from class View 
     def get(self, request: WSGIRequest, *args, **kwargs):
         query = Collection.objects.filter(owner = self.request.user, deleted = False)
@@ -668,6 +729,7 @@ class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
         return JsonResponse(body, safe = False)
         
     def delete(self, request: WSGIRequest, *args, **kwargs):
+        """ Soft delete bookmark entry """
         assert( request.method == "DELETE" and request.is_ajax() )
 
         req: WSGIRequest = self.request
@@ -792,7 +854,7 @@ class Ajax_Collection_AddItem(LoginRequiredMixin, django.views.View):
         coll.save()
         return JsonResponse({ "result": "OK" }, safe = False)        
 
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
 
 class ViewPaginatorMixin(object):
     min_limit = 1
@@ -815,12 +877,12 @@ class ViewPaginatorMixin(object):
         except (ValueError, TypeError):
             limit = self.max_limit
 
-        paginator = Paginator(object_list, limit)
+        paginator = dj_paginator.Paginator(object_list, limit)
         try:
             objects = paginator.page(page)
-        except PageNotAnInteger:
+        except dj_paginator.PageNotAnInteger:
             objects = paginator.page(1)
-        except EmptyPage:
+        except dj_paginator.EmptyPage:
             objects = paginator.page(paginator.num_pages)
         
         # print(" [INFO] type(objects) = ", type(objects))
@@ -870,20 +932,3 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
         results["total"] = queryset.count()
 
         return JsonResponse(results, safe = False)
-
-class Ajax_Item_Rename(LoginRequiredMixin, django.views.View):
-    """Quickly rename item."""
-
-    def post(self, request: WSGIRequest, *args, **kwargs):
-        req: WSGIRequest = self.request
-        body = json.loads(req.body.decode("utf-8"))
-        item_id = body["item_id"]
-        title   = body["title"]
-
-        if (not item_id) and (not title):
-            return Http404("Error: invalid request")
-
-        item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)
-        item.title = title
-        item.save()
-        return JsonResponse({ "result": "OK" }, safe = False)
