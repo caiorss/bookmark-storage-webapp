@@ -328,8 +328,12 @@ export class Dialog_Basic extends HTMLElement
 
         this.node = document.createElement("dialog");
         dialogPolyfill.registerDialog(this.node);
-        this._callback = (flag) => { alert("Submit Clicked"); }
-        this.custom_style = "";
+        this._promise_callback = (flag) => {  };
+        this._submit_callback = (falg) => {  };
+        this._custom_style = "";
+
+        /** Detach current dialog from document body when the window is closed. */
+        this._detach_on_close = true;
 
         var html = `
             <div>    
@@ -353,15 +357,17 @@ export class Dialog_Basic extends HTMLElement
         this.node.appendChild(elem);
 
         this.node.querySelector("#btn-close").addEventListener("click", () => { 
-            this._callback(false);
+            this._promise_callback(false);
+            this._submit_callback(false);
             this.node.close();
-            this.detach_body();
+            if(this._detach_on_close) this.detach_body();
         });
 
         this.node.querySelector("#btn-submit").addEventListener("click", () => {             
-            this._callback(true);            
+            this._promise_callback(true);
+            this._submit_callback(true);
             this.node.close();
-            this.detach_body();
+            if(this._detach_on_close) this.detach_body();
         });
 
        this.attach_body();
@@ -397,16 +403,17 @@ export class Dialog_Basic extends HTMLElement
                     border-radius: 20px;
                     z-index: 2;
                 }
-
-                input {
-                    width: 100%;
-                }
-
+                ${this._custom_style}
             </style>            
         `.trim();
 
         this.shadowRoot.appendChild(this.node);
     }
+
+    /** Set this flag to true in order to create a stateful dialog
+     * , which is removed when it is closed.
+     */
+    detach_on_close(flag){ this._detach_on_close = flag; }
 
     detach_body() 
     {
@@ -426,7 +433,7 @@ export class Dialog_Basic extends HTMLElement
     {
         this.show();
         let p = new Promise( (resolve, reject) => {
-            this._callback = (flag) => {
+            this._promise_callback = (flag) => {
                 resolve(flag);
             };
         });
@@ -445,6 +452,15 @@ export class Dialog_Basic extends HTMLElement
         return elem;
     }
 
+    setCustomStyle(style)
+    {
+        this._custom_style = style;
+    }
+
+    setSubmitCallback(callback)
+    {
+        this._submit_callback = callback;
+    }
 
     setTitle(title)
     {
