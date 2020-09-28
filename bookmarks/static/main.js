@@ -1,4 +1,4 @@
-import {Dialog2_Prompt, Dialog_GenericNotification, Dialog_YesNo
+import { Dialog_Basic, Dialog2_Prompt, Dialog_GenericNotification, Dialog_YesNo
       , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
@@ -187,15 +187,17 @@ async function ajax_perform_bulk_operation(action)
 //----------------------------------------------//
 
 
-class Dialog_Search_Item extends Dialog_GenericNotification
+class Dialog_Search_Item extends Dialog_Basic
 {
     constructor()
     {
         super()
-        this.attachShadow( { mode: 'open' } )
+        // this.attachShadow( { mode: 'open' } )
 
         this.setTitle("Search bookmarks");
         this.setText("");
+
+        this.detach_on_close(false);
 
         var x = this.insertBodyHtml(`
                     <div>
@@ -230,13 +232,14 @@ class Dialog_Search_Item extends Dialog_GenericNotification
                 border: 10px;
                 border-radius: 20px;
             }
-        `);
+        `); 
+
         this.page  = 1;
 
-        this.onClose(() => {
+/*         this.onClose(() => {
             this.reset()
             console.log(" [INFO] Window closed ok. ");
-        });
+        }); */
 
         this.input_search = x.querySelector("#input-search");
         this.btn_search = x.querySelector("#btn-search");
@@ -264,10 +267,10 @@ class Dialog_Search_Item extends Dialog_GenericNotification
             this.search_items();
         })
 
-        this.onSubmit((flag) => {
+        this.setSubmitCallback((flag) => {
           if(!flag){ return};
           this.add_items_to_collection() 
-        });
+        }); 
 
         console.log(" [TRACE] x = ", x);
     }
@@ -344,8 +347,10 @@ class Dialog_Search_Item extends Dialog_GenericNotification
 
             utils.dom_append_html(this.div_search_results,
                 `<div class="div-row-result">
-                    <input type="checkbox" class="bookmark-checkbox" value="${id}"></input>
-                    <a target="_blank" href="${url}">[${id}] ${title}</a>
+                    <li>
+                        <input type="checkbox" class="bookmark-checkbox" value="${id}" />
+                        <a target="_blank" href="${url}">[${id}] ${title}</a>
+                    </li>
                 </div>
                 `);
         });
