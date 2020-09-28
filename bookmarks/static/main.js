@@ -1,4 +1,4 @@
-import {Dialog2_Prompt, Dialog_OkCancel, Dialog_GenericNotification, Dialog_YesNo
+import {Dialog2_Prompt, Dialog_GenericNotification, Dialog_YesNo
       , DialogForm, Dialog_Notify, DialogFormBuilder} from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
@@ -528,10 +528,10 @@ utils.dom_onContentLoaded(() => {
 
         if(res["result"] == "OK")
         {
-            dialog_notify.notify("Bookmark added successfuly");
-            location.reload();
+            let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+            utils.dom_page_refresh();
         } else {
-            dialog_notify.notify("Error: bookmark already exists");
+            Dialog_Notify.notify("Error", "Failed to create collection.");
         }
     
         dialog.close();
@@ -544,31 +544,28 @@ utils.dom_onContentLoaded(() => {
 
     });
 
-    let dialog_collection_delete = new Dialog_OkCancel();
-    dialog_collection_delete.setTitle("Delete collection");
-    dialog_collection_delete.attach_body();
-    
-    window["collection_delete"] = (collection_id, collection_title) => {
-        dialog_collection_delete.setText(`Are you sure you want to delete the collection: '${collection_title}' `)
-        dialog_collection_delete.show();
-        dialog_collection_delete.onSubmit( flag => {
-            if(!flag) return;
 
-            var p = utils.ajax_request("/api/collections"
-                                    , window["generated_token"]
-                                    , utils.HTTP_DELETE
-                                    , { "collection_id": collection_id });
+    window["collection_delete"] =  async (collection_id, collection_title) => {
 
-            p.then( res => {
-                if(res["result"] == "OK"){
-                    dialog_notify.notify("Bookmark added successfuly");
-                    location.reload();
-                } else {
-                    dialog_notify.notify("Error: bookmark already exists");
-                }
-            });
+        let answer = await Dialog_YesNo.prompt(
+                      "Delete collection."
+                    , `Are you sure you want to delete the collection: '${collection_title}' ` );
 
-        });
+        if(!answer) { return; }
+
+        let resp = await utils.ajax_request("/api/collections"
+                                , window["generated_token"]
+                                , utils.HTTP_DELETE
+                                , { "collection_id": collection_id });
+
+
+        if(resp["result"] == "OK")
+        { 
+            Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+            utils.dom_page_refresh();
+        } else {
+            Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+        }
     };
 
     async function collection_edit(collection_id, collection_title) 
@@ -711,14 +708,13 @@ async function collection_remove_item(collectionID, itemID)
                                               , item_id:       itemID 
                                           });
 
-    if(res["result"] == "OK"){
-        dialog_notify.notify("Bookmark added successfuly", 2000);
-        location.reload();
+    if(res["result"] == "OK")
+    {
+        let r = await Dialog_Notify.notify("Information", "Item removed from collection Ok.", 500);
+        utils.dom_page_refresh();
     } else {
-        dialog_notify.notify("Error: bookmark already exists", 2000);
-    }
-                            
-
+        Dialg.notify("Error: bookmark already exists", 500);
+    }                        
 }
 
 window["collection_remove_item"] = collection_remove_item;

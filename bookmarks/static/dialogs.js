@@ -174,27 +174,6 @@ export class Dialog_GenericNotification extends HTMLElement
 customElements.define('dialog-generic', Dialog_GenericNotification);
 
 
-export class Dialog_OkCancel extends Dialog_GenericNotification
-{
-    constructor(){
-        super()
-        this.attachShadow( { mode: 'open' } )
-
-        this.setTitle("Are you sure?")
-        this.setText("Are you sure you want to delete this item?");
-        this.setButtonSubmitLabel("OK");
-        this.setButtonCloseLabel("Cancel");
-
-        this.onSubmit( (flag) => {
-            console.log(" [INFO] User clicked submit ? = ", flag);
-            this.close();
-        });
-    }
-}
-
-customElements.define('dialog-okcancel', Dialog_OkCancel);
-
-
 export class DialogFormBuilder extends Dialog_GenericNotification 
 {
    
