@@ -576,15 +576,11 @@ export class Dialog2_Prompt extends Dialog_Basic
     constructor(title, text, input = "")
     {
         super()
-        // this.attachShadow( { mode: 'open' } )
-
         this.input = this.insertBodyHtml("<input id='dialog-input'></input>");
         this.input.value = input;
-        //input = this.node.querySelector("#dialog-input");
-                
         this.setTitle(title);
         this.setText(text);
-        
+        this.setCustomStyle(`input { width: 100%; }`);
     }
     
     static async prompt(title, text, input = "")
