@@ -25,7 +25,7 @@ urlpatterns = [
   ,path("items/extract_metadata", views.extract_metadata)
   ,path("items/view/<int:itemID>", views.document_viewer)
 
-  ,path("snapshot/get", views.fetch_itemsnapshot)
+  # ,path("snapshot/get", views.fetch_itemsnapshot)
   
   ,path("snapshot/file/<fileID>/<fileName>", views.get_snapshot_file)
 

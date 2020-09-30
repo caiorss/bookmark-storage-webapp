@@ -242,8 +242,6 @@ class BookmarksList(LoginRequiredMixin, ListView):
             .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
 
 
-
-
 # URL route for adding item through bookmarklet 
 @login_required 
 def bookmark_add_item_bookmarklet(request: WSGIRequest):
@@ -675,6 +673,16 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         if mode == "hard": item.hard_delete()
         return  JsonResponse({ "result": "OK" })
 
+    # Backend REST-like API 
+    #  
+    # Http Method: 'PUT'
+    # 
+    # Json request: 
+    #  { 
+    #      , action: <ACTION>
+    #      , id:     <ITEM_ID>
+    #      , <PARAM>: <VALUE> 
+    #  }
     def put(self, request: WSGIRequest, *args, **kwargs):
         """ Performs partial data update. """
         body = json.loads(request.body.decode("utf-8"))
@@ -693,10 +701,36 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             value: bool = body["value"]
             item.starred = value 
 
+        if action == "snapshot":            
+            return self.download_file_snapshot(request, item_id)
+            
         item.save()
         return JsonResponse({ "result": "OK" }, safe = False)
 
     
+    def download_file_snapshot(self, request: WSGIRequest, item_id):
+        """Download file snapshot from URL to the file repository."""
+
+        try:
+            item = SiteBookmark.objects.get(id = item_id, owner = request.user)
+        except SiteBookmark.DoesNotExist: 
+            return JsonResponse({ 'result': 'ERROR', 'message': "Item does not exist"})
+
+        try:
+            FileSnapshot.createSnapshot(item.id, item.url)
+        except django.db.utils.IntegrityError as ex:
+            return JsonResponse(
+                {  "result": "ERROR"
+                  ,"message": "Error: Database Integrity Error: {ex}".format(ex = ex)        
+                 })
+        except urllib.error.URLError as ex:    
+            print(f" Exception = {ex}")      
+            return JsonResponse({ 
+                     "result": "ERROR"
+                    ,"message": "Error: urrlib Exception = {ex}".format(ex = ex)
+                   })
+        return JsonResponse({'result': "OK", "message": "File downloaded Ok."})
+
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
     """Provides AJAX (REST) API response containing all user collections. """

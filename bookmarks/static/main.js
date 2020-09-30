@@ -786,6 +786,25 @@ async function item_delete(flag, item_id, item_title)
 
 window["item_delete"] = item_delete;
 
+async function item_snapshot(item_id)
+{
+    let r = await Dialog_Notify.notify("Download", "Downloading file snapshot. Wait a while ...");
+
+    let token = window["generated_token"];
+    let payload = { action: "snapshot", id: item_id };
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload);
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+    }
+}
+
+window["item_snapshot"] = item_snapshot;
+
+
 class YoutubeThumb extends HTMLElement {
     constructor() {
         super()

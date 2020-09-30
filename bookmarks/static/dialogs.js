@@ -85,7 +85,10 @@ export class Dialog_Basic extends HTMLElement
                     border-radius: 20px;
                     z-index: 2;
                 }
+
                 ${this._custom_style}
+
+                #dialog-input { width: 100%; }
             </style>            
         `.trim();
 
@@ -286,6 +289,15 @@ export class Dialog_Notify extends Dialog_Basic
         return p;
     }
 
+    static notify_error(text) 
+    {
+        return Dialog_Notify.notify("ERROR Notification", text);
+    }
+
+    static notify_ok(text) 
+    {
+        return Dialog_Notify.notify("OK", text);
+    }
 }
 
 customElements.define('dialog-notify', Dialog_Notify);
@@ -341,6 +353,7 @@ export class Dialog2_Prompt extends Dialog_Basic
         }
         throw new Error("User clicked cancel");
     }
+
 
 }
 
