@@ -187,8 +187,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
                    .filter(owner = self.request.user).order_by("id").reverse()
 
     def filter_oldest(self):
-        return self.model.objects.exclude(deleted = True)\
-            .filter(owner = self.request.user).order_by("id")
+        return self.model.objects.filter(owner = self.request.user, deleted = False).order_by("id")
 
     # Select only user marked (starred, favourite) bookmarks
     def filter_starred(self):
