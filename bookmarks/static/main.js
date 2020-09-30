@@ -682,8 +682,8 @@ async function api_item_add(crfs_token)
             return;
         }
 
-
-        var payload = {url: url};
+        let starred = query_params.get("filter") == "starred";
+        var payload = {url: url, starred: starred};
         utils.ajax_post("/api/items", crfs_token, payload).then( res => {
             if(res["result"] == "OK"){
                 Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);

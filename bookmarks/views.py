@@ -647,7 +647,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         body_unicode = request.body.decode("utf-8")
         body         = json.loads(body_unicode)
         url:  str    = body["url"]
-        url_: str    = dutils.remove_url_obfuscation(url)    
+        url_: str    = dutils.remove_url_obfuscation(url)            
         assert url_ is not None 
         # Current logged user 
         user: AbstractBaseUser = request.user
@@ -658,6 +658,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         except SiteBookmark.DoesNotExist:
             pass         
         item = SiteBookmark.objects.create(url = url_, owner = user)
+        item.starred = body.get("starred") or False 
         item.save()
         update_item_from_metadata(item.id)
         return  JsonResponse({ "result": "OK" })
