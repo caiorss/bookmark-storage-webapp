@@ -625,12 +625,13 @@ function toggle_sidebar()
 // Allows accessing this variable from html templates 
 window["toggle_sidebar"] = toggle_sidebar;
 
-function toggle_items_table_info()
+function toggle_items_table_info(table_info_id)
 {
-    flagItemDetailsVisible.toggle();
-    var flag = flagItemDetailsVisible.get();
-    var obs = document.querySelectorAll(".item-details");
-    obs.forEach(x => DOM_set_visibility(x, flag));    
+    // alert("Button toggle clicked ok.");
+    let obs = document.querySelector(table_info_id);
+    if(obs == null){ alert(`Error: object #${table_info_id} not found. `); }
+    console.assert(obs, "Table info supposed not null.");
+    DOM_toggle(obs);    
 }
 
 window["toggle_items_table_info"] = toggle_items_table_info;

@@ -58,11 +58,13 @@
             </ul>
 
             <div class="item-additional-buttons"></div>
+              <a class="btn-sm btn-primary" 
+                title="Actions for current bookmark" 
+                href="javascript:toggle_action_menu('#action-menu-{{ bookmark.id }}')">Toggle Actions</a>
 
-            <a class="btn-sm btn-primary" 
-               title="Actions for current bookmark" 
-               href="javascript:toggle_action_menu('#action-menu-{{ bookmark.id }}')">Toggle Actions</a>
-
+                <a class="btn-sm btn-primary btn-toggle-details" 
+                    href="javascript:toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" 
+                    >Toggle Details</a>
 
                {%if bookmark.isDocumentFile %}
                    <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
@@ -150,11 +152,13 @@
                   </th>
                 </tr>
                 
-            </table>                          
+            </table>               
             
-          <div class="item-details">
-            <br>
-            <table class="item-table-info">
+            
+            <table  class="item-table-info" 
+                    id="item-detail-{{ bookmark.id }}" 
+                    style="display: none; visibility: hidden;"
+                  >
                 <tr>
                     <th class="row-label">Id</th>
                     <th>{{ bookmark.id }} </th>
@@ -188,8 +192,6 @@
                     <th>{{ bookmark.updated }}</th>
                   </tr>
             </table>                        
-
-          </div>
 
             <p class = ""> {{ bookmark.brief|default:"" }} </p>
 
