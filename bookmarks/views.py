@@ -15,7 +15,7 @@ import socket
 from bookmarks import dutils
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection \
-    , FileSnapshot
+    , FileSnapshot, Tag
 
 import bookmarks.models as bm
 
@@ -966,3 +966,28 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
         results["total"] = queryset.count()
 
         return JsonResponse(results, safe = False)
+
+
+class Ajax_Tags(LoginRequiredMixin, django.views.View):
+
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        query = Tag.objects.filter(owner = request.user)
+        return queryset2Json(query, ["id", "name", "description"])
+
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        """ Create new collection """
+        assert( request.method == "POST" and request.is_ajax() )
+        req: WSGIRequest = self.request
+        body        = json.loads(req.body.decode("utf-8"))        
+        name        = body["name"]
+        description = body["description"]
+        new_tag     = Tag.objects.create(name = name, description = description, owner = request.user)
+        new_tag.save()        
+        return JsonResponse({ "result": "OK", "name": new_tag.name, "id": new_tag.id }, safe = False)        
+
+    def put(self, request: WSGIRequest, *args, **kwargs):    
+        return JsonResponse({ "result": "OK" }, safe = False)        
+
+    def delete(self, request: WSGIRequest, *args, **kwargs):
+        return JsonResponse({ "result": "OK" }, safe = False)        
