@@ -215,6 +215,7 @@ class SiteBookmark(models.Model):
             return  s 
         return None 
 
+
 class Tag(models.Model):
     name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")
     description = models.CharField(max_length = 5000, null = True, blank=True, help_text = "Tag description")
@@ -229,12 +230,29 @@ class Tag(models.Model):
     # Allows soft-delete feature. The tag is not presented by the web app, but it appears to be deleted 
     # This field is reserved for future user.
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
-
-    tags    = models.ManyToManyField(SiteBookmark, blank = True)
+    item    = models.ManyToManyField(SiteBookmark, blank = True)
 
     def __str__(self):
         return self.name 
 
+class Tag2(models.Model):
+    name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")
+    description = models.CharField(max_length = 5000, null = True, blank=True, help_text = "Tag description")
+    starred = models.BooleanField(blank = True, default = False, help_text = "Check this box to mark this bookmark as favourite")
+    # Set field only when instance is created
+    created = models.DateField(editable = False, auto_now_add = True)
+    # Set field only when instance is changed
+    updated = models.DateField(editable = False, auto_now = True)
+
+    # Refers to the user which created the tag 
+    owner = models.ForeignKey(Account, null = True, blank = True, editable = True, on_delete=models.PROTECT)
+    # Allows soft-delete feature. The tag is not presented by the web app, but it appears to be deleted 
+    # This field is reserved for future user.
+    deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
+    item    = models.ManyToManyField(SiteBookmark, blank = True)
+
+    def __str__(self):
+        return self.name  
 
 class Collection(models.Model):
     title       = models.CharField(max_length= 8000, blank = True, null = True, help_text = "Collection title")

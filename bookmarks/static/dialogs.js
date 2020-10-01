@@ -186,6 +186,12 @@ export class Dialog_Basic extends HTMLElement
         btn.style.display    = "block";
     }
 
+    addChild(dom_element)
+    {
+        let anchor = this.node.querySelector("#dialog-body");
+        anchor.appendChild(dom_element);
+    }
+
 
 } // ---- Dialog_Basic class ---------------// 
 
@@ -257,7 +263,7 @@ export class DialogForm extends Dialog_Basic
 }
 
 customElements.define('dialog-form', DialogForm);
-
+window["DialogForm"] = DialogForm;
 
 
 /** ============ Notification Dialog ============= */
@@ -359,3 +365,60 @@ export class Dialog2_Prompt extends Dialog_Basic
 
 customElements.define('dialog2-prompt', Dialog2_Prompt);
 window["dialog2-prompt"] = Dialog2_Prompt;
+
+
+// ======= D I A L O  - D A T A L I S T - P R O M P T ===================// 
+// 
+export class Dialog_Datalist_Prompt extends Dialog_Basic
+{
+    constructor(title , text, input = "")
+    {
+        super()
+        this.insertBodyHtml(`
+            <div>
+                <input id='dialog-input' list='dataset'></input>
+                <datalist id="dataset"></datalist>
+            </div>
+        `);
+        this._input = this.node.querySelector("#dialog-input");
+        this._dataset = this.node.querySelector("#dataset");
+
+        this.setTitle("Select an option");
+        this.setCustomStyle(`input { width: 100%; }`);
+    }
+
+    add_option(value, key = null )
+    {
+        let opt = document.createElement("option");
+        opt.value = value; 
+        // opt.label = label;        
+        opt.setAttribute("data-key", key);
+        this._dataset.appendChild(opt);
+    }
+
+    get_selected_option() 
+    {
+        let value = this._input.value;
+        let nodes = this._dataset.childNodes;
+        for(let n = 0; n < nodes.length; n++)
+        {
+            let opt = nodes[n];
+            if(opt.value == value )   
+                return  { value: value, key: opt.getAttribute("data-key")};
+        }
+        
+        return { value: value, key: null};
+    }
+    
+    async prompt_selected()
+    {        
+        let is_submit = await this.run();
+        if(is_submit && this._input.value != "") 
+            return this.get_selected_option();
+        throw new Error("User clicked cancel");
+    }
+    
+}
+
+customElements.define('dialog-datalist-prompt', Dialog_Datalist_Prompt);
+window["Dialog_Datalist_Prompt"] = Dialog_Datalist_Prompt;

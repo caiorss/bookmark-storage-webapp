@@ -15,7 +15,7 @@ import socket
 from bookmarks import dutils
 
 from bookmarks.models import SiteBookmark, SavedSearch, Collection \
-    , FileSnapshot, Tag
+    , FileSnapshot, Tag, Tag2
 
 import bookmarks.models as bm
 
@@ -117,6 +117,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("search",     "Search results",                  self.filter_search)
         self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
         self.add_filter("collection", "Collection items",                self.filter_collection)
+        self.add_filter("tag-name",   "Filter tag by name",              self.filter_by_tag_name)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
@@ -207,6 +208,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.filter(url__contains = d)\
                    .exclude(deleted = True).filter(owner = self.request.user)\
                    .order_by("id").reverse()
+
+    # Url example: /items?filter=tag-name&A0=tag1,tag2,...,tagn
+    def filter_by_tag_name(self):
+        A0: str = self.request.GET.get("A0")            
+        if not A0: return self.empty_query
+        tag: Tag2 = Tag2.objects.get(name = A0, owner = self.request.user)
+        return tag.item.filter(deleted = False)        
 
     # Url example: /items?filter=doctype&A0=thesis
     def filter_doctype(self):
@@ -972,7 +980,7 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
 
     def get(self, request: WSGIRequest, *args, **kwargs):
-        query = Tag.objects.filter(owner = request.user)
+        query = Tag2.objects.filter(owner = request.user)
         return queryset2Json(query, ["id", "name", "description"])
 
     def post(self, request: WSGIRequest, *args, **kwargs):
@@ -982,12 +990,39 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
         body        = json.loads(req.body.decode("utf-8"))        
         name        = body["name"]
         description = body["description"]
-        new_tag     = Tag.objects.create(name = name, description = description, owner = request.user)
+        new_tag     = Tag2.objects.create(name = name, description = description, owner = request.user)
         new_tag.save()        
-        return JsonResponse({ "result": "OK", "name": new_tag.name, "id": new_tag.id }, safe = False)        
+        return JsonResponse({ "result": "OK", "message": f"Created tag: ${new_tag.name} / id = ${new_tag.id} " }, safe = False)        
 
-    def put(self, request: WSGIRequest, *args, **kwargs):    
-        return JsonResponse({ "result": "OK" }, safe = False)        
+    def put(self, request: WSGIRequest, *args, **kwargs):            
+        req: WSGIRequest = self.request
+        body    = json.loads(req.body.decode("utf-8"))        
+        tag_id  = body.get("tag_id") or ""       
+        action  = body["action"]
+
+        if action == "add_item_new_tag":
+            item_id = body["item_id"]
+            tag_name = body["tag_name"]
+            tag: Tag = Tag2.objects.create(name = tag_name, description = "", owner = request.user)
+            item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
+            tag.save()
+            tag.item.add(item)
+            tag.save()
+            #print(" Tag  = " + tag)
+            #print(" Item = " + item)
+            return JsonResponse({ "result": "OK", "message": "Tag added successfully" }, safe = False)        
+
+        if action == "add_item":
+            item_id = body["item_id"]
+            tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)        
+            item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
+            tag.item.add(item)
+            tag.save()
+            #print(" Tag  = " + tag)
+            #print(" Item = " + item)
+            return JsonResponse({ "result": "OK", "message": "Tag added successfully" }, safe = False)        
+        
+        return JsonResponse({ "result": "ERROR", "message": "Action not valid for this case." }, safe = False)        
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
         return JsonResponse({ "result": "OK" }, safe = False)        
