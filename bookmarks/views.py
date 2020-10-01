@@ -568,7 +568,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'deleted', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'doctype' ]
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')
 
     # Override UpdateView.get_success_url()
