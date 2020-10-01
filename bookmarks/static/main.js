@@ -753,8 +753,8 @@ async function item_set_starred(checkbox)
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 1000);
-        // location.reload();
+        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 500);
+        utils.dom_page_refresh();
     } else {
         Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
     }    
@@ -805,6 +805,27 @@ async function item_snapshot(item_id)
 }
 
 window["item_snapshot"] = item_snapshot;
+
+
+async function tag_create()
+{
+    let tag_name = await Dialog2_Prompt.prompt("Enter new tag name:");
+    if(tag_name == "") return;
+    let token = window["generated_token"];
+    
+    let payload = { name: tag_name, description: "" };
+    let resp = await utils.ajax_request("/api/tags", token, utils.HTTP_POST, payload);
+    
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+    }
+}
+
+window["tag_create"] = tag_create;
 
 
 class YoutubeThumb extends HTMLElement {
