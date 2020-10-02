@@ -709,7 +709,8 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             value: bool = body["value"]
             item.starred = value 
 
-        if action == "snapshot":            
+        if action == "snapshot":       
+            print(" [INFO] Downloading file snapshot. Ok.")     
             return self.download_file_snapshot(request, item_id)
             
         item.save()

@@ -32,12 +32,6 @@
                   </a>                  
             </h5>
 
-            Tags:
-
-            {% for tag in bookmark.tag2_set.all %}
-                <a class="tag-hyperlink" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
-            {% endfor %}
-            
 
             <ul>
               <li>                  
@@ -81,6 +75,15 @@
                      <img src="/static/gdriver.png"> 
                    </a>    
                {% endif %}
+
+            <br/></br>
+
+            Tags:
+
+            {% for tag in bookmark.tag2_set.all %}
+                <a class="tag-hyperlink" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+            {% endfor %}
+            
 
             <table class="action-menu-table" 
                    id="action-menu-{{ bookmark.id }}" 
