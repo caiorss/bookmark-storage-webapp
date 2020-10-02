@@ -14,3 +14,5 @@ files/*
 *.code-workspace
 *~
 *.log
+*-back-*
+db.sqlite3-*
