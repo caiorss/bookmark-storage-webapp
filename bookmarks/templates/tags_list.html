@@ -1,0 +1,26 @@
+{% extends "base2.html" %}
+
+{% block content %}
+
+<a class="btn btn-info" href="/search/new"  title="Saved search">Add saved search</a>
+
+<a id="btn-create-new-collection" class="btn btn-info" href="#"  
+    title="New collection">New collection</a>
+
+<div id="bookmark-list" class="container">       
+
+    {% for tag in object_list %}
+        
+        <div class = "well item ">   
+
+            <a  href="/items?filter=tag-name&A0={{ tag.name }}" 
+                title="{{ tag.name }}"> 
+                {{ tag.name }} 
+            </a>
+  
+        </div>                            
+    {% endfor %}
+    
+</div>
+
+{% endblock %}
