@@ -35,6 +35,7 @@ urlpatterns = [
   ,path('search/list', views.SavedSearchList.as_view(), name='bookmark_savedsearch_list')
   ,path('search/new', views.SavedSearchCreate.as_view(), name='bookmark_savedsearch_new')
  
+  ,path('tags', views.TagList.as_view())
   #----------------------------------------------------#
 
   ,path('collection/list', views.CollectionList.as_view(), name='bookmark_collection_list')

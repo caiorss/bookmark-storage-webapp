@@ -631,6 +631,18 @@ class CollectionCreate(LoginRequiredMixin, CreateView):
     fields = ['title', 'description', 'starred', 'deleted']
     success_url = reverse_lazy('bookmarks:bookmark_savedsearch_list')
 
+# URL route: /tags
+class TagList(LoginRequiredMixin, ListView):
+    template_name = "tags_list.html"
+    # model = Collection
+    # queryset = Collection.objects.order_by("title")
+
+    def get_queryset(self):
+        # print(" [TRACE] Executed SavedSearchList.get_queryset() ")
+        user: AbstractBaseUser = self.request.user
+        return Tag2.objects.filter(owner = user, deleted = False)\
+            .order_by(Lower("name")) #.reverse()    
+
 
 def queryset2Json(queryset: QuerySet, columns: List[str]) -> JsonResponse:
     """ Turn queryset object into a key-value pair json response. """
