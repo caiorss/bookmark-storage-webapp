@@ -25,7 +25,7 @@ urlpatterns = [
   ,path("items/extract_metadata", views.extract_metadata)
   ,path("items/view/<int:itemID>", views.document_viewer)
 
-  # ,path("snapshot/get", views.fetch_itemsnapshot)
+  #,path("snapshot/get", views.fetch_itemsnapshot)
   
   ,path("snapshot/file/<fileID>/<fileName>", views.get_snapshot_file)
 
@@ -35,6 +35,7 @@ urlpatterns = [
   ,path('search/list', views.SavedSearchList.as_view(), name='bookmark_savedsearch_list')
   ,path('search/new', views.SavedSearchCreate.as_view(), name='bookmark_savedsearch_new')
  
+  ,path('tags', views.TagList.as_view())
   #----------------------------------------------------#
 
   ,path('collection/list', views.CollectionList.as_view(), name='bookmark_collection_list')
@@ -51,4 +52,5 @@ urlpatterns = [
 
   ,path("api/collections/add_item", views.Ajax_Collection_AddItem.as_view())  
   ,path("api/search",               views.Ajax_ItemSearch.as_view())
+  ,path("api/tags",               views.Ajax_Tags.as_view())
 ]

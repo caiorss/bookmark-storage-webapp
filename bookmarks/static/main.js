@@ -1,8 +1,9 @@
 import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
-      , DialogForm, Dialog_Notify
+      , DialogForm, Dialog_Notify, Dialog_Datalist_Prompt
         } from "/static/dialogs.js";
 
 import * as utils from "/static/utils.js";
+
 
 function DOM_select(selector)
 {
@@ -753,8 +754,8 @@ async function item_set_starred(checkbox)
     let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
         
     if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 1000);
-        // location.reload();
+        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 500);
+        utils.dom_page_refresh();
     } else {
         Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
     }    
@@ -806,6 +807,86 @@ async function item_snapshot(item_id)
 
 window["item_snapshot"] = item_snapshot;
 
+
+async function tag_create()
+{
+    let tag_name = await Dialog2_Prompt.prompt("Enter new tag name:");
+    if(tag_name == "") return;
+    let token = window["generated_token"];
+    
+    let payload = { name: tag_name, description: "" };
+    let resp = await utils.ajax_request("/api/tags", token, utils.HTTP_POST, payload);
+    
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+    }
+}
+
+window["tag_create"] = tag_create;
+
+ 
+async function tag_add(item_id)
+{
+    let token = window["generated_token"];
+    let dlg = new Dialog_Datalist_Prompt();
+    dlg.setTitle("Select a tag");
+
+    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let all_tags = await utils.ajax_get("/api/tags", token);
+    console.log(all_tags);   
+    
+    for(let n in all_tags){
+        let row = all_tags[n];
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        dlg.add_option(row["name"], row["id"]);
+    }
+    
+    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
+    let answer = await dlg.prompt_selected();
+    console.log(" ANSWER = ", answer);
+
+    let resp = null;
+
+    if(answer["key"] == null)
+    {  
+        console.trace(" Create new TAG:");
+        // Create  new tag            
+        let payload = {   action:   "add_item_new_tag"
+                        , tag_name:  answer["value"]
+                        , item_id:   item_id 
+                      };
+        console.log(" Payload = ", payload);
+        resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    // Add a new item to a given tag 
+    } else {
+        let payload = {   action: "add_item"
+                        , tag_id:  answer["key"]
+                        , item_id: item_id 
+        };
+        console.log(" Payload = ", payload);
+        resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    }
+
+    console.log(" Resp = ", resp);
+
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+    }
+
+}
+
+window["tag_add"] = tag_add;
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

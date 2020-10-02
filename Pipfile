@@ -15,6 +15,7 @@ lxml    = "*"
 django-pdb = "*"
 pypdf2  = "*"
 djangorestframework = "*"
+pylint-django = "*"
 
 [requires]
 python_version = "*"
