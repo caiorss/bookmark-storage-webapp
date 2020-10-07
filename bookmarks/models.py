@@ -283,6 +283,12 @@ class Collection(models.Model):
     # User to which the collection belongs to 
     owner = models.ForeignKey(Account, null = True, blank = True, editable = True, on_delete=models.PROTECT)
     
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['owner', 'title', 'deleted'], name='unique_user_collection'),
+        ]
+
+
     def __str__(self):
         return " title = {title} ".format(title = self.title)
 
