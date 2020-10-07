@@ -236,7 +236,7 @@ class Tag(models.Model):
         return self.name 
 
 class Tag2(models.Model):
-    name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")
+    name        = models.CharField(max_length=300, help_text="Tag title or name")
     description = models.CharField(max_length = 5000, null = True, blank=True, help_text = "Tag description")
     starred = models.BooleanField(blank = True, default = False, help_text = "Check this box to mark this bookmark as favourite")
     # Set field only when instance is created
@@ -250,6 +250,13 @@ class Tag2(models.Model):
     # This field is reserved for future user.
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
     item    = models.ManyToManyField(SiteBookmark, blank = True)
+
+    # Databasse constraint for this table: 
+    # Requires a unique pair (name, owner). 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['owner', 'name'], name='unique_user_url'),
+        ]
 
     def __str__(self):
         return self.name  
