@@ -3,7 +3,7 @@ import bookmarks.models as bm
 
 class SiteBookmarkAdmin(admin.ModelAdmin):
     model = bm.SiteBookmark
-    filter_horizontal = ('tags', )
+    filter_horizontal = ('tag2', )
 
 class CollectionAdmin(admin.ModelAdmin):
     model = bm.Collection
@@ -11,7 +11,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
 admin.site.register(bm.Account)
 
-##admin.site.register(bm.SiteBookmark, SiteBookmarkAdmin)
+admin.site.register(bm.SiteBookmark, SiteBookmarkAdmin)
 admin.site.register(bm.Tag2)
 admin.site.register(bm.SavedSearch)
 admin.site.register(bm.Collection, CollectionAdmin)
