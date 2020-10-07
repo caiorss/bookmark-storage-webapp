@@ -151,6 +151,13 @@ class SiteBookmark(models.Model):
     # User to which the collection belongs to
     owner = models.ForeignKey(Account, editable = True, on_delete=models.PROTECT)
 
+    # Databasse constraint for this table requires a unique pair (name, owner). 
+    class Meta:
+       constraints = [
+           models.UniqueConstraint(fields=['owner', 'url'], name='unique_user_bookmark'),
+       ] 
+
+
     # Override deleted behavior, mark field delete to True instead of elininate
     # this database row. See: https://stackoverflow.com/questions/52767988
     def delete(self):
