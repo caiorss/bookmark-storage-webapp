@@ -160,7 +160,7 @@
                   <th> 
                     <a  class="btn-sm btn-primary" 
                         title="Delete current item" 
-                        href="javascript:item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escape }}' ); "
+                        href="javascript:item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
                      >Delete</a>                                                 
                   </th>
                 </tr>
