@@ -59,7 +59,7 @@
 <div class="sidebar">
 
     <ul class="sidebar-nav">
-        <li>User: {{ request.user.username }}</li>
+        <li><strong>User: </strong>{{ request.user.username }}</li>
 
         <li>
             <a href="/accounts/logout">Log out</a>
@@ -72,18 +72,18 @@
         <li><a href="/items?filter=starred">Starred Bookmarks</a></li>
         <li><a href="/items?filter=removed">Removed Bookmarks</a></li>
         
-        <li><span>Saved Search</span></li>
+        <li><strong>Saved Search</strong></li>
         <li> <a href='/search/new'>New  saved search</a> </li>
         <li> <a href='/search/list'>Saved searches</a> </li>      
 
-        <li><span>Collections</span></li>
+        <li><strong>Collections</strong></li>
         <li> <a href='/collection/list'>List collections</a> </li>
         <li> <a href='/collection/new'>Add new collection</a> </li>
 
-        <li><span>Tags</span></li>
+        <li><strong>Tags</strong></li>
         <li> <a href='/tags' title="List all user-defined tags">List tags</a> </li>
 
-        <li><span>Misc Filters</span></li>
+        <li><strong>Miscellaneous Filters</strong></li>
         <li> <a href='/items?filter=doctype&A0=search%20engine'>Search Engine</a> </li>
         <li> <a href='/items?filter=doctype&A0=news'>News outlets</a> </li>
         <li> <a href='/items?filter=doctype&A0=community'>Online Forums and Communities</a> </li>
@@ -92,13 +92,13 @@
                 >Online Store</a> </li>
         <li> <a href='/items?filter=doctype&A0=follow'>Followed social media accounts</a> </li>
 
-        <li><span>Documents Filters</span></li>
+        <li><strong>Documents Filters</strong></li>
         <li> <a href='/items?filter=doctype&A0=book'>Books or online books</a> </li>    
         <li> <a href='/items?filter=doctype&A0=paper'>Papers</a> </li>        
         <li> <a href='/items?filter=doctype&A0=thesis'>Thesis</a> </li>    
         <li> <a href='/items?filter=doctype&A0=reference%20card'>Reference card, cheat sheet</a> </li>       
 
-        <li><span>Media Filters</span></li>
+        <li><strong>Media Filters</strong></li>
         <li> <a href='/items?filter=doctype&A0=music'>Music</a> </li>
         <li> <a href='/items?filter=doctype&A0=video'>Video</a> </li>
         <li> <a href='/items?filter=doctype&A0=youtube%20channel'>Youtube Channel</a> </li>                        
