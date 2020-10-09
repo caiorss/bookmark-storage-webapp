@@ -544,7 +544,7 @@ def rest_bulk_action(request: WSGIRequest):
 class BookmarkCreate(LoginRequiredMixin, CreateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'deleted', 'tags']
+    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'deleted']
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')    
 
     # Overriden from CreateView 
