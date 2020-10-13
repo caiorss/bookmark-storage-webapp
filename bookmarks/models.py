@@ -180,9 +180,136 @@ class SiteBookmark(models.Model):
     def get_absolute_url(self):
         return reverse('bookmarks:book_edit', kwargs={'pk': self.pk})
 
-    def hostname(self):        
+    def hostname(self) -> str:        
         u = urlparse(self.url)
         return u.hostname
+
+    def favicon(self) -> Optional[str]:
+        domain: str = self.hostname()
+        if domain == None: return ""
+        icon_url: Optional[str] = None 
+
+        if domain == "reference.wolfram.com":
+            icon_url = "https://reference.wolfram.com/favicon.ico"
+        
+        elif domain == "developer.apple.com":
+            icon_url = "https://developer.apple.com/favicon.ico"
+
+        elif domain.startswith("www.amazon."):
+            icon_url = "https://www.amazon.com/favicon.ico"
+
+        #---- Communities --------------------------------# 
+        elif domain == "stackoverflow.com" or domain == "stackoverflow.blog":
+            icon_url = "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico"   
+        elif domain == "www.reddit.com" or domain == "np.reddit.com" or domain == "old.reddit.com":
+            icon_url = "https://www.reddit.com/favicon.ico"
+        elif domain == "news.ycombinator.com":
+            icon_url = "https://news.ycombinator.com/favicon.ico"
+        elif domain == "medium.com":
+            icon_url = "https://cdn-static-1.medium.com/_/fp/icons/favicon-rebrand-medium.3Y6xpZ-0FSdWDnPM3hSBIA.ico"
+        elif domain == "mobile.twitter.com" or domain == "twitter.com":
+            icon_url = "https://abs.twimg.com/favicons/twitter.ico"
+
+        #---- Github -------------------------------------#
+        elif domain == "github.com":
+            icon_url = "https://github.githubassets.com/favicons/favicon-dark.png"
+        elif ".gitbooks.io" in domain:
+            icon_url = "https://gstatic.gitbook.com/images/b1c4c86ca817a71628d2debe73be9a64.ico"
+        
+        #---- Gitlab -------------------------------------#
+        elif domain == "gitlab.com" or domain == "about.gitlab.com":
+            icon_url = "https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png"
+
+        #----- BitBucker / Git Hosting website -----------#
+        elif domain == "bitbucket.org":
+            icon_url = "https://d301sr5gafysq2.cloudfront.net/frontbucket/build-favicon-default.3b48bd21f29d.ico"
+
+        # --- Python documentation and Packages URL ----- #
+        elif domain == "docs.python.org": 
+            icon_url = "https://docs.python.org/3/_static/py.png"
+        elif domain == "pypi.org":
+            icon_url = "https://pypi.org/static/images/favicon.6a76275d.ico"
+
+        #---- Linux Documentation ---------------------#
+        elif domain == "tldp.org":
+            icon_url = "https://tldp.org/favicon.ico"
+        elif domain == "lwn.net":
+            icon_url = "https://static.lwn.net/images/favicon.png"
+        elif domain == "www.kernel.org":
+            icon_url = "https://www.kernel.org/theme/images/logos/favicon.png"
+        elif domain == "wiki.debian.org":
+            icon_url = "https://wiki.debian.org/htdocs/favicon.ico"
+        elif domain == "www.phoronix.com":
+            icon_url = "https://www.phoronix.com/favicon.ico"
+        elif domain == "unix.stackexchange.com":
+            icon_url = "https://cdn.sstatic.net/Sites/unix/Img/favicon.ico?v=fb86ccabb921"
+
+        #--- R Language (RLang) packages ------------#
+        elif domain == "cran.r-project.org":
+            icon_url = "https://cran.r-project.org/favicon.ico"
+
+        # --- Julia Language Documentation ----------#
+        elif domain == "docs.julialang.org":
+            icon_url = "https://docs.julialang.org/favicon.ico"
+
+        # --- C++ Language --------------------------# 
+        if domain == "en.cppreference.com":
+            icon_url = "https://en.cppreference.com/favicon.ico"
+        elif domain == "cmake.org":
+            icon_url = "https://cmake.org/cmake/help/latest/_static/cmake-favicon.ico"
+        elif domain == "www.open-std.org":
+            icon_url = "http://www.open-std.org/favicon.ico"
+        elif domain == "isocpp.org":
+            icon_url = "https://isocpp.org/favicon.ico"
+        elif domain == 'accu.org':
+            icon_url = "https://accu.org/img/favicon.ico"
+        elif domain == "gcc.gnu.org":
+            icon_url = "https://gcc.gnu.org/favicon.ico"
+        elif domain == "doc.qt.io":
+            icon_url = "https://d33sqmjvzgs8hq.cloudfront.net/wp-content/themes/oneqt/assets/images/favicon-32x32.png"
+        elif domain == "docs.microsoft.com":
+            icon_url = "https://docs.microsoft.com/favicon.ico"
+
+        #----- Web Development and Javascript reference ---#
+        elif domain == "developer.mozilla.org":
+            icon_url = "https://developer.mozilla.org/static/img/favicon32.7f3da72dcea1.png"   
+        elif domain == "fonts.google.com":
+            icon_url = "https://www.gstatic.com/images/branding/product/ico/google_fonts_blue_lodp.ico"       
+
+        #---- Papers --------------------------------#
+        elif domain == "citeseerx.ist.psu.edu":
+            icon_url = "https://citeseerx.ist.psu.edu/favicon.ico"
+        elif domain == "www.scielo.br":
+            icon_url = "https://www.scielo.br/favicon.ico"
+
+        elif domain == "wikipedia.org" or domain == "en.m.wikipedia.org" \
+                or domain == "en.wikipedia.org" or domain =="en.m.wikibooks.org" \
+                or domain == "en.wikibooks.org":
+            icon_url = "https://en.m.wikipedia.org/static/favicon/wikipedia.ico"
+
+        elif domain == "www.investopedia.com":
+            icon_url = "https://www.investopedia.com/static/1.122.0/icons/favicons/favicon.ico"
+      
+        elif domain == "youtube.com" or domain == "www.youtube.com" or domain == "m.youtube.com":
+            icon_url = "https://www.youtube.com/s/desktop/ce045d38/img/favicon.ico"        
+
+        elif domain == "www.freebsd.org":
+            icon_url = "https://www.freebsd.org/favicon.ico"
+        elif domain == "dzone.com":
+            icon_url = "https://dzone.com/themes/dz20/images/favicon.png"
+        elif domain == "blogs.microsoft.com":
+            icon_url = "https://1gew6o3qn6vx9kp3s42ge0y1-wpengine.netdna-ssl.com/wp-content/uploads/sites/5/2017/08/favicon-599dd744b8cac.jpg"
+        
+        # ---- Auditing -------------------------#
+        elif domain == "mitre.org":
+            icon_url = "https://www.mitre.org/sites/all/themes/mitre/favicon.ico"
+        elif domain == "nvd.nist.gov":
+            icon_url = "https://nvd.nist.gov/site-media/images/favicons/favicon.ico"
+        
+        if icon_url: 
+            print(" ICon URL = ", icon_url)
+            return f"<img class='bookmark-favicon' style='width:16px;height:16px;' src='{icon_url}' />"
+        return ""
 
     def is_youtube_video(self):
         return self.url.startswith("https://www.youtube.com/watch?v=") \

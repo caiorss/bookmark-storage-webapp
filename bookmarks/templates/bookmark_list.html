@@ -13,7 +13,7 @@
 
             <h5>  
         
-                 <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" /> 
+                 <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" />                  
 
                   <a  class="item-bookmark-link"
                       target='_blank' 
@@ -27,8 +27,10 @@
                           <path class="stroke-linejoin-round" d="M14 9.048V14H2V2h5">
                           </path>
                       </svg>
+                      
+                      {{  bookmark.favicon | safe }}
 
-                        {{ bookmark.modified_title | default:bookmark.url }}                                                                        
+                      {{ bookmark.modified_title | default:bookmark.url }}                                                                        
                   </a>                  
             </h5>
 
