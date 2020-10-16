@@ -54,27 +54,28 @@ function DOM_set_visibility(m, flag)
 // Boolean flag ('true' or 'false') stored in html5
 // local storage API. It is useful for storing non critical 
 // user preference data on client-side. 
-function LocalStorageFlag(name, value)
-{
-    this.name = name;
-    this._dummy = (function() {
-        var q = localStorage.getItem(name);
-        if(q == null || q == "undefined" ){
-            localStorage.setItem(name, value);
-        }
-    }());
-
-    this.get     = () => {
-        var result = localStorage.getItem(this.name);
-        if(result == "undefined") { 
-            this.set(false);
-            return false;            
-        }
-        return JSON.parse(result) || false;
-    };
-    this.set     = (value) => localStorage.setItem(this.name, value);
-    this.toggle  = ()      => { this.set(!this.get()); return this.get(); }
-};
+class LocalStorageFlag {
+    constructor(name, value) {
+        this.name = name;
+        this._dummy = (function () {
+            var q = localStorage.getItem(name);
+            if (q == null || q == "undefined") {
+                localStorage.setItem(name, value);
+            }
+        } ());
+        this.get = () => {
+            var result = localStorage.getItem(this.name);
+            if (result == "undefined") {
+                this.set(false);
+                return false;
+            }
+            return JSON.parse(result) || false;
+        };
+        this.set = (value) => localStorage.setItem(this.name, value);
+        this.toggle = () => { this.set(!this.get()); return this.get(); };
+    }
+}
+;
 
 
 
