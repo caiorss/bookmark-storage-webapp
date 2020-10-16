@@ -894,6 +894,28 @@ async function tag_add(item_id)
 
 window["tag_add"] = tag_add;
 
+
+async function tag_remove(tag_id, bookmark_id)
+{    
+    let payload = {   action:   "remove_tag_item"
+                    , tag_id:    tag_id
+                    , item_id:  bookmark_id
+                };
+    console.log(" Payload = ", payload);
+    let token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"], 500);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"], 500);
+    }
+}
+
+window["tag_remove"] = tag_remove;
+
 class YoutubeThumb extends HTMLElement {
     constructor() {
         super()

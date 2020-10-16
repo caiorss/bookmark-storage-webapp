@@ -1034,6 +1034,17 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             #print(" Tag  = " + tag)
             #print(" Item = " + item)
             return JsonResponse({ "result": "OK", "message": "Tag added successfully" }, safe = False)        
+
+        if action == "remove_tag_item":
+            item_id = body["item_id"]
+            tag_id  = body["tag_id"]
+            tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)        
+            item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
+            tag.item.remove(item)
+            tag.save()
+            return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)        
+
+            
         
         return JsonResponse({ "result": "ERROR", "message": "Action not valid for this case." }, safe = False)        
 

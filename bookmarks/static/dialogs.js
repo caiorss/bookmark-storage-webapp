@@ -394,6 +394,9 @@ export class Dialog_Datalist_Prompt extends Dialog_Basic
         this._input = this.node.querySelector("#dialog-input");
         this._dataset = this.node.querySelector("#dataset");
 
+        // Action that happens when user presses RETURN key.
+        // this._input.addEventListener("keypress", () => )
+
         this.setTitle("Select an option");
         this.setCustomStyle(`input { width: 100%; }`);
 

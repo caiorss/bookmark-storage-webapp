@@ -83,6 +83,10 @@
             <strong>Tags:</strong>
 
             {% for tag in bookmark.tag2_set.all %}
+                <a class="tag-remove-button" href="#" 
+                   onclick="tag_remove( {{ tag.id }},  {{ bookmark.id}}  );"
+                   title="Remove tag from bookmark."
+                >[X]</a>
                 <a class="tag-hyperlink" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
             {% endfor %}
             
