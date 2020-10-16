@@ -884,10 +884,10 @@ async function tag_add(item_id)
 
     if(resp["result"] == "OK")
     {
-        await Dialog_Notify.notify_ok(resp["message"]);
+        await Dialog_Notify.notify_ok(resp["message"], 500);
         utils.dom_page_refresh();
     } else {
-        await Dialog_Notify.notify_error(resp["message"]);
+        await Dialog_Notify.notify_error(resp["message"], 500);
     }
 
 }
