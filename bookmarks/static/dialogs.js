@@ -26,7 +26,7 @@ export class Dialog_Basic extends HTMLElement
 
                 <div id="dialog-body"> 
                 </div>
-                <div>
+                <div id="div-panel-button">
                     <button id="btn-close">Close</button>
                     <button id="btn-submit">Submit</button>
                 </div>
@@ -186,10 +186,21 @@ export class Dialog_Basic extends HTMLElement
         btn.style.display    = "block";
     }
 
+    /** Append additional DOM elements in the #dialog-body anchor element. */
     addChild(dom_element)
     {
         let anchor = this.node.querySelector("#dialog-body");
         anchor.appendChild(dom_element);
+    }
+
+    /** Create additional buttons for the dialog */
+    addButton(label, callback)
+    {        
+        let button = document.createElement("button");
+        button.textContent = label;
+        button.addEventListener("click", callback);
+        let anchor = this.node.querySelector("#div-panel-button");
+        anchor.appendChild(button);
     }
 
 
@@ -385,6 +396,11 @@ export class Dialog_Datalist_Prompt extends Dialog_Basic
 
         this.setTitle("Select an option");
         this.setCustomStyle(`input { width: 100%; }`);
+
+        this.addButton("Clear", () => { 
+            console.log("Text cleared Ok. ");
+            this._input.value = ""; 
+        })
     }
 
     add_option(value, key = null )
