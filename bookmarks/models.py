@@ -307,7 +307,7 @@ class SiteBookmark(models.Model):
             icon_url = "https://nvd.nist.gov/site-media/images/favicons/favicon.ico"
         
         if icon_url: 
-            print(" ICon URL = ", icon_url)
+            # print(" ICon URL = ", icon_url)
             return f"<img class='bookmark-favicon' style='width:16px;height:16px;' src='{icon_url}' />"
         return ""
 
