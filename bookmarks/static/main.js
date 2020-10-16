@@ -838,11 +838,14 @@ window["tag_create"] = tag_create;
  
 async function tag_add(item_id)
 {
-    let token = window["generated_token"];
+    let last_input = new LocalStorageString("tag-last-input", "");
+        
     let dlg = new Dialog_Datalist_Prompt();
-    dlg.setTitle("Select a tag");
+    dlg.setTitle("Select a tag");    
+    dlg.setInputText(last_input.get());
 
     // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let token = window["generated_token"];
     let all_tags = await utils.ajax_get("/api/tags", token);
     console.log(all_tags);   
     
@@ -858,6 +861,7 @@ async function tag_add(item_id)
     console.log(" ANSWER = ", answer);
 
     let resp = null;
+    last_input.set(answer["value"]);
 
     if(answer["key"] == null)
     {  
@@ -867,7 +871,7 @@ async function tag_add(item_id)
                         , tag_name:  answer["value"]
                         , item_id:   item_id 
                       };
-        console.log(" Payload = ", payload);
+        console.log(" Payload = ", payload);        
         resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
 
     // Add a new item to a given tag 

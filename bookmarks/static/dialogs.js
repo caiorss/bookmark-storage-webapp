@@ -360,6 +360,11 @@ export class Dialog2_Prompt extends Dialog_Basic
         this.setText(text);
         this.setCustomStyle(`input { width: 100%; }`);
     }
+
+    setInputText(text)
+    {
+        this.input.value = text;
+    }
     
     static async prompt(title, text, input = "")
     {
@@ -405,6 +410,13 @@ export class Dialog_Datalist_Prompt extends Dialog_Basic
             this._input.value = ""; 
         })
     }
+
+
+    setInputText(text)
+    {
+        this._input.value = text;
+    }
+        
 
     add_option(value, key = null )
     {
