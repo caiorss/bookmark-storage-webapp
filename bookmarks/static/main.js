@@ -369,6 +369,9 @@ window["Dialog_Search_Item"] = Dialog_Search_Item;
 var dialog_search_item = new Dialog_Search_Item();
 window["dialog_search_item"] = dialog_search_item;
 
+
+
+
 // Callback executed after DOM is fully loaded
 utils.dom_onContentLoaded(() => {
 
@@ -918,8 +921,46 @@ async function tag_remove(tag_id, bookmark_id)
         await Dialog_Notify.notify_error(resp["message"], 500);
     }
 }
-
 window["tag_remove"] = tag_remove;
+
+function search_bookmarks()
+{    
+    //console.trace(" [TRACE] I was called. ");
+    let search_box    = document.querySelector("#search-entry");
+    let query         = encodeURIComponent(search_box.value); 
+    let mode_selector = document.querySelector("#search-mode-selector");
+    let mode = mode_selector ? mode_selector.value : "AND";
+    let url        = `/items?filter=search&query=${query}&mode=${mode}`;    
+    //console.log("URL = ", url);
+    // Redirect to search route.
+    document.location = url;
+
+}
+
+window["search_bookmarks"] = search_bookmarks;
+
+function keypress_return_adapter(funct)
+{
+    //console.log(" [TRACE] Install function");
+    return (event) => {
+        //console.log(" Event = ", event);
+        if(event.keyCode != 13) return;
+        funct();
+    };
+};
+
+window["keypress_return_adapter"] = keypress_return_adapter;
+
+function clear_entry_field(dom_element_id)
+{
+    let field = document.querySelector(dom_element_id);
+    console.assert(field != null, `Cannot find entry field to be cleared`);
+    field.value = "";
+    field.focus();
+}
+
+window["clear_entry_field"] = clear_entry_field;
+
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

@@ -108,14 +108,12 @@
 <div id="top-panel">
     <h1>Bookmarks Storage</h1>
 
-    <div class="div-form-search">
-        <form method='GET' action="/items" class="form-group">
-            <input type="hidden" name="filter" value="search" /> 
-            
-            <input id="search-entry-box" type='text' name='query' value='{{ request.GET.query }}'>
+    <div class="div-form-search">       
+            <input id="search-entry" type='text' name='query' value='{{ request.GET.query }}'
+                   onkeypress="keypress_return_adapter(search_bookmarks)(event);">
             </br>
-            <input class="btn-sm btn-info" type='submit' value="Search">
-            <input class="btn-sm btn-info" type="reset" value="Clear">
+            <input class="btn-sm btn-info" type='submit' value="Search" onclick="search_bookmarks();">
+            <input class="btn-sm btn-info" type="reset" value="Clear"  onclick="clear_entry_field('#search-entry');">
 
             <!-- Set search mode  -->
             <select name="mode" title="Select search mode.">
@@ -124,8 +122,7 @@
             </select>        
             <a class="topbar-svg-button" href="/search/list" title="Saved search."> 
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
-            </a>
-        </form> 
+            </a>       
     </div>
 </div>
 

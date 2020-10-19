@@ -49,11 +49,13 @@
 Search Items:
 
 <div class="">
-        <form method='GET' action="/items" class="form-group">
+
             <input type="hidden" name="filter" value="search" /> 
-            <input type='text' name='search' value='{{ request.GET.search }}'>
-            <input class="btn btn-info" type='submit' value="Search">
-        </form> 
+            <input id="search-entry" type='text' name='search' 
+                   value='{{ request.GET.search }}'
+                   onkeydown='keypress_return_adapter(search_bookmarks)(event)'
+                   >
+            <input class="btn btn-info" type='button' value="Search" onclick="search_bookmarks();">
 </div>      
 
 <h2> Items </h2>
