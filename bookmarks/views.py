@@ -293,8 +293,14 @@ def update_item_from_metadata(itemID: int) -> None:
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     try:
+        # Reference: https://stackoverflow.com/a/18269491
+        url_ = urllib.parse.urlsplit(real_url)
+        url_ = list(url_)
+        url_[2] = urllib.parse.quote(url_[2])
+        url_ = urllib.parse.urlunsplit(url_)
+
         req = urllib.request.Request(
-              real_url
+              url_
             , data=None
             , headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
