@@ -375,7 +375,7 @@ from urllib.parse import urlparse
 
 @login_required
 def fetch_itemsnapshot(request: WSGIRequest):
-    """ Download file snaphot from bookmark URL and insert it in the database as a blob. """
+    """ Download file snaphot from bookmark URL and store file in cache."""
     redirect_url: str = request.GET.get("url")
     if redirect_url is None or redirect_url == "":
         return django.http.HttpResponseBadRequest("Error: invalid redirection URL.")

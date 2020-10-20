@@ -136,7 +136,17 @@
                 </th>
               </tr>
 
-              {% if bookmark.snapshot_exists %}
+
+              <tr>
+                <th> 
+                  {% if  bookmark.snapshot_exists %}
+                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
+                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                                                             
+                  {% endif %}                      
+                </th>
+              </tr>
+
+              {% if  bookmark.snapshot_exists %}
                 <tr>
                   <th>
                     <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" 
@@ -144,15 +154,10 @@
                   </th>
                 </tr>             
               {% endif %}
-
+              
               <tr>
-                <th> 
-                  {% if bookmark.snapshot_exists %}
-                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
-                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                           
-                  {% else %}
-                    <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
-                  {% endif %}                      
+                <th>
+                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
                 </th>
               </tr>
 
