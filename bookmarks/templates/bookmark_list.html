@@ -122,6 +122,17 @@
 
               <tr>
                 <th> 
+                  <a  class="btn-sm btn-primary" 
+                      href="items?filter=created-date&A0={{ bookmark.created | date:'Y-m-d' }}" 
+                      title="Filter all items with the same created date as this item: {{ bookmark.created }}" 
+                  > 
+                    Filter by created date
+                  </a>
+                </th>
+              </tr>              
+
+              <tr>
+                <th> 
                   <a class="btn-sm btn-primary" href="#" onclick="open_url_newtab('http://{{ bookmark.hostname }}')" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 

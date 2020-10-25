@@ -105,7 +105,7 @@ def download_file_from_ftp(url: str) -> DownloadedFile:
    
 
 def download_from_slideshare(url: str) -> DownloadedFile:
-    assert url.startswith("https://www.slideshare.net/")
+    #assert url.startswith("https://www.slideshare.net/")
                                           
     def make_http_request(url) -> HTTPResponse:
         req = urllib.request.Request(url, data = None, headers = { 
@@ -157,7 +157,7 @@ def download_from_slideshare(url: str) -> DownloadedFile:
 
 
 def download_file(url: str) -> DownloadedFile:
-    if url.startswith("https://www.slideshare.net/"):
+    if ".slideshare.net" in url:
         return download_from_slideshare(url)
         #raise Exception("Error: not implemented.")
 

@@ -118,6 +118,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
         self.add_filter("collection", "Collection items",                self.filter_collection)
         self.add_filter("tag-name",   "Filter tag by name",              self.filter_by_tag_name)
+        self.add_filter("created-date", "Filter by created date",        self.filter_by_created_date)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
@@ -248,6 +249,12 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.filter(owner = self.request.user)\
             .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
 
+    def filter_by_created_date(self):
+        created_date: str = self.request.GET.get("A0")
+        filter_type:  str = self.request.GET.get("filter")
+        assert filter_type == "created-date"
+        return self.model.objects.filter(owner = self.request.user, created = created_date)\
+            .exclude(deleted = True ).order_by("id").reverse()
 
 # URL route for adding item through bookmarklet 
 @login_required 
