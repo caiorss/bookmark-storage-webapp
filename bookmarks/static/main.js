@@ -923,6 +923,18 @@ async function tag_remove(tag_id, bookmark_id)
 }
 window["tag_remove"] = tag_remove;
 
+async function tag_delete(tag_name)
+{
+    alert("Not implemented \n");
+}
+window["tag_delete"] = tag_delete;
+
+async function tag_update(tag_update)
+{
+    alert("Not implemented \n");
+}
+window["tag_update"] = tag_update;
+
 function search_bookmarks()
 {    
     //console.trace(" [TRACE] I was called. ");

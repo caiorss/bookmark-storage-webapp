@@ -12,6 +12,16 @@
                 title="{{ tag.name }}"> 
                 {{ tag.name }} 
             </a>
+
+            <br/>
+            <br/>
+
+            <button onclick="tag_update( '{{ tag.name | escapejs }}' )" >Update</button>
+            <button onclick="tag_delete( '{{ tag.name | escapejs }}' )" >Delete</button>
+
+            <br/>
+
+            <p> {{ tag.description }} </p>
   
         </div>                            
     {% endfor %}
