@@ -1070,6 +1070,15 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             tag.delete()            
             return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)       
         
+        if action == "update_tag":
+            tag_name = body["tag_name"]
+            tag_desc = body["tag_desc"]
+            tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)
+            tag.name = tag_name 
+            tag.description = tag_desc
+            tag.save()
+            return JsonResponse({ "result": "OK", "message": "Tag updated Ok." }, safe = False)       
+
         return JsonResponse({ "result": "ERROR", "message": "Action not valid for this case." }, safe = False)        
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
