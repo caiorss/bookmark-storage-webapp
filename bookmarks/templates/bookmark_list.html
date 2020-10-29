@@ -88,8 +88,15 @@
                    onclick="tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
                    title="Remove tag '{{ tag.name }}' from bookmark."
                 >[X]</a>
+
+              <!-- Button for Editing tag -->
+              <a class="tag-remove-button" 
+                   href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                   title="Update/Edit tag '{{ tag.name }}' from bookmark."
+                >[E]</a>
+
                 <!-- Button for filtering all bookmarks with this tag. -->
-                <a class="tag-hyperlink" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+                <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
             {% endfor %}
             
 
