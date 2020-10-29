@@ -16,8 +16,8 @@
             <br/>
             <br/>
 
-            <button onclick="tag_update( '{{ tag.name | escapejs }}' )" >Update</button>
-            <button onclick="tag_delete( '{{ tag.name | escapejs }}' )" >Delete</button>
+            <button onclick="tag_update( '{{ tag.name | escapejs }}', {{ tag.id }} )" >Update</button>
+            <button onclick="tag_delete( '{{ tag.name | escapejs }}', {{ tag.id }} )" >Delete</button>
 
             <br/>
 

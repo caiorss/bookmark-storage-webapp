@@ -923,9 +923,32 @@ async function tag_remove(tag_id, bookmark_id)
 }
 window["tag_remove"] = tag_remove;
 
-async function tag_delete(tag_name)
+async function tag_delete(tag_name, tag_id)
 {
-    alert("Not implemented \n");
+
+        let answer = await Dialog_YesNo.prompt(
+                      "Delete tag."
+                    , `Are you sure you want to delete this tag: '${tag_name}' ` );
+
+        if(!answer) { return; }
+
+        let resp = await utils.ajax_request("/api/tags"
+                                , window["generated_token"]
+                                , utils.HTTP_PUT
+                                , { 
+                                      "tag_name": tag_name 
+                                    , "tag_id":   tag_id
+                                    , "action":   "delete_tag"
+                                 });
+
+
+        if(resp["result"] == "OK")
+        { 
+            Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+            utils.dom_page_refresh();
+        } else {
+            Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+        }
 }
 window["tag_delete"] = tag_delete;
 

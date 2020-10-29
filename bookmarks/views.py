@@ -1058,9 +1058,17 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
             tag.item.remove(item)
             tag.save()
-            return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)        
+            return JsonResponse({ "result": "OK", "message": "Item removed from tag. Ok." }, safe = False)       
 
-            
+
+        if action == "delete_tag" :
+            tag_name = body["tag_name"]
+            tag: Tag = Tag2.objects.get(name = tag_name, owner = request.user)    
+            # Remove all items from many-to-many relationship from this tag 
+            for item in tag.item.all():
+                tag.item.remove(item)
+            tag.delete()            
+            return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)       
         
         return JsonResponse({ "result": "ERROR", "message": "Action not valid for this case." }, safe = False)        
 
