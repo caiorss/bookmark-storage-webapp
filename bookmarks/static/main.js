@@ -927,7 +927,8 @@ async function tag_delete(tag_name, tag_id)
 {
     let answer = await Dialog_YesNo.prompt(
                     "Delete tag."
-                , `Are you sure you want to delete this tag: '${tag_name}' ` );
+                , `Are you sure you want to delete this tag: '${tag_name}'. 
+                   Note: This action is irreversible. ` );
 
     if(!answer) { return; }
 
