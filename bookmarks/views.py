@@ -160,6 +160,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
             coll = Collection.objects.get(id = coll_id, owner = self.request.user)
             title = title + " : " + coll.title 
 
+        if view == "tag-name":
+            title = title + " : " + self.request.GET.get("A0")
+
         context["page_title"] = title 
 
         context['count'] = self.get_queryset().count()
