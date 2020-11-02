@@ -217,8 +217,11 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def filter_by_tag_name(self):
         A0: str = self.request.GET.get("A0")            
         if not A0: return self.empty_query
-        tag: Tag2 = Tag2.objects.get(name = A0, owner = self.request.user)
-        return tag.item.filter(deleted = False)        
+        try:
+            tag: Tag2 = Tag2.objects.get(name = A0, owner = self.request.user)
+            return tag.item.filter(deleted = False)   
+        except Tag2.DoesNotExist:
+            return self.model.objects.none()     
 
     # Url example: /items?filter=doctype&A0=thesis
     def filter_doctype(self):
