@@ -17,6 +17,11 @@ import hashlib
 import ssl 
 import re 
 
+import urllib.request   
+import bs4
+from http.client import HTTPResponse 
+import base64
+
 # Constant:
 DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
 
@@ -27,7 +32,6 @@ class DownloadedFile(NamedTuple):
     fileMimeType: str 
     fileHash:     str 
     fileData:     bytes 
-
 
 def download_file_from_http(url: str) -> DownloadedFile:
     """Download file from URL returning a DownloadedFile record. """
@@ -97,7 +101,66 @@ def download_file_from_ftp(url: str) -> DownloadedFile:
                          , fileHash     = f_hash
                          , fileData     = f_data  )
 
+
+   
+
+def download_from_slideshare(url: str) -> DownloadedFile:
+    #assert url.startswith("https://www.slideshare.net/")
+                                          
+    def make_http_request(url) -> HTTPResponse:
+        req = urllib.request.Request(url, data = None, headers = { 
+                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36' 
+        })
+        return urllib.request.urlopen(req, timeout = 4)
+
+    resp = make_http_request(url)
+    data = resp.read().decode('utf-8')
+    #print(" data = ", data)
+    soup = bs4.BeautifulSoup(data, features = "html.parser") 
+
+    title_node = soup.find("title")
+    assert title_node is not None
+    title = title_node.text
+    print(" [INFO] Title = ", title)
+
+    html = f""" 
+    <h1>{title}</h1>
+    <br/>
+        Slide URL: <a href={url}>{title}</a>
+    <br/>
+    """
+
+    for img in soup.select("img.slide_image"):
+        img_url = img.get("data-normal").strip("'")        
+        print(" Slide image : ", img_url)
+        img_resp = make_http_request(img_url)        
+        mime = img_resp.getheader("Content-Type", "application/octet-stream")
+        img_b64: str = base64.b64encode(img_resp.read()).decode("ascii")
+        assert type(img_b64) is str 
+        html = html + "\n" + f'<img src="data:{mime};base64, {img_b64}" />' + "<br/>"
+
+    # print(" html = ", html)
+
+    # Convert string in to a file name friendly string. 
+    # See: https://docs.djangoproject.com/en/2.1/ref/utils/#django.utils.text.slugify
+    import django.utils.text
+    f_name  = django.utils.text.slugify(title) + ".html"
+    f_mime  = "text/html"
+    f_data: bytes = html.encode("utf-8")
+    f_hash: str   = hashlib.md5(f_data).hexdigest()
+
+    return DownloadedFile( fileName     = f_name
+                         , fileMimeType = f_mime
+                         , fileHash     = f_hash
+                         , fileData     = f_data  )
+
+
+
 def download_file(url: str) -> DownloadedFile:
+    if ".slideshare.net" in url:
+        return download_from_slideshare(url)
+        #raise Exception("Error: not implemented.")
+
     if url.startswith("http://") or url.startswith("https://"):
         return download_file_from_http(url)
     if url.startswith("ftp://"):

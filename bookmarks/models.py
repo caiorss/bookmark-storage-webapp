@@ -305,6 +305,9 @@ class SiteBookmark(models.Model):
             icon_url = "https://www.mitre.org/sites/all/themes/mitre/favicon.ico"
         elif domain == "nvd.nist.gov":
             icon_url = "https://nvd.nist.gov/site-media/images/favicons/favicon.ico"
+
+        elif domain == "docs.google.com":
+            icon_url = "https://ssl.gstatic.com/docs/presentations/images/favicon5.ico"
         
         if icon_url: 
             # print(" ICon URL = ", icon_url)
@@ -454,9 +457,9 @@ class FileSnapshot(models.Model):
         media_dir: str     = django.conf.settings.MEDIA_ROOT 
 
         # Create entry in database 
-        sn = FileSnapshot( fileName = df.fileName
-                            ,fileHash = df.fileHash
-                            ,fileMimeType = df.fileMimeType )
+        sn = FileSnapshot(  fileName = df.fileName
+                           ,fileHash = df.fileHash
+                           ,fileMimeType = df.fileMimeType )
         sn.save()
         sn.item.add(item)
         sn.save()

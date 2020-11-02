@@ -84,12 +84,19 @@
 
             {% for tag in bookmark.tag2_set.all %}
               <!-- Button for removing tag from element. -->
-                <a class="tag-remove-button" href="#" 
-                   onclick="tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                <a class="tag-remove-button" 
+                   href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
                    title="Remove tag '{{ tag.name }}' from bookmark."
                 >[X]</a>
+
+              <!-- Button for Editing tag -->
+              <a class="tag-remove-button" 
+                   href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                   title="Update/Edit tag '{{ tag.name }}' from bookmark."
+                >[E]</a>
+
                 <!-- Button for filtering all bookmarks with this tag. -->
-                <a class="tag-hyperlink" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+                <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
             {% endfor %}
             
 
@@ -122,6 +129,17 @@
 
               <tr>
                 <th> 
+                  <a  class="btn-sm btn-primary" 
+                      href="items?filter=created-date&A0={{ bookmark.created | date:'Y-m-d' }}" 
+                      title="Filter all items with the same created date as this item: {{ bookmark.created }}" 
+                  > 
+                    Filter by created date
+                  </a>
+                </th>
+              </tr>              
+
+              <tr>
+                <th> 
                   <a class="btn-sm btn-primary" href="#" onclick="open_url_newtab('http://{{ bookmark.hostname }}')" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 
@@ -136,7 +154,17 @@
                 </th>
               </tr>
 
-              {% if bookmark.snapshot_exists %}
+
+              <tr>
+                <th> 
+                  {% if  bookmark.snapshot_exists %}
+                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
+                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                                                             
+                  {% endif %}                      
+                </th>
+              </tr>
+
+              {% if  bookmark.snapshot_exists %}
                 <tr>
                   <th>
                     <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" 
@@ -144,15 +172,10 @@
                   </th>
                 </tr>             
               {% endif %}
-
+              
               <tr>
-                <th> 
-                  {% if bookmark.snapshot_exists %}
-                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
-                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                           
-                  {% else %}
-                    <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
-                  {% endif %}                      
+                <th>
+                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
                 </th>
               </tr>
 

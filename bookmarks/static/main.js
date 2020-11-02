@@ -923,6 +923,72 @@ async function tag_remove(tag_id, bookmark_id)
 }
 window["tag_remove"] = tag_remove;
 
+async function tag_delete(tag_name, tag_id)
+{
+    let answer = await Dialog_YesNo.prompt(
+                    "Delete tag."
+                , `Are you sure you want to delete this tag: '${tag_name}'. 
+                   Note: This action is irreversible. ` );
+
+    if(!answer) { return; }
+
+    let resp = await utils.ajax_request("/api/tags"
+                            , window["generated_token"]
+                            , utils.HTTP_PUT
+                            , { 
+                                  "tag_name": tag_name 
+                                , "tag_id":   tag_id
+                                , "action":   "delete_tag"
+                                });
+
+
+    if(resp["result"] == "OK")
+    { 
+        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+    }
+}
+window["tag_delete"] = tag_delete;
+
+async function tag_update(tag_name, tag_id, tag_desc)
+{
+    let dialog = new DialogForm();
+    //dialog_collection_edit.detach_on_close(false);
+    dialog.setTitle("Update tag");
+    dialog.setText("Enter the following informations:");
+    
+    let entry_name = dialog.add_row_input("name", "Tag Name:");
+    let entry_desc  = dialog.add_row_input("desc", "Tag Description:");
+
+    entry_name.value = tag_name;
+    entry_desc.value = tag_desc;
+    
+    // Wait user fill the dialog form information. 
+    let sender = await dialog.onConfirm();
+
+    let resp = await utils.ajax_request("/api/tags"
+                            , window["generated_token"]
+                            , utils.HTTP_PUT
+                            , { 
+                                  "action":         "update_tag"
+                                , "tag_name":        entry_name.value 
+                                , "tag_desc":        entry_desc.value 
+                                , "tag_id":          tag_id
+                                });
+
+    if(resp["result"] == "OK")
+    { 
+        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+    }    
+
+}
+window["tag_update"] = tag_update;
+
 function search_bookmarks()
 {    
     //console.trace(" [TRACE] I was called. ");
@@ -938,6 +1004,37 @@ function search_bookmarks()
 }
 
 window["search_bookmarks"] = search_bookmarks;
+
+async function tag_filter_window()
+{
+    let dlg = new Dialog_Datalist_Prompt();
+    dlg.setTitle("Select a tag");    
+    // dlg.setInputText(last_input.get());
+
+    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let token = window["generated_token"];
+    let all_tags = await utils.ajax_get("/api/tags", token);
+    console.log(all_tags);   
+    
+    for(let n in all_tags){
+        let row = all_tags[n];
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        dlg.add_option(row["name"], row["id"]);
+    }    
+
+    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
+    let answer = await dlg.prompt_selected();
+    console.log(" ANSWER = ", answer);
+
+    if(answer == null){ return; }
+
+    // Redirect URL 
+    document.location = `/items?filter=tag-name&A0=${answer["value"]}`;
+}
+
+window["tag_filter_window"] = tag_filter_window;
+
 
 function keypress_return_adapter(funct)
 {

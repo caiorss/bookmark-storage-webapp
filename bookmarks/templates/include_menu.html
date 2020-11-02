@@ -36,7 +36,7 @@
     </a>
 
     {% if page_obj.has_previous %}
-        <a id="page-prev-button" class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
+        <a id="page-prev-button" title="Pagination / List previous items" class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg>
         </a>
     {% else %}
@@ -45,7 +45,7 @@
     {% endif %}
 
     {% if page_obj.has_next %}
-        <a id="page-next-button" class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
+        <a id="page-next-button" title="Pagination / List next items" class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
         </a>
     {% else %}
@@ -116,7 +116,7 @@
             <input class="btn-sm btn-info" type="reset" value="Clear"  onclick="clear_entry_field('#search-entry');">
 
             <!-- Set search mode  -->
-            <select name="mode" title="Select search mode.">
+            <select name="mode" id="search-mode-selector" title="Select search mode.">
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
             </select>        
@@ -132,8 +132,10 @@
 
 <ul>
     
-    <li> <a href="#" class="btn-sm btn-primary" 
-                 onclick="api_item_add(generated_token)" >Quick Add Bookmark</a></li>
+    <li> 
+        <a href="#" class="btn-sm btn-primary" 
+                 onclick="api_item_add(generated_token)" >Quick Add Bookmark</a>
+    </li>
 
     <li>
         <!-- Set search mode  -->
@@ -144,14 +146,11 @@
             <option value="light_mode">Light mode</option>
         </select>        
     </li>
+
+    <li>
+        <a href="#" class="btn-sm btn-primary" 
+           title="Filter bookmark by tag"
+           onclick="tag_filter_window()" >Filter by tag</a>
+    </li>
 </ul>
-
-
-<div id="div-keyboard-status" display="none" class="kdb-status">
-   <ul>
-        <li><span id="keyboard-status" class="kdb-status" >Keyboard Shortcuts Disabled </li>
-        <li>Type 'ESC' (Escape) key to toggle keyboard shortcuts.</li>   
-                
-    </ul>
-</div>
 

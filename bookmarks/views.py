@@ -118,6 +118,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
         self.add_filter("collection", "Collection items",                self.filter_collection)
         self.add_filter("tag-name",   "Filter tag by name",              self.filter_by_tag_name)
+        self.add_filter("created-date", "Filter by created date",        self.filter_by_created_date)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
@@ -158,6 +159,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
             coll_id = self.request.GET.get("A0")
             coll = Collection.objects.get(id = coll_id, owner = self.request.user)
             title = title + " : " + coll.title 
+
+        if view == "tag-name":
+            title = title + " : " + self.request.GET.get("A0")
 
         context["page_title"] = title 
 
@@ -213,8 +217,11 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def filter_by_tag_name(self):
         A0: str = self.request.GET.get("A0")            
         if not A0: return self.empty_query
-        tag: Tag2 = Tag2.objects.get(name = A0, owner = self.request.user)
-        return tag.item.filter(deleted = False)        
+        try:
+            tag: Tag2 = Tag2.objects.get(name = A0, owner = self.request.user)
+            return tag.item.filter(deleted = False)   
+        except Tag2.DoesNotExist:
+            return self.model.objects.none()     
 
     # Url example: /items?filter=doctype&A0=thesis
     def filter_doctype(self):
@@ -248,6 +255,12 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.filter(owner = self.request.user)\
             .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
 
+    def filter_by_created_date(self):
+        created_date: str = self.request.GET.get("A0")
+        filter_type:  str = self.request.GET.get("filter")
+        assert filter_type == "created-date"
+        return self.model.objects.filter(owner = self.request.user, created = created_date)\
+            .exclude(deleted = True ).order_by("id").reverse()
 
 # URL route for adding item through bookmarklet 
 @login_required 
@@ -375,7 +388,7 @@ from urllib.parse import urlparse
 
 @login_required
 def fetch_itemsnapshot(request: WSGIRequest):
-    """ Download file snaphot from bookmark URL and insert it in the database as a blob. """
+    """ Download file snaphot from bookmark URL and store file in cache."""
     redirect_url: str = request.GET.get("url")
     if redirect_url is None or redirect_url == "":
         return django.http.HttpResponseBadRequest("Error: invalid redirection URL.")
@@ -1048,10 +1061,27 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
             tag.item.remove(item)
             tag.save()
-            return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)        
+            return JsonResponse({ "result": "OK", "message": "Item removed from tag. Ok." }, safe = False)       
 
-            
+
+        if action == "delete_tag" :
+            tag_name = body["tag_name"]
+            tag: Tag = Tag2.objects.get(name = tag_name, owner = request.user)    
+            # Remove all items from many-to-many relationship from this tag 
+            for item in tag.item.all():
+                tag.item.remove(item)
+            tag.delete()            
+            return JsonResponse({ "result": "OK", "message": "Tag removed Ok." }, safe = False)       
         
+        if action == "update_tag":
+            tag_name = body["tag_name"]
+            tag_desc = body["tag_desc"]
+            tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)
+            tag.name = tag_name 
+            tag.description = tag_desc
+            tag.save()
+            return JsonResponse({ "result": "OK", "message": "Tag updated Ok." }, safe = False)       
+
         return JsonResponse({ "result": "ERROR", "message": "Action not valid for this case." }, safe = False)        
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
