@@ -1005,6 +1005,37 @@ function search_bookmarks()
 
 window["search_bookmarks"] = search_bookmarks;
 
+async function tag_filter_window()
+{
+    let dlg = new Dialog_Datalist_Prompt();
+    dlg.setTitle("Select a tag");    
+    // dlg.setInputText(last_input.get());
+
+    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let token = window["generated_token"];
+    let all_tags = await utils.ajax_get("/api/tags", token);
+    console.log(all_tags);   
+    
+    for(let n in all_tags){
+        let row = all_tags[n];
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        dlg.add_option(row["name"], row["id"]);
+    }    
+
+    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
+    let answer = await dlg.prompt_selected();
+    console.log(" ANSWER = ", answer);
+
+    if(answer == null){ return; }
+
+    // Redirect URL 
+    document.location = `/items?filter=tag-name&A0=${answer["value"]}`;
+}
+
+window["tag_filter_window"] = tag_filter_window;
+
+
 function keypress_return_adapter(funct)
 {
     //console.log(" [TRACE] Install function");

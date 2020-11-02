@@ -132,8 +132,10 @@
 
 <ul>
     
-    <li> <a href="#" class="btn-sm btn-primary" 
-                 onclick="api_item_add(generated_token)" >Quick Add Bookmark</a></li>
+    <li> 
+        <a href="#" class="btn-sm btn-primary" 
+                 onclick="api_item_add(generated_token)" >Quick Add Bookmark</a>
+    </li>
 
     <li>
         <!-- Set search mode  -->
@@ -144,14 +146,11 @@
             <option value="light_mode">Light mode</option>
         </select>        
     </li>
+
+    <li>
+        <a href="#" class="btn-sm btn-primary" 
+           title="Filter bookmark by tag"
+           onclick="tag_filter_window()" >Filter by tag</a>
+    </li>
 </ul>
-
-
-<div id="div-keyboard-status" display="none" class="kdb-status">
-   <ul>
-        <li><span id="keyboard-status" class="kdb-status" >Keyboard Shortcuts Disabled </li>
-        <li>Type 'ESC' (Escape) key to toggle keyboard shortcuts.</li>   
-                
-    </ul>
-</div>
 

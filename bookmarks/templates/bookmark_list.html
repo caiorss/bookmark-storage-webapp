@@ -84,8 +84,8 @@
 
             {% for tag in bookmark.tag2_set.all %}
               <!-- Button for removing tag from element. -->
-                <a class="tag-remove-button" href="#" 
-                   onclick="tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                <a class="tag-remove-button" 
+                   href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
                    title="Remove tag '{{ tag.name }}' from bookmark."
                 >[X]</a>
 
