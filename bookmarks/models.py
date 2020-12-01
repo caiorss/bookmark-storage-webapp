@@ -352,6 +352,11 @@ class SiteBookmark(models.Model):
             return  s 
         return None 
 
+    def snapshot_is_pdf(self) -> bool:
+        sn: ManyRelatedManager = self.filesnapshot_set.first()        
+        if sn is None: return False 
+        return sn.fileMimeType == "application/pdf"
+
 
 class Tag(models.Model):
     name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")

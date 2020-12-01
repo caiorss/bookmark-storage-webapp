@@ -52,6 +52,10 @@ RUN python3 manage.py initadmin
 # Persistence of database (SQLite3) and user downloaded files.
 ### VOLUME [ "/app/data" ]
 
+# Download pdf2htmlEx application (AppImage release) for exporting 
+# html to PDF
+ADD https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage data/pdf2htmlEx.bin
+
 EXPOSE 9000:9000
 
 ENTRYPOINT ["python3", "/app/manage.py", "runserver", "0.0.0.0:9000"]

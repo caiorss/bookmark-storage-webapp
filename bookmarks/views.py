@@ -411,7 +411,16 @@ def fetch_itemsnapshot(request: WSGIRequest):
 
 @login_required
 def get_snapshot_file(request: WSGIRequest, fileID, fileName):
-    """Download bookmark's file snapshot (attachment) from the database. """
+    """Download bookmark's file snapshot (attachment) from the database. 
+       
+       Endpoint URL: /snapshot/file/<fileID>/<fileName>
+       Where: 
+           - fileID - is the file unique ID (UUID)
+           - fileName - is the file name.
+
+       The URL was designed in this way for obfuscating file URLs
+       and avoiding viewers from guessing the URLs.
+    """
     from django.utils.text import slugify
 
     # sn: ItemSnapshot = ds.get_object_or_404(ItemSnapshot, id = fileID)
@@ -558,6 +567,37 @@ def rest_bulk_action(request: WSGIRequest):
     return JsonResponse({  "result": "OK"
                          , "data":    body })
 
+
+#  Route: /pdf2html/<<uuid>>/<<fileName>>
+# 
+@login_required
+def pdf2hml(request: WSGIRequest, fileUUID, fileName):
+    import subprocess
+    sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileUUID)
+    data_dir:   str = os.path.join(django.conf.settings.BASE_DIR, "data")
+    cache_dir:  str = os.path.join(data_dir,"pdf2html-cache")
+    if not os.path.exists(cache_dir): os.makedirs(cache_dir)    
+    pdf2hml_bin: str = os.path.join(data_dir, "pdf2htmlEx.bin")
+    assert os.path.exists(pdf2hml_bin), f"pdf2html executable supposed to be in ${data_dir}"    
+    
+    html_file: str = os.path.join(cache_dir, f"{fileUUID}.html")
+    print(f" [TRACE] html_file = {html_file} \n file = {sn.getFilePath()}")
+
+    if not os.path.exists( html_file ):
+        print(f" [TRACE] HTML snapshot of file: ${fileUUID} does not exist yet ")
+        print(" [TRACE] Creating file snapshot with pdf2html")
+
+        proc = subprocess.run([   pdf2hml_bin
+                                , sn.getFilePath()
+                                , os.path.basename(html_file)
+                                , "--dest-dir=" + cache_dir])
+        #print(" Type(proc) ", type(proc))
+        #status = proc.wait()
+        #if status != 0:
+        #    return Http404("Error: pdf2thml snapshot application failed.")
+        
+    with open(html_file, "rb") as fd:
+        return HttpResponse(fd, content_type = "text/html")   
 
 
 class BookmarkCreate(LoginRequiredMixin, CreateView):
