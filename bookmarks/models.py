@@ -352,9 +352,17 @@ class SiteBookmark(models.Model):
             return  s 
         return None 
 
+    def snapshot_id(self):
+        # print(" =>>> Here ")
+        sn: ManyRelatedManager = self.filesnapshot_set.first()        
+        if sn is not None: 
+            return str(sn.id)
+        return None 
+
     def snapshot_is_pdf(self) -> bool:
         sn: ManyRelatedManager = self.filesnapshot_set.first()        
-        if sn is None: return False 
+        if sn is None: 
+            return False        
         return sn.fileMimeType == "application/pdf"
 
 
@@ -450,7 +458,7 @@ class FileSnapshot(models.Model):
     fileName = models.CharField(max_length=5000)
     # File hash = > Contains crypto-hash signature MD5SUM 
     fileHash = models.CharField(max_length=100, unique = True)
-    # Contains file media type 
+    # Contains file media type []
     fileMimeType = models.CharField(max_length=100)
 
     @staticmethod
@@ -476,6 +484,9 @@ class FileSnapshot(models.Model):
         # Create snapshot file 
         with open(file_path, 'wb') as f:
             f.write(df.fileData)
+
+    def is_pdf(self):
+        return self.fileMimeType == "application/pdf"
     
     def getFilePath(self):
         media_dir: str = django.conf.settings.MEDIA_ROOT 

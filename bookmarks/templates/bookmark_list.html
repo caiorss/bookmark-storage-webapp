@@ -87,11 +87,11 @@
              {% endif %}          
              
              {% if  bookmark.snapshot_is_pdf %}
-             <a target="_blank" title="View PDF as html" 
-                href="/pdf2html/{{ bookmark.snapshot_file }}"
-              >            
-              <img src="/static/icon-download-item.png"> 
-            </a>                                                             
+              <a target="_blank" title="View PDF in the web browser" 
+                  href="/pdf2html/{{ bookmark.snapshot_file }}"
+                >            
+                <img src="/static/icon-download-item.png"> 
+              </a>                                                             
            {% endif %} 
 
             <br/></br>
@@ -258,7 +258,16 @@
             {% if bookmark.is_youtube_video %}
               <youtube-thumb video="{{ bookmark.youtube_id }}"></youtube-thumb>              
             {% endif %}
-        </div>                            
+
+
+            {% if  bookmark.snapshot_is_pdf %}
+                <img src="/thumbnail/{{ bookmark.snapshot_id }}" >            
+            {% endif %} 
+
+        </div>        
+        
+        
+
     {% endfor %}
     
 
