@@ -675,14 +675,17 @@ async function api_item_add(crfs_token)
             utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
                 if(res["result"] == "OK"){
                     let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
-                    location.reload();
+                    utils.dom_page_refresh();
                 } else {
-                    Dialog_Notify.notify("Error", "Error: Bookmark already exists.", 2000);
+                    Dialog_Notify.notify("Error", "Error 1: Bookmark already exists.", 2000);
                     //dialog_notify.notify("Error: bookmark already exists", 2000);
+                    console.error("Error: bookmark already exists");
+                    document.location.href = `/items?filter=search&query=${url}`;
                 }
         
             }).catch(err => { 
-                Dialog_Notify.notify("Error: " + err);
+                console.log("Error: item already exists. [2]");
+                Dialog_Notify.notify("Error: " + err);                
             });
 
             return;
@@ -696,6 +699,7 @@ async function api_item_add(crfs_token)
                 location.reload();
             } else {
                 Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
+                document.location.href = `/items?filter=search&query=${url}`;
             }
 
         });

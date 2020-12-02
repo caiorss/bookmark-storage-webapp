@@ -71,6 +71,11 @@ export function dom_page_refresh()
     document.location.reload(true);
 }
 
+/** Redirect URL */
+export function dom_redirect_url(url)
+{
+    document.location.href = url;
+}
 
 /** Wrapper function to document.querySelectorAll, but returns array instead of NodeList. 
  * 

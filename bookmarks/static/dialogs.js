@@ -203,6 +203,10 @@ export class Dialog_Basic extends HTMLElement
         anchor.appendChild(button);
     }
 
+    getSubmitButton(){
+        return this.node.querySelector("#btn-submit");
+    }
+
 
 } // ---- Dialog_Basic class ---------------// 
 
@@ -408,7 +412,15 @@ export class Dialog_Datalist_Prompt extends Dialog_Basic
         this.addButton("Clear", () => { 
             console.log("Text cleared Ok. ");
             this._input.value = ""; 
-        })
+        });
+
+        this._input.addEventListener("keypress", (event) => {
+            // User hit RETURN
+            if(event.keyCode == 13){
+                console.log(" [INFO] User hit RETURN key");
+                this.getSubmitButton().click();
+            }
+        });
     }
 
 

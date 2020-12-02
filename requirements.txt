@@ -2,4 +2,5 @@ Django #>=2.2,<2.3
 # from bs4 import BeautifulSoup - html web scrapping
 bs4
 django-pdb
+djangorestframework
 pypdf2

@@ -28,6 +28,8 @@ urlpatterns = [
   #,path("snapshot/get", views.fetch_itemsnapshot)
   
   ,path("snapshot/file/<fileID>/<fileName>", views.get_snapshot_file)
+  ,path("pdf2html/<fileUUID>/<fileName>", views.pdf2hml)
+  ,path("thumbnail/<fileUUID>", views.document_thumbnail)
 
   ,path('options/video_toggle', views.video_toggle, name='options_video_toggle')
   # ----------------------------------------------------#

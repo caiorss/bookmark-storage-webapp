@@ -16,3 +16,4 @@ files/*
 *.log
 *-back-*
 db.sqlite3-*
+data/*
