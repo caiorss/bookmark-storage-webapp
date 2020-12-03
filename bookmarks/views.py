@@ -132,7 +132,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.filter_latest()
 
     # Return context data dictionary to the rendered template 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):        
+        # Context variable is a dictionary which contains the variables
+        # visible in the Django template files 
         context = super(BookmarksList, self).get_context_data(**kwargs)
         assert context is not None 
         print(f" Trace = { self.context_object_name }")
@@ -196,8 +198,20 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
     # Select only user marked (starred, favourite) bookmarks
     def filter_starred(self):
-        return self.model.objects.filter(starred = True).exclude(deleted = True)\
-            .filter(owner = self.request.user).order_by("id").reverse()    
+        query = self.model.objects.filter(starred = True).exclude(deleted = True)\
+            .filter(owner = self.request.user)
+        order: str = self.request.GET.get("order") or "last"        
+
+        if order == "first":
+            return query.order_by("id")
+        
+        if order == "last":
+            return query.order_by("id").reverse()  
+        
+        if order == "last-modified":
+            return query.order_by("-updated").reverse()
+
+        return  query.order_by("id").reverse()  
     
     def filter_removed(self):        
         return self.model.objects.filter(deleted = True)\
@@ -815,7 +829,11 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         
         if (not item_id) and (not title):
             return Http404("Error: invalid request")
-        item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)
+        
+        try:
+            item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)    
+        except SiteBookmark.DoesNotExist:
+            item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = None)    
         
         if action == "rename":
             title: str = body["title"]
