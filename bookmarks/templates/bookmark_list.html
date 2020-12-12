@@ -10,25 +10,33 @@
 
     {% for bookmark in object_list %}
         <div class = "well item item_div" value="{{ bookmark.id}}">   
-
+           
             <h5>  
-        
-                 <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" />                  
 
+                <!-- Checkbox for bulk operations -->
+                 <input type="checkbox" class="bulk-checkbox" id="{{ bookmark.id }}" />                                             
+
+                <!-- SVG square icon -->
+                 <svg class = "box1" xmlns="http://www.w3.org/2000/svg" 
+                      width="1.2rem" height="1.2rem" background="blue" viewBox="0 0 16 16" 
+                      focusable="false" aria-hidden="true">
+                      <path class="stroke-linecap-square" d="M10 2h4v4">
+                      </path><path d="M6 10l8-8"></path>
+                      <path class="stroke-linejoin-round" d="M14 9.048V14H2V2h5">
+                      </path>
+                 </svg>
+             
+                 <!-- Bookmark that selects only this item. -->
+                 <a href="/items?filter=id&A0={{ bookmark.id }}">( {{ bookmark.id }} )</a>
+
+                  <!-- Favicon - Icon related to the website. -->
+                  {{  bookmark.favicon | safe }}
+
+                  <!-- Bookmark main link -->
                   <a  class="item-bookmark-link"
                       target='_blank' 
                       title="{{bookmark.brief}}" 
-                      href="{{ bookmark.url }}"> 
-                      <svg class = "box1" xmlns="http://www.w3.org/2000/svg" 
-                          width="1.2rem" height="1.2rem" background="blue" viewBox="0 0 16 16" 
-                          focusable="false" aria-hidden="true">
-                          <path class="stroke-linecap-square" d="M10 2h4v4">
-                          </path><path d="M6 10l8-8"></path>
-                          <path class="stroke-linejoin-round" d="M14 9.048V14H2V2h5">
-                          </path>
-                      </svg>
-                      
-                      {{  bookmark.favicon | safe }}
+                      href="{{ bookmark.url }}" >                       
 
                       {{ bookmark.modified_title | default:bookmark.url }}                                                                        
                   </a>                  
@@ -97,23 +105,26 @@
 
             <strong>Tags:</strong>
 
-            {% for tag in bookmark.tag2_set.all %}
-              <!-- Button for removing tag from element. -->
-                <a class="tag-remove-button" 
-                   href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
-                   title="Remove tag '{{ tag.name }}' from bookmark."
-                >[X]</a>
+            <lu>
+                {% for tag in bookmark.tag2_set.all %}
+                <li>
+                    <!-- Button for removing tag from element. -->
+                    <a class="tag-remove-button" 
+                        href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                        title="Remove tag '{{ tag.name }}' from bookmark."
+                    >[X]</a>
 
-              <!-- Button for Editing tag -->
-              <a class="tag-remove-button" 
-                   href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
-                   title="Update/Edit tag '{{ tag.name }}' from bookmark."
-                >[E]</a>
+                  <!-- Button for Editing tag -->
+                  <a class="tag-remove-button" 
+                        href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                        title="Update/Edit tag '{{ tag.name }}' from bookmark."
+                    >[E]</a>
 
-                <!-- Button for filtering all bookmarks with this tag. -->
-                <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
-            {% endfor %}
-            
+                    <!-- Button for filtering all bookmarks with this tag. -->
+                    <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+                </li>
+                {% endfor %}
+            </lu>            
 
             <table class="action-menu-table" 
                    id="action-menu-{{ bookmark.id }}" 
