@@ -7,6 +7,10 @@
 #FROM python:3.7-alpine
 FROM ubuntu
 
+# Don't show any interactive prompt.
+
+ARG DEBIAN_FRONTEND=noninteractive
+
 #------------- Dependencies ----------------------------#
 
 # Create a group and user to run our app
@@ -18,10 +22,20 @@ FROM ubuntu
 #     ca-certificates gcc postgresql-dev linux-headers musl-dev \
 #     libffi-dev jpeg-dev zlib-dev
 
-RUN apt-get update
-
-RUN apt-get install -y python3 python3-pip && \
+RUN apt-get update                                               && \
+    apt-get install -y python3 python3-pip                       && \
+    apt-get install -y imagemagick                               && \
     apt-get install -y --no-install-recommends postgresql-client
+
+# Persistence of database (SQLite3) and user downloaded files.
+### VOLUME [ "/app/data" ]
+
+ENV ENV_PDF2HTML_PATH /bin/pdf2htmlEx.bin
+ARG PDF2THML_URL=https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage
+
+# Download pdf2htmlEx application (AppImage release) for exporting html to PDF
+ADD $PDF2THML_URL $ENV_PDF2HTML_PATH
+RUN chmod +x $ENV_PDF2HTML_PATH
 
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -49,12 +63,6 @@ RUN python3 manage.py makemigrations \
 # It can be changed later by accessing: http://localhost:9000/admin
 RUN python3 manage.py initadmin 
 
-# Persistence of database (SQLite3) and user downloaded files.
-### VOLUME [ "/app/data" ]
-
-# Download pdf2htmlEx application (AppImage release) for exporting 
-# html to PDF
-ADD https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage data/pdf2htmlEx.bin
 
 EXPOSE 9000:9000
 
