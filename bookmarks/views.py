@@ -109,17 +109,17 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         # ---------- Set callbacks ------------#   
     def start(self):
-        self.add_filter("id",         "Select single item by ID",        self.filter_by_id)
-        self.add_filter("latest",     "Listing items by newest added",   self.filter_latest)
-        self.add_filter("oldest",     "Listing items by oldest added",   self.filter_oldest)
-        self.add_filter("starred",    "Starred items",                   self.filter_starred)
-        self.add_filter("removed",    "Removed items",                   self.filter_removed)
-        self.add_filter("doctype",    "Items fitered by type",           self.filter_doctype)
-        self.add_filter("search",     "Search results",                  self.filter_search)
-        self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
-        self.add_filter("collection", "Collection items",                self.filter_collection)
-        self.add_filter("tag-name",   "Filter tag by name",              self.filter_by_tag_name)
-        self.add_filter("created-date", "Filter by created date",        self.filter_by_created_date)
+        self.add_filter("id",           "Select single item by ID",        self.filter_by_id)
+        self.add_filter("latest",       "Listing items by newest added",   self.filter_latest)
+        self.add_filter("oldest",       "Listing items by oldest added",   self.filter_oldest)
+        self.add_filter("starred",      "Starred items",                   self.filter_starred)
+        self.add_filter("removed",      "Removed items",                   self.filter_removed)
+        self.add_filter("doctype",      "Items fitered by type",           self.filter_doctype)
+        self.add_filter("search",       "Search results",                  self.filter_search)
+        self.add_filter("domain",       "Items filtered by domain",        self.filter_domain)
+        self.add_filter("collection",   "Collection items",                self.filter_collection)
+        self.add_filter("tag-name",     "Filter tag by name",              self.filter_by_tag_name)
+        self.add_filter("created-date", "Filter by created date",          self.filter_by_created_date)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
