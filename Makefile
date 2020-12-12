@@ -47,8 +47,9 @@ docker-run1:
 
 # Bind ${CURRRENT_PROJECT_DIR}/data to /app/data in the container.
 docker-run2:
-	docker volume create django-server-volume
-	docker run --detach  \
+	# Remove container if it already exists.
+	docker rm -f django-server \
+	|| docker run --detach  \
 		-p 9000:9000 \
 		-v $(shell pwd)/data:/app/data \
 		--name django-server \
