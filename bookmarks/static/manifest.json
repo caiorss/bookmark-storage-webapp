@@ -1,0 +1,18 @@
+{
+  "lang": "en",
+  "dir": "ltr",
+  "name": "Super Racer 3000",
+  "short_name": "Racer3K",
+  "icons": [
+   {
+      "src": "static/images/favicon.png",
+      "sizes": "64x64"
+    }
+ ],
+  "scope": "/",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "theme_color": "aliceblue",
+  "background_color": "red"
+}

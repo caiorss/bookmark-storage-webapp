@@ -24,13 +24,19 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update                                               && \
     apt-get install -y python3 python3-pip                       && \
-    apt-get install -y imagemagick p7zip-full                    && \
+    apt-get install -y imagemagick                               && \
     apt-get install -y --no-install-recommends postgresql-client
 
 # Persistence of database (SQLite3) and user downloaded files.
 ### VOLUME [ "/app/data" ]
 
-# Clean package cache for saving disk space
+ENV ENV_PDF2HTML_PATH /bin/pdf2htmlEx.bin
+ARG PDF2THML_URL=https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage
+
+# Download pdf2htmlEx application (AppImage release) for exporting html to PDF
+ADD $PDF2THML_URL $ENV_PDF2HTML_PATH
+RUN chmod +x $ENV_PDF2HTML_PATH
+
 RUN rm -rf /var/lib/apt/lists/*
 
 #================== Install Pdf2hmlEx =====================#
@@ -85,7 +91,6 @@ ADD image-magic-policy.xml /etc/ImageMagick-6/policy.xml
 #
 # It can be changed later by accessing: http://localhost:9000/admin
 RUN cd /app && pipenv run ./manage.py initadmin
-
 
 
 
