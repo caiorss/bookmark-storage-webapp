@@ -65,7 +65,7 @@ docker-run2:
 	# Remove container if it already exists.
 	docker rm -f django-server \
 	|| docker run --detach  \
-		-p 9000:9020 \
+		-p 9000:9000 \
 		-v $(shell pwd)/data:/app/data \
 		--name django-server \
 		--restart=always \
