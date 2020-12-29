@@ -142,13 +142,11 @@ class SiteBookmark(models.Model):
     doctype = models.CharField(max_length=80, choices = DocumentType.choices, default = DocumentType.webpage
                              , verbose_name = "Type")
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
+    
+    created = models.DateTimeField(editable = False, auto_now_add = True, null = True)
+    updated = models.DateTimeField(editable = False, auto_now = True, null = True)
 
-    # Set field only when instance is created
-    created = models.DateField(editable = False, auto_now_add = True, null = True)
-    # Set field only when instance is changed
-    updated = models.DateField(editable = False, auto_now = True, null = True)
-
-    # User to which the collection belongs to
+    # User to which the collection belongs to   
     owner = models.ForeignKey(Account, editable = True, on_delete=models.PROTECT)
 
     # Databasse constraint for this table requires a unique pair (name, owner). 
