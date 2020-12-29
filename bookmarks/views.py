@@ -125,15 +125,40 @@ class BookmarksList(LoginRequiredMixin, ListView):
     def add_filter(self, view: str, title: str, callback):
         self.filter_dispatch[view] = BookMarkFilter(view = view, title = title, callback = callback)
 
-    # Determines the query 
-    def get_queryset(self):
+    def order_query(self, query: QuerySet) -> QuerySet:
+        ORDER_BY_NEWEST = "new"       # Order items by newest added (by id)
+        ORDER_BY_OLDEST = "old"       # Order items by oldest added (by id)
+        ORDER_BY_UPDATE = "updated"   # Order items by last updated 
+        order: str = self.request.GET.get("order") or ORDER_BY_NEWEST
+        print(" [TRACE] ORDER = ", order)
+
+        if order == ORDER_BY_NEWEST:
+            print(" [TRACE] Order by newest")
+            return query.order_by("id").reverse()
+        elif order == ORDER_BY_OLDEST:
+            print(" [TRACE] Order by oldest")
+            return query.order_by("id")
+        elif order == ORDER_BY_UPDATE:
+            print(" [TRACE] Order by last update")
+            return query.order_by("updated").reverse()
+        else:
+            # Default: ORDER_BY_NEWEST
+            return query.order_by("id").reverse()
+
+    # Determines the query => Called before get_context_data()
+    def get_queryset(self) -> QuerySet:
+        print(" [TRACE] get_queryset() called. Ok. ")
         filter_: str = self.request.GET.get("filter", "")                
+        query: QuerySet = self.empty_query
         if filter_ in self.filter_dispatch.keys():            
-            return self.filter_dispatch[filter_].callback()                     
-        return self.filter_latest()
+            query = self.filter_dispatch[filter_].callback() 
+        else:                    
+            query = self.filter_latest()
+        return self.order_query( query )
 
     # Return context data dictionary to the rendered template 
     def get_context_data(self, **kwargs):        
+        print(" [TRACE] get_context_data() called. Ok. ")
         # Context variable is a dictionary which contains the variables
         # visible in the Django template files 
         context = super(BookmarksList, self).get_context_data(**kwargs)
@@ -193,32 +218,21 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
     def filter_latest(self):
         user: AbstractBaseUser = self.request.user         
-        if user.is_anonymous:
-            return self.model.objects.exclude(deleted = True)\
-                       .order_by("id").reverse()
-
-        return self.model.objects.exclude(deleted = True)\
-                   .filter(owner = self.request.user).order_by("id").reverse()
+        order: str = self.request.GET.get("order") or "last"  
+        query = self.model.objects\
+            .filter(owner = self.request.user)\
+            .exclude(deleted = True)
+        return query 
 
     def filter_oldest(self):
         return self.model.objects.filter(owner = self.request.user, deleted = False).order_by("id")
 
     # Select only user marked (starred, favourite) bookmarks
     def filter_starred(self):
-        query = self.model.objects.filter(starred = True).exclude(deleted = True)\
+        query: QuerySet = self.model.objects.filter(starred = True).exclude(deleted = True)\
             .filter(owner = self.request.user)
         order: str = self.request.GET.get("order") or "last"        
-
-        if order == "first":
-            return query.order_by("id")
-        
-        if order == "last":
-            return query.order_by("id").reverse()  
-        
-        if order == "last-modified":
-            return query.order_by("-updated").reverse()
-
-        return  query.order_by("id").reverse()  
+        return  query
     
     def filter_removed(self):        
         return self.model.objects.filter(deleted = True)\
