@@ -110,8 +110,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # ---------- Set callbacks ------------#   
     def start(self):
         self.add_filter("id",           "Select single item by ID",        self.filter_by_id)
-        self.add_filter("latest",       "Listing items by newest added",   self.filter_latest)
-        self.add_filter("oldest",       "Listing items by oldest added",   self.filter_oldest)
+        self.add_filter("all",          "Listing items by newest added",   self.filter_all)
         self.add_filter("starred",      "Starred items",                   self.filter_starred)
         self.add_filter("removed",      "Removed items",                   self.filter_removed)
         self.add_filter("doctype",      "Items fitered by type",           self.filter_doctype)
@@ -153,7 +152,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if filter_ in self.filter_dispatch.keys():            
             query = self.filter_dispatch[filter_].callback() 
         else:                    
-            query = self.filter_latest()
+            query = self.filter_all()
         return self.order_query( query )
 
     # Return context data dictionary to the rendered template 
@@ -167,11 +166,12 @@ class BookmarksList(LoginRequiredMixin, ListView):
         query: QuerySet = context[self.context_object_name]
         assert query is not None 
        
-        url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}"\
-            .format( filter = self.request.GET.get("filter") or ""
-                    ,A0     = self.request.GET.get("A0")   or ""
-                    ,query  = urllib.parse.quote(self.request.GET.get("query") or "")
-                    ,mode   = self.request.GET.get("mode") or ""
+        url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}&order={order}"\
+            .format(  filter = self.request.GET.get("filter") or ""
+                    , A0     = self.request.GET.get("A0")   or ""
+                    , query  = urllib.parse.quote(self.request.GET.get("query") or "")
+                    , mode   = self.request.GET.get("mode") or ""
+                    , order  = self.request.GET.get("order") or ""
                     )   
         print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
         
@@ -216,7 +216,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.exclude(deleted = True)\
             .filter( owner = user, id = A0)
 
-    def filter_latest(self):
+    def filter_all(self):
         user: AbstractBaseUser = self.request.user         
         order: str = self.request.GET.get("order") or "last"  
         query = self.model.objects\
@@ -224,8 +224,6 @@ class BookmarksList(LoginRequiredMixin, ListView):
             .exclude(deleted = True)
         return query 
 
-    def filter_oldest(self):
-        return self.model.objects.filter(owner = self.request.user, deleted = False).order_by("id")
 
     # Select only user marked (starred, favourite) bookmarks
     def filter_starred(self):
