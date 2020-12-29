@@ -44,8 +44,11 @@
             
             <ul>
               <li>                  
-                  <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
+                  Domain: <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
                     title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a>
+              </li>
+              <li>
+                Update time: {{ bookmark.updated }}
               </li>
               <li>
                   Starred: 
@@ -70,11 +73,12 @@
                 title="Actions for current bookmark" 
                 href="javascript:toggle_action_menu('#action-menu-{{ bookmark.id }}')">Actions</a>
 
+                <!-- Button for toggling details -->
                 <a class="btn-sm btn-primary btn-toggle-details" 
                     href="javascript:toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" 
                     >Details</a>
 
-              
+                <!-- Button for adding new tags -->
                 <a class="btn-sm btn-primary btn-toggle-details" 
                     href="javascript:tag_add( {{ bookmark.id }} );" 
                     >Add tag</a>
