@@ -132,13 +132,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
         print(" [TRACE] ORDER = ", order)
 
         if order == ORDER_BY_NEWEST:
-            print(" [TRACE] Order by newest")
+            ## print(" [TRACE] Order by newest")
             return query.order_by("id").reverse()
         elif order == ORDER_BY_OLDEST:
-            print(" [TRACE] Order by oldest")
+            ## print(" [TRACE] Order by oldest")
             return query.order_by("id")
         elif order == ORDER_BY_UPDATE:
-            print(" [TRACE] Order by last update")
+            ## print(" [TRACE] Order by last update")
             return query.order_by("updated").reverse()
         else:
             # Default: ORDER_BY_NEWEST
@@ -146,7 +146,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
     # Determines the query => Called before get_context_data()
     def get_queryset(self) -> QuerySet:
-        print(" [TRACE] get_queryset() called. Ok. ")
+        ## print(" [TRACE] get_queryset() called. Ok. ")
         filter_: str = self.request.GET.get("filter", "")                
         query: QuerySet = self.empty_query
         if filter_ in self.filter_dispatch.keys():            
@@ -162,7 +162,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # visible in the Django template files 
         context = super(BookmarksList, self).get_context_data(**kwargs)
         assert context is not None 
-        print(f" Trace = { self.context_object_name }")
+        ## print(f" Trace = { self.context_object_name }")
         query: QuerySet = context[self.context_object_name]
         assert query is not None 
        
@@ -173,10 +173,10 @@ class BookmarksList(LoginRequiredMixin, ListView):
                     , mode   = self.request.GET.get("mode") or ""
                     , order  = self.request.GET.get("order") or ""
                     )   
-        print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
+        ## print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
         
         view = self.request.GET.get("filter") or "null"
-        print(f" [TRACE] get_context_data() =>> view = {view}")
+        ## print(f" [TRACE] get_context_data() =>> view = {view}")
 
         title = (self.filter_dispatch.get(view) or self.null_view).title 
         
@@ -244,7 +244,6 @@ class BookmarksList(LoginRequiredMixin, ListView):
         d = A0.strip("www.").strip("m.").strip("old.").strip("mobile.")
         return self.model.objects.filter(url__contains = d)\
                    .exclude(deleted = True).filter(owner = self.request.user)\
-                   .order_by("id").reverse()
 
     # Url example: /items?filter=tag-name&A0=tag1,tag2,...,tagn
     def filter_by_tag_name(self):
@@ -263,13 +262,12 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if not A0: return self.empty_query
         return self.model.objects.filter(doctype = A0)\
                    .exclude(deleted = True)\
-                   .filter(owner = self.request.user).order_by("id").reverse()
+                   .filter(owner = self.request.user)
 
     def filter_collection(self):
         coll_id: int = self.query_param_as_int("A0")
         c: Collection = ds.get_object_or_404(Collection, id = coll_id)
-        return c.item.all().order_by("id").reverse() 
-        #.order_by("link_to_items").reverse()
+        return c.item.all()        
 
     def filter_search(self):
         search = self.request.GET.get('query')
@@ -294,7 +292,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         filter_type:  str = self.request.GET.get("filter")
         assert filter_type == "created-date"
         return self.model.objects.filter(owner = self.request.user, created = created_date)\
-            .exclude(deleted = True ).order_by("id").reverse()
+            .exclude(deleted = True )
 
 # URL route for adding item through bookmarklet 
 @login_required 
