@@ -285,8 +285,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # q = Q(title__contains =   search) | Q(url__contains =  search)       
         q1 = reduce(lam, [ Q(url__contains=w) for w in words])
         q2 = reduce(lam, [ Q(title__contains=w) for w in words])
-        return self.model.objects.filter(owner = self.request.user)\
-            .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
+        return self.model.objects\
+            .filter(owner = self.request.user)\
+            .filter(q1 | q2).exclude( deleted = True )
 
     def filter_by_created_date(self):
         created_date: str = self.request.GET.get("A0")
