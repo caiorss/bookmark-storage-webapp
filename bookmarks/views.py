@@ -334,6 +334,20 @@ def update_item_from_metadata(itemID: int) -> None:
     # URL with obfuscation removed 
     real_url: str = dutils.remove_url_obfuscation(b.url)
     print(f" [TRACE] real_url = { real_url }")    
+    
+    import urllib
+    from urllib.parse import urlparse 
+    url_obj: urllib.parse.ParseResult = urlparse(real_url)
+    domain  = url_obj.hostname
+
+    if domain == "wikipedia.org" or domain == "en.m.wikipedia.org":
+        import wikipedia
+        guess_title = url_obj.path.strip("/wiki")
+        page: wikipedia.wikipedia.WikipediaPage = wikipedia.page(guess_title)
+        b.title = page.original_title
+        b.brief = page.summary
+        b.save()
+        return 
 
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
@@ -353,8 +367,8 @@ def update_item_from_metadata(itemID: int) -> None:
         page = urllib.request.urlopen(req, timeout = 4)
         #page = urllib.request.urlopen(b.url)
     except (urllib.error.URLError, socket.timeout) as ex:          
-        return django.http.HttpResponseBadRequest("Error: Exception = {}".format(ex))        
-    
+        return 
+
     info = page.info()
 
     if "pdf" in info.get_content_type():
