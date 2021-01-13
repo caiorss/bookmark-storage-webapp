@@ -72,8 +72,8 @@ RUN cd /app && pipenv run ./manage.py initadmin
 ARG PDF2THML_URL=https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage
 
 RUN mkdir -p /opt
-ADD ./pdf2hmlEx.sh /opt
-RUN chmod +x /opt/pdf2hmlEx.sh
+ADD ./pdf2html.sh /opt
+RUN chmod +x /opt/pdf2html.sh
 
 # Download pdf2htmlEx application (AppImage release) for exporting html to PDF
 ADD $PDF2THML_URL /opt/pdf2html.bin
@@ -81,13 +81,12 @@ ADD $PDF2THML_URL /opt/pdf2html.bin
 RUN cd /opt && 7z x /opt/pdf2html.bin
 RUN chmod +x /opt/usr/bin/pdf2htmlEX
 
-ENV ENV_PDF2HTML_PATH /opt/pdf2hmlEx.sh
-          # /opt/usr/bin/pdf2htmlEX
+ENV ENV_PDF2HTML_PATH /opt/usr/bin/pdf2htmlEX
 
    #==============================#
    # Container initialization     #
    #==============================#
-
+ENV APP_PORT 9000
 EXPOSE 9000:9000
 
-ENTRYPOINT ["pipenv", "run", "/app/manage.py", "runserver", "0.0.0.0:9000"]
+ENTRYPOINT ["pipenv", "run", "/app/manage.py", "runserver", "0.0.0.0:$APP_PORT"]
