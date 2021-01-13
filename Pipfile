@@ -16,6 +16,7 @@ django-pdb = "*"
 pypdf2  = "*"
 djangorestframework = "*"
 pylint-django = "*"
+uwsgi = "*"
 
 [requires]
 python_version = "*"
