@@ -342,12 +342,15 @@ def update_item_from_metadata(itemID: int) -> None:
 
     if domain == "wikipedia.org" or domain == "en.m.wikipedia.org":
         import wikipedia
-        guess_title = url_obj.path.strip("/wiki")
-        page: wikipedia.wikipedia.WikipediaPage = wikipedia.page(guess_title)
-        b.title = page.original_title
-        b.brief = page.summary
-        b.save()
-        return 
+        try:
+            guess_title = url_obj.path.strip("/wiki")
+            page: wikipedia.wikipedia.WikipediaPage = wikipedia.page(guess_title)
+            b.title = page.original_title
+            b.brief = page.summary
+            b.save()            
+            return 
+        except wikipedia.exceptions.PageError:
+            pass        
 
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
@@ -827,22 +830,76 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         """Create new bookmark entry in the database."""
         body_unicode = request.body.decode("utf-8")
         body         = json.loads(body_unicode)
-        url:  str    = body["url"]
-        url_: str    = dutils.remove_url_obfuscation(url)            
-        assert url_ is not None 
-        # Current logged user 
+        action = body["action"]
         user: AbstractBaseUser = request.user
-        try:
-            # Check whether URL already exists in the database         
-            it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
-            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
-        except SiteBookmark.DoesNotExist:
-            pass         
-        item = SiteBookmark.objects.create(url = url_, owner = user)
-        item.starred = body.get("starred") or False 
-        item.save()
-        update_item_from_metadata(item.id)
+        print(" [TRACE] Request received ")
+
+        if action == "item_new":
+            url:  str    = body["url"]
+            url_: str    = dutils.remove_url_obfuscation(url)            
+            assert url_ is not None 
+            # Current logged user             
+            try:
+                # Check whether URL already exists in the database         
+                it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
+                return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+            except SiteBookmark.DoesNotExist:
+                pass         
+
+            item = SiteBookmark.objects.create(url = url_, owner = user)
+            item.starred = body.get("starred") or False 
+            item.save()
+            update_item_from_metadata(item.id)
+            return  JsonResponse({ "result": "OK" })
+        
+        if action == "item_upload":
+            import base64 
+            import hashlib
+            import mimetypes
+            import os 
+
+            media_dir: str = django.conf.settings.MEDIA_ROOT 
+            file_name: str = body["name"]
+            # print(f" File data =  { body['data'] }")
+            # Possible value: data:application/octet-stream;base64,KiBFbWJlZGRlZCBTY3 ....
+            raw_data = body["data"].split(",")[1]            
+            file_data: bytes = base64.b64decode(raw_data)
+            file_hash: str   = hashlib.md5(file_data).hexdigest()
+            file_mime: str   = mimetypes.guess_type(file_name)[0] or "application/octet-stream"
+
+            print(" Name = ", file_name)
+            print(" Hash = ", file_hash)
+            print(" Mime = ", file_mime)
+
+            sn = FileSnapshot( fileName = file_name
+                             , fileHash = file_hash
+                             , fileMimeType = file_mime )
+            sn.save()
+            
+            # Create associated file at path: 
+            #  ${MEDIA_ROOT}/<FILE UUID>/<FILE_NAME>
+            file_dir = os.path.join(media_dir, str(sn.id))
+            file_path = os.path.join(file_dir, file_name)
+            os.mkdir(file_dir)
+
+            with open(file_path, 'wb') as fd:
+                fd.write(file_data)
+
+            item_url = "snapshot/" + str(sn.id) + "/" + sn.fileName
+            item: SiteBookmark = SiteBookmark.objects.create(url = item_url, owner = user)
+            item.title   = " [UPLOAD] " + sn.fileName
+            item.starred = body.get("starred") or False 
+            item.save()
+
+            sn.item.add(item)
+            sn.save()
+            
+            #sn = FileSnapshot( fileName = body["name"], fileHash = fhash )
+            return  JsonResponse({ "result": "OK" })
+
         return  JsonResponse({ "result": "OK" })
+
+
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
         body_unicode  = request.body.decode("utf-8")

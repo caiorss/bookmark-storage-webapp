@@ -668,11 +668,11 @@ async function api_item_add(crfs_token)
             console.trace(" [TRACE] Add item to collection")
 
             var collection_id = query_params.get("A0");
-            var data = { url: url, collection_id: collection_id };
+            var payload = { url: url, action: "item_new", collection_id: collection_id };
 
             var token = window["generated_token"];
 
-            utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
+            utils.ajax_post("/api/collections/add_item", token, payload).then( async res => {
                 if(res["result"] == "OK"){
                     let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
                     utils.dom_page_refresh();
@@ -692,9 +692,11 @@ async function api_item_add(crfs_token)
         }
 
         let starred = query_params.get("filter") == "starred";
-        var payload = {url: url, starred: starred};
+        var payload = {url: url, action: "item_new", starred: starred};
+
         utils.ajax_post("/api/items", crfs_token, payload).then( res => {
-            if(res["result"] == "OK"){
+            if(res["result"] == "OK")
+            {
                 Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
             } else {
@@ -706,6 +708,39 @@ async function api_item_add(crfs_token)
 }
 
 window["api_item_add"] = api_item_add;
+
+async function item_upload_file()
+{
+    // alert("Not implemented Ok.");
+    let file_dlg = document.querySelector("#file-choose");
+    let file = file_dlg.files[0];
+    console.log(" File = ", file);
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    /** Possible value for payload:
+     * 
+     *  {   action: "item_upload"
+     *    , name: "embedded-scripting-language.org"
+     *    , data: "data:application/octet-stream;base64,KiBFbWJlZGR...."
+     *   }
+     * 
+     */
+    reader.onload = async (evt) => {
+        let payload = {
+             action: "item_upload"
+           , name:   file.name
+           , data:   evt.target.result
+         };
+        console.log(" [TRACE] Payload = ", payload);
+        var token = window["generated_token"];
+        let res = await utils.ajax_post("/api/items", token, payload);
+        console.log(" res = ", res);
+        utils.dom_page_refresh();
+    };
+}
+
+window["item_upload_file"] = item_upload_file;
 
 async function collection_remove_item(collectionID, itemID)
 {
