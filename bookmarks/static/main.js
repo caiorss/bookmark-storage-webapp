@@ -759,7 +759,7 @@ async function item_upload_file()
         , body:    form 
     });
     console.log(res);
-    // utils.dom_page_refresh();
+    utils.dom_page_refresh();
 }
 
 window["item_upload_file"] = item_upload_file;
