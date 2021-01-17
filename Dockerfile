@@ -33,17 +33,38 @@ RUN apt-get update                                               && \
 # Clean package cache for saving disk space
 RUN rm -rf /var/lib/apt/lists/*
 
+#================== Install Pdf2hmlEx =====================#
+#
 
-#--------------- App Settings --------------------------#
+ARG PDF2THML_URL=https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage
+
+RUN mkdir -p /opt
+ADD ./pdf2html.sh /opt
+RUN chmod +x /opt/pdf2html.sh
+
+# Download pdf2htmlEx application (AppImage release) for exporting html to PDF
+  # ADD $PDF2THML_URL /opt/pdf2html.bin
+  ADD ./pdf2html.bin /opt/pdf2html.bin 
+  
+# Extract PDF2html as fuser does not work on Docker enviroments.
+RUN cd /opt && 7z x /opt/pdf2html.bin
+RUN chmod +x /opt/usr/bin/pdf2htmlEX
+
+ENV ENV_PDF2HTML_PATH /opt/usr/bin/pdf2htmlEX
+
+# ================ Python Settings ===========================#
 
 # Install Requiremenets
 #COPY requirements.txt  /tmp
 RUN pip3 install pipenv
 
 RUN mkdir -p /app/data/files
-WORKDIR   /app
-ADD .     /app
+WORKDIR         /app
+# Install dependencies 
+ADD ./Pipfile  /app
 RUN cd /app && pipenv install
+# Copy source of current directory to /app
+ADD .          /app 
 
 # Database setup SQLite 3 default.
 RUN cd /app \
@@ -66,22 +87,7 @@ ADD image-magic-policy.xml /etc/ImageMagick-6/policy.xml
 RUN cd /app && pipenv run ./manage.py initadmin
 
 
-#================== Install Pdf2hmlEx =====================#
-#
 
-ARG PDF2THML_URL=https://github.com/pdf2htmlEX/pdf2htmlEX/releases/download/v0.18.8.rc1/pdf2htmlEX-0.18.8.rc1-master-20200630-Ubuntu-bionic-x86_64.AppImage
-
-RUN mkdir -p /opt
-ADD ./pdf2html.sh /opt
-RUN chmod +x /opt/pdf2html.sh
-
-# Download pdf2htmlEx application (AppImage release) for exporting html to PDF
-ADD $PDF2THML_URL /opt/pdf2html.bin
-# Extract PDF2html as fuser does not work on Docker enviroments.
-RUN cd /opt && 7z x /opt/pdf2html.bin
-RUN chmod +x /opt/usr/bin/pdf2htmlEX
-
-ENV ENV_PDF2HTML_PATH /opt/usr/bin/pdf2htmlEX
 
    #==============================#
    # Container initialization     #
