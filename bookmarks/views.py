@@ -864,9 +864,9 @@ def item_upload(request: WSGIRequest):
         for chunk in fdata.chunks(): fd.write(chunk)
 
     # Create corresponding bookmark to uploaded file 
-    item_url = "snapshot/" + str(sn.id) + "/" + sn.fileName
+    item_url = "snapshot/file/" + str(sn.id) + "/" + urllib.parse.quote(sn.fileName)
     item: SiteBookmark = SiteBookmark.objects.create(url = item_url, owner = request.user)
-    item.title   = " [UPLOAD] " + sn.fileName
+    item.title = " [UPLOAD] " + sn.fileName
     ## item.starred = body.get("starred") or False 
     item.save()
     # Associate file entry and internal bookmark
@@ -905,7 +905,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             item.save()
             update_item_from_metadata(item.id)
             return  JsonResponse({ "result": "OK" })
-            
+
         return  JsonResponse({ "result": "OK" })
 
 
