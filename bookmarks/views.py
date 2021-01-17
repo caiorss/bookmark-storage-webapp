@@ -820,6 +820,60 @@ def querylist2Json(querylist, columns: List[str]) -> JsonResponse:
     list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
     return JsonResponse(list_of_dicts, safe =False)    
 
+@login_required
+def item_upload(request: WSGIRequest):
+    from django.core.files.uploadhandler import InMemoryUploadedFile
+    from functools import partial
+    import base64 
+    import hashlib
+    import mimetypes
+    import os     
+    # name of the form-upload field in the HTML template 
+    UPLOAD_FORM_FIELD = "upload-file"
+    media_dir: str = django.conf.settings.MEDIA_ROOT 
+
+    # Reference: https://gist.github.com/Alir3z4/725297248a59cae05a50b15dd79fb4d0
+    def hash_file(file, block_size=65536):
+        hasher = hashlib.md5()
+        for buf in iter(partial(file.read, block_size), b''):
+            hasher.update(buf)
+        return hasher.hexdigest()
+
+    if request.method != "POST":
+        return Http404("Error: invalid method. Only POST allowed")
+    print(f" Request = ${request} ")
+
+    uploaded_files: List[InMemoryUploadedFile] = request.FILES.getlist(UPLOAD_FORM_FIELD)
+    fdata: InMemoryUploadedFile = uploaded_files[0]
+
+    print(f" Uploaded file = {fdata.name}           " )
+    print(f" Uploaded size = {fdata.size}           " )
+    print(f" Content type  = {fdata.content_type}   " )
+    sn = FileSnapshot(  fileName     = fdata.name 
+                      , fileHash     = hash_file(fdata)
+                      , fileMimeType = fdata.content_type )
+    sn.save()
+
+    # Create associated file directory at path: 
+    #  ${MEDIA_ROOT}/<FILE UUID>/<FILE_NAME>
+    file_dir = os.path.join(media_dir, str(sn.id))
+    file_path = os.path.join(file_dir, sn.fileName)
+    os.mkdir(file_dir)
+
+    with open( file_path, 'wb') as fd:
+        for chunk in fdata.chunks(): fd.write(chunk)
+
+    # Create corresponding bookmark to uploaded file 
+    item_url = "snapshot/" + str(sn.id) + "/" + sn.fileName
+    item: SiteBookmark = SiteBookmark.objects.create(url = item_url, owner = request.user)
+    item.title   = " [UPLOAD] " + sn.fileName
+    ## item.starred = body.get("starred") or False 
+    item.save()
+    # Associate file entry and internal bookmark
+    sn.item.add(item)
+    sn.save()
+    return JsonResponse({"startus": "OK"})
+
 
 class Ajax_Items(LoginRequiredMixin, django.views.View):
 

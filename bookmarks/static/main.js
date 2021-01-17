@@ -709,7 +709,7 @@ async function api_item_add(crfs_token)
 
 window["api_item_add"] = api_item_add;
 
-async function item_upload_file()
+async function item_upload_file2()
 {
     // alert("Not implemented Ok.");
     let file_dlg = document.querySelector("#file-choose");
@@ -738,6 +738,28 @@ async function item_upload_file()
         console.log(" res = ", res);
         utils.dom_page_refresh();
     };
+}
+
+async function item_upload_file() 
+{
+    let file_dlg = document.querySelector("#file-choose");
+    let file = file_dlg.files[0];
+
+    let form = new FormData();
+    form.append("upload-file", file);
+    console.log(form);
+    var token = window["generated_token"];
+
+    let res = await fetch("/api/item_upload", {
+           method: 'POST'
+         , headers: {    // 'Content-Type':     'multipart/form-data'
+                         'X-Requested-With': 'XMLHttpRequest'
+                       , 'X-CSRFToken':       token 
+                    }          
+        , body:    form 
+    });
+    console.log(res);
+    // utils.dom_page_refresh();
 }
 
 window["item_upload_file"] = item_upload_file;

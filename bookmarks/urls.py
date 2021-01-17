@@ -45,6 +45,7 @@ urlpatterns = [
 
   # ----------------- REST API ------------------------#
   ,path("api/items",                views.Ajax_Items.as_view())  
+  ,path("api/item_upload",          views.item_upload)
 
   ,path("api/item",                 views.rest_item)  
   ,path("api/bulk",                 views.rest_bulk_action)  
