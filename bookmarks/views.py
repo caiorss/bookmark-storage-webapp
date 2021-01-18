@@ -340,8 +340,8 @@ def update_item_from_metadata(itemID: int) -> None:
     print(f" [TRACE] real_url = { real_url }")    
     
     import urllib
-    from urllib.parse import urlparse 
-    url_obj: urllib.parse.ParseResult = urlparse(real_url)
+    from urllib.parse import urlparse, ParseResult
+    url_obj: ParseResult = urlparse(real_url)
     domain  = url_obj.hostname
 
     if domain == "wikipedia.org" or domain == "en.m.wikipedia.org":
@@ -441,7 +441,9 @@ from urllib.parse import urlparse
 
 @login_required
 def fetch_itemsnapshot(request: WSGIRequest):
-    """ Download file snaphot from bookmark URL and store file in cache."""
+    """ Download file snaphot from bookmark URL and store file in file cache.
+    
+    """
     redirect_url: str = request.GET.get("url")
     if redirect_url is None or redirect_url == "":
         return django.http.HttpResponseBadRequest("Error: invalid redirection URL.")
@@ -481,12 +483,23 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
 
     title = urllib.parse.quote(request.GET.get("title") or "archive")
+    
     try:
         with open(sn.getFilePath(), 'rb') as fp:
             res       = HttpResponse(fp, content_type = sn.fileMimeType)
             extension = os.path.splitext(sn.getFilePath())[1]
-            fname     = slugify(request.GET.get("title"))
-            res["Content-Disposition"] = f"inline; filename = {fname}.{extension}"
+            # Truncate title to 60 characters 
+            title     = request.GET.get("title")
+            title     = title[:60] if len(title) > 60 else title 
+            # Create a suitable file name out of an arbitrary string 
+            fname     = slugify(title)
+
+            if extension.startswith("."):
+                _fname = fname + extension
+            else:
+                _fname = fname + "." + extension
+            
+            res["Content-Disposition"] = f"inline; filename = {_fname}"
             return res 
     except FileNotFoundError as err:
         raise Http404("Error: file not found => {err}".format(err = err))

@@ -435,8 +435,8 @@ class Collection(models.Model):
         return " title = {title} ".format(title = self.title)
 
     def delete(self):
-        self.deleted = True 
-        self.starred = False 
+        self.deleted = True
+        self.starred = False
         self.save()
 
 class FileSnapshot(models.Model):

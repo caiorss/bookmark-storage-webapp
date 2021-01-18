@@ -41,9 +41,9 @@ def download_file_from_http(url: str) -> DownloadedFile:
     import django.utils.text
     
     req = urllib.request.Request(
-        url, 
-        data=None, 
-        headers={ 'User-Agent': DEFAULT_USER_AGENT })
+          url 
+        , data = None 
+        , headers = { 'User-Agent': DEFAULT_USER_AGENT })
     # Ignore SSL verification for downloading file in any case 
     context = ssl._create_unverified_context()
 
@@ -71,7 +71,7 @@ def download_file_from_http(url: str) -> DownloadedFile:
         f_name: str = header_disposion.split(";")[1].strip().strip("filename=").strip("\"")
     elif f_mime is not None and ext is not None:
         f_name: str = basename + ext 
-    else: 
+    else:
         f_name: str = basename
     return DownloadedFile( fileName     = f_name
                          , fileMimeType = f_mime
@@ -100,9 +100,6 @@ def download_file_from_ftp(url: str) -> DownloadedFile:
                          , fileMimeType = f_mime
                          , fileHash     = f_hash
                          , fileData     = f_data  )
-
-
-   
 
 def download_from_slideshare(url: str) -> DownloadedFile:
     #assert url.startswith("https://www.slideshare.net/")
@@ -154,17 +151,44 @@ def download_from_slideshare(url: str) -> DownloadedFile:
                          , fileHash     = f_hash
                          , fileData     = f_data  )
 
-
+def download_github_archive(user: str, repository: str) -> DownloadedFile:
+    """Download ZIP archive from master or main repository. """
+    _url_base = f"https://www.github.com/{user}/{repository}/archive/"
+    _url1 = _url_base + "master.zip"
+    _url2 = _url_base + "main.zip"
+    try:
+        print(f" [TRACE] Downloading from URL = {_url1}")
+        data = download_file_from_http(_url1)
+        return data 
+    except Exception as ex:
+        print(" [ERROR] Got exception => Retry => Ex: ", ex)
+        print(f" [TRACE] Downloading from URL = {_url2}")
+        data = download_file_from_http(_url2)
+        return data   
+    raise Exception("Edge case reached. => Not implemented yet.")
 
 def download_file(url: str) -> DownloadedFile:
+    print(f" [DEBUG] Downloading file from URL = {url}")
+
     if ".slideshare.net" in url:
         return download_from_slideshare(url)
         #raise Exception("Error: not implemented.")
+    
+    # Match URL for instance: http://github.com/USER/REPOSITORY 
+    # Download zip archive from repository: http://github.com/USER/REPOSITORY/archive/master.zip
+    url_parse: ParseResult = urlparse(url)
+    # import pdb; pdb.set_trace()
+    if (url_parse.hostname == "github.com" or url_parse.hostname == "www.github.com") \
+        and len(url_parse.path.split("/")) == 3:
+        p = url_parse.path.split("/")
+        return download_github_archive(user = p[1], repository = p[2])
 
     if url.startswith("http://") or url.startswith("https://"):
         return download_file_from_http(url)
     if url.startswith("ftp://"):
         return download_file_from_ftp(url)    
+
+    # if url.startswith("")
     raise Exception("There is no handle function for this type of URL.") 
 
 
