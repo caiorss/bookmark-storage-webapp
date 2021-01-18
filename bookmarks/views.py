@@ -119,6 +119,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("collection",   "Collection items",                self.filter_collection)
         self.add_filter("tag-name",     "Filter tag by name",              self.filter_by_tag_name)
         self.add_filter("created-date", "Filter by created date",          self.filter_by_created_date)
+        self.add_filter("upload",       "File uploads",                    self.filter_uploads)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
@@ -293,6 +294,9 @@ class BookmarksList(LoginRequiredMixin, ListView):
         assert filter_type == "created-date"
         return self.model.objects.filter(owner = self.request.user, created = created_date)\
             .exclude(deleted = True )
+
+    def filter_uploads(self):
+        return self.model.objects.filter(owner = self.request.user, is_upload = True).exclude(deleted = True)
 
 # URL route for adding item through bookmarklet 
 @login_required 
@@ -732,7 +736,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'doctype' ]
+    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'is_upload' ]
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')
 
     # Override UpdateView.get_success_url()
@@ -866,7 +870,8 @@ def item_upload(request: WSGIRequest):
     # Create corresponding bookmark to uploaded file 
     item_url = "snapshot/file/" + str(sn.id) + "/" + urllib.parse.quote(sn.fileName)
     item: SiteBookmark = SiteBookmark.objects.create(url = item_url, owner = request.user)
-    item.title = " [UPLOAD] " + sn.fileName
+    item.title         = " [UPLOAD] " + sn.fileName
+    item.is_upload     = True
     ## item.starred = body.get("starred") or False 
     item.save()
     # Associate file entry and internal bookmark
