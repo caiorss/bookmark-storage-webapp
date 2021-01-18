@@ -848,6 +848,10 @@ def item_upload(request: WSGIRequest):
     print(f" Request = ${request} ")
 
     uploaded_files: List[InMemoryUploadedFile] = request.FILES.getlist(UPLOAD_FORM_FIELD)
+
+    if len(uploaded_files) == 0:
+        return JsonResponse({"status": "ERROR", 'message': 'Error: zero file uploaded.'})
+
     fdata: InMemoryUploadedFile = uploaded_files[0]
 
     print(f" Uploaded file = {fdata.name}           " )
@@ -877,7 +881,7 @@ def item_upload(request: WSGIRequest):
     # Associate file entry and internal bookmark
     sn.item.add(item)
     sn.save()
-    return JsonResponse({"startus": "OK"})
+    return JsonResponse({"status": "OK"})
 
 
 class Ajax_Items(LoginRequiredMixin, django.views.View):
