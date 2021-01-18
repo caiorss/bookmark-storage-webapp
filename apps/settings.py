@@ -21,6 +21,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'data', "files")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
+# 100 megabytes => WARNING: It may be vulnerable to DOS (Denial-Of-Service) attacks
+# if this value is too high. 
+# @TODO: Find a way to upload large files without loading everything to memory.
+### DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 100
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '0ux_%=7!81&z=^uj5iw@tue#7zkfn9lk)=*d147(g+$5t$l9nz'
 

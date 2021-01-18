@@ -35,6 +35,12 @@ db-reset:
 docker-build:
 	docker build . -t django-bookmark-server
 
+# Command for testing the docker image
+docker-test:
+	docker run -it --rm  \
+		-p 9000:9000 \
+		django-bookmark-server
+
 # Run docker Image container
 # The server URL will be the URL: http://localhost:9000/
 docker-run1:
@@ -55,7 +61,6 @@ docker-run2:
 		--name django-server \
 		--restart=always \
 		django-bookmark-server
-
 
 # Stop docker image container
 docker-stop:

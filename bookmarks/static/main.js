@@ -668,11 +668,11 @@ async function api_item_add(crfs_token)
             console.trace(" [TRACE] Add item to collection")
 
             var collection_id = query_params.get("A0");
-            var data = { url: url, collection_id: collection_id };
+            var payload = { url: url, action: "item_new", collection_id: collection_id };
 
             var token = window["generated_token"];
 
-            utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
+            utils.ajax_post("/api/collections/add_item", token, payload).then( async res => {
                 if(res["result"] == "OK"){
                     let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
                     utils.dom_page_refresh();
@@ -692,9 +692,11 @@ async function api_item_add(crfs_token)
         }
 
         let starred = query_params.get("filter") == "starred";
-        var payload = {url: url, starred: starred};
+        var payload = {url: url, action: "item_new", starred: starred};
+
         utils.ajax_post("/api/items", crfs_token, payload).then( res => {
-            if(res["result"] == "OK"){
+            if(res["result"] == "OK")
+            {
                 Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
             } else {
@@ -706,6 +708,61 @@ async function api_item_add(crfs_token)
 }
 
 window["api_item_add"] = api_item_add;
+
+async function item_upload_file2()
+{
+    // alert("Not implemented Ok.");
+    let file_dlg = document.querySelector("#file-choose");
+    let file = file_dlg.files[0];
+    console.log(" File = ", file);
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    /** Possible value for payload:
+     * 
+     *  {   action: "item_upload"
+     *    , name: "embedded-scripting-language.org"
+     *    , data: "data:application/octet-stream;base64,KiBFbWJlZGR...."
+     *   }
+     * 
+     */
+    reader.onload = async (evt) => {
+        let payload = {
+             action: "item_upload"
+           , name:   file.name
+           , data:   evt.target.result
+         };
+        console.log(" [TRACE] Payload = ", payload);
+        var token = window["generated_token"];
+        let res = await utils.ajax_post("/api/items", token, payload);
+        console.log(" res = ", res);
+        utils.dom_page_refresh();
+    };
+}
+
+async function item_upload_file() 
+{
+    let file_dlg = document.querySelector("#file-choose");
+    let file = file_dlg.files[0];
+
+    let form = new FormData();
+    form.append("upload-file", file);
+    console.log(form);
+    var token = window["generated_token"];
+
+    let res = await fetch("/api/item_upload", {
+           method: 'POST'
+         , headers: {    // 'Content-Type':     'multipart/form-data'
+                         'X-Requested-With': 'XMLHttpRequest'
+                       , 'X-CSRFToken':       token 
+                    }          
+        , body:    form 
+    });
+    console.log(res);
+    utils.dom_page_refresh();
+}
+
+window["item_upload_file"] = item_upload_file;
 
 async function collection_remove_item(collectionID, itemID)
 {
@@ -1006,8 +1063,52 @@ function search_bookmarks()
     document.location = url;
 
 }
-
 window["search_bookmarks"] = search_bookmarks;
+
+// How can add or update a query string parameter.
+// Reference: https://stackoverflow.com/questions/5999118
+function UpdateQueryString(key, value, url) {
+    if (!url) url = window.location.href;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        hash;
+
+    if (re.test(url)) {
+        if (typeof value !== 'undefined' && value !== null) {
+            return url.replace(re, '$1' + key + "=" + value + '$2$3');
+        } 
+        else {
+            hash = url.split('#');
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+    }
+    else {
+        if (typeof value !== 'undefined' && value !== null) {
+            var separator = url.indexOf('?') !== -1 ? '&' : '?';
+            hash = url.split('#');
+            url = hash[0] + separator + key + '=' + value;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+        else {
+            return url;
+        }
+    }
+}
+
+function bookmarks_order_by(order)
+{
+    var url = document.location.href;
+    document.location.href = UpdateQueryString("order", order, url);
+
+}
+window["bookmarks_order_by"] = bookmarks_order_by;
+
 
 async function tag_filter_window()
 {

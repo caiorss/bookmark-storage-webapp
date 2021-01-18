@@ -142,6 +142,7 @@ class SiteBookmark(models.Model):
     doctype = models.CharField(max_length=80, choices = DocumentType.choices, default = DocumentType.webpage
                              , verbose_name = "Type")
     deleted = models.BooleanField(blank = True, default = False, null = True, editable = True)
+    is_upload  = models.BooleanField(default = False, null = True, editable = True)
     
     created = models.DateTimeField(editable = False, auto_now_add = True, null = True)
     updated = models.DateTimeField(editable = False, auto_now = True, null = True)
