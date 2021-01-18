@@ -854,9 +854,9 @@ def item_upload(request: WSGIRequest):
 
     fdata: InMemoryUploadedFile = uploaded_files[0]
 
-    print(f" Uploaded file = {fdata.name}           " )
-    print(f" Uploaded size = {fdata.size}           " )
-    print(f" Content type  = {fdata.content_type}   " )
+    ## print(f" Uploaded file = {fdata.name}           " )
+    ## print(f" Uploaded size = {fdata.size}           " )
+    ## print(f" Content type  = {fdata.content_type}   " )
     sn = FileSnapshot(  fileName     = fdata.name 
                       , fileHash     = hash_file(fdata)
                       , fileMimeType = fdata.content_type )
