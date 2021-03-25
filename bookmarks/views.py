@@ -867,12 +867,14 @@ def item_upload(request: WSGIRequest):
 
     fdata: InMemoryUploadedFile = uploaded_files[0]
 
-    ## print(f" Uploaded file = {fdata.name}           " )
-    ## print(f" Uploaded size = {fdata.size}           " )
-    ## print(f" Content type  = {fdata.content_type}   " )
+    print(f" Uploaded file = {fdata.name}           " )
+    print(f" Uploaded size = {fdata.size}           " )
+    print(f" Content type  = {fdata.content_type}   " )
     sn = FileSnapshot(  fileName     = fdata.name 
                       , fileHash     = hash_file(fdata)
                       , fileMimeType = fdata.content_type )
+
+    print(" [TRACE] sn = ", sn)
     sn.save()
 
     # Create associated file directory at path: 
@@ -894,6 +896,7 @@ def item_upload(request: WSGIRequest):
     # Associate file entry and internal bookmark
     sn.item.add(item)
     sn.save()
+    print(" [TRACE] Finished Ok.")
     return JsonResponse({"status": "OK"})
 
 
@@ -1244,7 +1247,6 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
 
 class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
-
     def get(self, request: WSGIRequest, *args, **kwargs):
         query = Tag2.objects.filter(owner = request.user)
         return queryset2Json(query, ["id", "name", "description"])
@@ -1327,3 +1329,28 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
         return JsonResponse({ "result": "OK" }, safe = False)        
+
+
+
+class Ajax_ItemRelated(LoginRequiredMixin, django.views.View):
+
+
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        """ Create new collection """
+        assert( request.method == "POST" and request.is_ajax() )
+        req: WSGIRequest = self.request
+        body        = json.loads(req.body.decode("utf-8"))        
+        item_id      = body["item_id"]
+        related_ids  = body["related_ids"]
+
+        item    = SiteBookmark.objects.get(id = item_id, owner = request.user)
+
+        for rid in related_ids:
+            if rid == item_id: continue 
+            related = SiteBookmark.objects.get(id = rid, owner = request.user)
+            item.related.add(related)
+            related.related.add(item)
+            related.save()
+        item.save()
+
+        return JsonResponse({ "result": "OK",  "message": "Item added Ok." })

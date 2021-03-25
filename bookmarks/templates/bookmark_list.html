@@ -112,7 +112,8 @@ Order by: <br/>
            {% endif %} 
 
             <br/></br>
-
+            
+            <!-- =================== I T E M - T A G S ================== -->
             <strong>Tags:</strong>
 
             <lu>
@@ -135,6 +136,27 @@ Order by: <br/>
                 </li>
                 {% endfor %}
             </lu>            
+
+            <!-- =================== I T E M - R E L A T E D ================== -->
+            <br/>
+            <strong>Related:</strong>
+            
+            <a class="tag-remove-button" 
+                href="javascript:related_item_add( {{ bookmark.id}}  );"
+                title="Add related item to current bookmark."
+            >[+]</a>
+
+
+            <lu>
+                {% for entry in bookmark.related.all %}
+                <li>
+                    <!-- Button for filtering all bookmarks with this tag. -->
+                   <label>( {{ entry.id }} )</label>   <a class="tag-hyperlink" title="{{ entry.title }}" href="/items?filter=id&A0={{ entry.id }}" >{{ entry.title }}</a>
+                </li>
+                {% endfor %}
+            </lu>            
+
+            <!-- ==========  I T E M - A C T I O N - M E N U =================== -->
 
             <table class="action-menu-table" 
                    id="action-menu-{{ bookmark.id }}" 

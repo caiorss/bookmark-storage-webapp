@@ -150,6 +150,8 @@ class SiteBookmark(models.Model):
     # User to which the collection belongs to   
     owner = models.ForeignKey(Account, editable = True, on_delete=models.PROTECT)
 
+    related = models.ManyToManyField("self", blank = True, symmetrical = True)
+
     # Databasse constraint for this table requires a unique pair (name, owner). 
     class Meta:
        constraints = [
