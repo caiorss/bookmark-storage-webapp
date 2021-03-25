@@ -35,6 +35,11 @@ Order by: <br/>
                  <!-- Bookmark that selects only this item. -->
                  <a href="/items?filter=id&A0={{ bookmark.id }}">( {{ bookmark.id }} )</a>
 
+                  <!-- Icon that identifies bookmark type -->
+                  {%if bookmark.icon %} 
+                    <img src="{{ bookmark.icon }}"></img>
+                  {%endif%}
+
                   <!-- Favicon - Icon related to the website. -->
                   {{  bookmark.favicon | safe }}
 

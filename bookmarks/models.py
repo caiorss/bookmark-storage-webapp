@@ -315,6 +315,21 @@ class SiteBookmark(models.Model):
             return f"<img class='bookmark-favicon' style='width:16px;height:16px;' src='{icon_url}' />"
         return ""
 
+    def icon(self) -> Optional[str]:
+        if self.starred:
+            return "static/icon-favorite.png"
+        if self.doctype == "book":
+            return "static/book-icon.png"
+        elif self.doctype == "music":
+            return "static/music-icon.png"
+        elif self.doctype == "news":
+            return "static/news-icon.png"
+        elif self.doctype == "online store":
+            return "static/icon-online-store.png"
+        elif self.doctype == "follow":
+            return "static/icon-follow.png"
+        return None 
+
     def is_youtube_video(self):
         return self.url.startswith("https://www.youtube.com/watch?v=") \
             or self.url.startswith("https://m.youtube.com/watch?v=") 
