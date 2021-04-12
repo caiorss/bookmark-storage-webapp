@@ -318,18 +318,16 @@ class SiteBookmark(models.Model):
     def icon(self) -> Optional[str]:
         if self.starred:
             return "static/icon-favorite.png"
-        if self.doctype == "book":
-            return "static/book-icon.png"
-        elif self.doctype == "music":
-            return "static/music-icon.png"
-        elif self.doctype == "news":
-            return "static/news-icon.png"
-        elif self.doctype == "online store":
-            return "static/icon-online-store.png"
-        elif self.doctype == "follow":
-            return "static/icon-follow.png"
-        return None 
 
+        icons_database = {
+              "book":           "static/icon-book.png"   
+            , "music":          "static/icon-music.png"
+            , "news":           "static/icon-news.png"
+            , "online store":   "static/icon-online-store.png"     
+            , "follow":         "static/icon-follow.png"
+        }
+        return icons_database.get(self.doctype)
+        
     def is_youtube_video(self):
         return self.url.startswith("https://www.youtube.com/watch?v=") \
             or self.url.startswith("https://m.youtube.com/watch?v=") 

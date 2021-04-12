@@ -94,6 +94,12 @@ Order by: <br/>
                     href="javascript:tag_add( {{ bookmark.id }} );" 
                     >Add tag</a>
 
+                <!--- Button for edding -->
+                <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"
+                   title="Edit current bookmark." >
+                    <img src="/static/icon-edit.png">
+                </a>
+
                {%if bookmark.isDocumentFile %}
                    <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
                      <img src="/static/gdriver.png"> 

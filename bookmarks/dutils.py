@@ -194,19 +194,16 @@ def download_file(url: str) -> DownloadedFile:
         and len(url_parse.path.split("/")) == 3:
         p = url_parse.path.split("/")
         return download_github_archive(user = p[1], repository = p[2])
-
     if url.startswith("http://") or url.startswith("https://"):
         return download_file_from_http(url)
     if url.startswith("ftp://"):
         return download_file_from_ftp(url)    
-
     # if url.startswith("")
     raise Exception("There is no handle function for this type of URL.") 
 
 
 def remove_url_obfuscation(url: str):
     """Clean URLs obfuscated by search engines."""
-
     # Remove google search engine obfuscated URLs.
     if re.match(".*google.*/url?", url) != None: 
         u = urllib.parse.urlparse(url)
