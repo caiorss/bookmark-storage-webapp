@@ -18,6 +18,9 @@ djangorestframework = "*"
 pylint-django = "*"
 uwsgi = "*"
 wikipedia = "*"
+django-rest-framework = "*"
+django-filter = "*"
+django-rest-auth = "*"
 
 [requires]
 python_version = "*"
