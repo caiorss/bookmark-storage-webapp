@@ -709,36 +709,18 @@ async function api_item_add(crfs_token)
 
 window["api_item_add"] = api_item_add;
 
-async function item_upload_file2()
-{
-    // alert("Not implemented Ok.");
-    let file_dlg = document.querySelector("#file-choose");
-    let file = file_dlg.files[0];
-    console.log(" File = ", file);
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
 
-    /** Possible value for payload:
-     * 
-     *  {   action: "item_upload"
-     *    , name: "embedded-scripting-language.org"
-     *    , data: "data:application/octet-stream;base64,KiBFbWJlZGR...."
-     *   }
-     * 
-     */
-    reader.onload = async (evt) => {
-        let payload = {
-             action: "item_upload"
-           , name:   file.name
-           , data:   evt.target.result
-         };
-        console.log(" [TRACE] Payload = ", payload);
-        var token = window["generated_token"];
-        let res = await utils.ajax_post("/api/items", token, payload);
-        console.log(" res = ", res);
-        utils.dom_page_refresh();
-    };
+window["related_item_add"] = async function related_item_add(item_id)
+{
+    let related_id = await Dialog2_Prompt.prompt("Enter related item id:", "");                            
+    let token = window["generated_token"];
+    let payload = { item_id: item_id, related_ids: [ related_id ] };
+    let res = await utils.ajax_post("/api/related", token, payload);
+    console.log(res);
+    utils.dom_page_refresh();    
 }
+
+
 
 async function item_upload_file() 
 {

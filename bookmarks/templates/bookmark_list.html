@@ -35,6 +35,11 @@ Order by: <br/>
                  <!-- Bookmark that selects only this item. -->
                  <a href="/items?filter=id&A0={{ bookmark.id }}">( {{ bookmark.id }} )</a>
 
+                  <!-- Icon that identifies bookmark type -->
+                  {%if bookmark.icon %} 
+                    <img src="{{ bookmark.icon }}"></img>
+                  {%endif%}
+
                   <!-- Favicon - Icon related to the website. -->
                   {{  bookmark.favicon | safe }}
 
@@ -89,6 +94,12 @@ Order by: <br/>
                     href="javascript:tag_add( {{ bookmark.id }} );" 
                     >Add tag</a>
 
+                <!--- Button for edding -->
+                <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"
+                   title="Edit current bookmark." >
+                    <img src="/static/icon-edit.png">
+                </a>
+
                {%if bookmark.isDocumentFile %}
                    <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
                      <img src="/static/gdriver.png"> 
@@ -112,7 +123,8 @@ Order by: <br/>
            {% endif %} 
 
             <br/></br>
-
+            
+            <!-- =================== I T E M - T A G S ================== -->
             <strong>Tags:</strong>
 
             <lu>
@@ -135,6 +147,27 @@ Order by: <br/>
                 </li>
                 {% endfor %}
             </lu>            
+
+            <!-- =================== I T E M - R E L A T E D ================== -->
+            <br/>
+            <strong>Related:</strong>
+            
+            <a class="tag-remove-button" 
+                href="javascript:related_item_add( {{ bookmark.id}}  );"
+                title="Add related item to current bookmark."
+            >[+]</a>
+
+
+            <lu>
+                {% for entry in bookmark.related.all %}
+                <li>
+                    <!-- Button for filtering all bookmarks with this tag. -->
+                   <label>( {{ entry.id }} )</label>   <a class="tag-hyperlink" title="{{ entry.title }}" href="/items?filter=id&A0={{ entry.id }}" >{{ entry.title }}</a>
+                </li>
+                {% endfor %}
+            </lu>            
+
+            <!-- ==========  I T E M - A C T I O N - M E N U =================== -->
 
             <table class="action-menu-table" 
                    id="action-menu-{{ bookmark.id }}" 

@@ -2,7 +2,7 @@ import bs4
 import urllib
 import shlex 
 
-from typing import NamedTuple
+from typing import NamedTuple, Dict
 from functools import reduce 
 
 import os 
@@ -22,8 +22,17 @@ import bs4
 from http.client import HTTPResponse 
 import base64
 
-# Constant:
-DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+# Http Request header for making http server believe that it is a 
+# a web browser. 
+_HTTP_REQUEST_HEADER: Dict[str, str] = {
+      'User-Agent':         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36' 
+    , 'accept':             'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    , 'accept-encoding':    'gzip, deflate, br'
+    , 'accept-language':    'en-US,en;q=0.9,fr;q=0.8,ro;q=0.7,ru;q=0.6,la;q=0.5,pt;q=0.4,de;q=0.3'
+    , 'cache-control':      'no-cache'
+    , 'upgrade-insecure-requests': '1'
+}
+
 
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
@@ -39,11 +48,14 @@ def download_file_from_http(url: str) -> DownloadedFile:
 
     import mimetypes
     import django.utils.text
-    
+
+    headers = _HTTP_REQUEST_HEADER.copy()
+    headers["referer"] = url 
+
     req = urllib.request.Request(
           url 
         , data = None 
-        , headers = { 'User-Agent': DEFAULT_USER_AGENT })
+        , headers = headers)
     # Ignore SSL verification for downloading file in any case 
     context = ssl._create_unverified_context()
 
@@ -182,19 +194,16 @@ def download_file(url: str) -> DownloadedFile:
         and len(url_parse.path.split("/")) == 3:
         p = url_parse.path.split("/")
         return download_github_archive(user = p[1], repository = p[2])
-
     if url.startswith("http://") or url.startswith("https://"):
         return download_file_from_http(url)
     if url.startswith("ftp://"):
         return download_file_from_ftp(url)    
-
     # if url.startswith("")
     raise Exception("There is no handle function for this type of URL.") 
 
 
 def remove_url_obfuscation(url: str):
     """Clean URLs obfuscated by search engines."""
-
     # Remove google search engine obfuscated URLs.
     if re.match(".*google.*/url?", url) != None: 
         u = urllib.parse.urlparse(url)

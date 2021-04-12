@@ -150,6 +150,8 @@ class SiteBookmark(models.Model):
     # User to which the collection belongs to   
     owner = models.ForeignKey(Account, editable = True, on_delete=models.PROTECT)
 
+    related = models.ManyToManyField("self", blank = True, symmetrical = True)
+
     # Databasse constraint for this table requires a unique pair (name, owner). 
     class Meta:
        constraints = [
@@ -313,6 +315,19 @@ class SiteBookmark(models.Model):
             return f"<img class='bookmark-favicon' style='width:16px;height:16px;' src='{icon_url}' />"
         return ""
 
+    def icon(self) -> Optional[str]:
+        if self.starred:
+            return "static/icon-favorite.png"
+
+        icons_database = {
+              "book":           "static/icon-book.png"   
+            , "music":          "static/icon-music.png"
+            , "news":           "static/icon-news.png"
+            , "online store":   "static/icon-online-store.png"     
+            , "follow":         "static/icon-follow.png"
+        }
+        return icons_database.get(self.doctype)
+        
     def is_youtube_video(self):
         return self.url.startswith("https://www.youtube.com/watch?v=") \
             or self.url.startswith("https://m.youtube.com/watch?v=") 
