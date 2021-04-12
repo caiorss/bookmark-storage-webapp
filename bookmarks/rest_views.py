@@ -54,8 +54,8 @@ class API_Items_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
     # user (provided by the request)  
     def get_queryset(self):
         queryset = models.SiteBookmark.objects\
-                         .filter(owner = self.request.user)\
-                         .exclude(deleted = True )
+                         .filter(owner = self.request.user)
+                         # .exclude(deleted = True )
         
         return queryset
 
