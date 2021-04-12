@@ -692,22 +692,39 @@ async function api_item_add(crfs_token)
         }
 
         let starred = query_params.get("filter") == "starred";
-        var payload = {url: url, action: "item_new", starred: starred};
+        // var payload = {url: url, action: "item_new", starred: starred};
+        var payload = { url: url, starred: starred };
 
-        utils.ajax_post("/api/items", crfs_token, payload).then( res => {
-            if(res["result"] == "OK")
+        console.log(" [TRACE] Payload = ", payload);
+
+        utils.ajax_post("/api2/items", crfs_token, payload).then( res => {
+            
+            console.log(" Status /api2/items = ", res);
+            
+            if(res.status == 200 || res.status == 201 )
             {
+                
                 Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
                 location.reload();
             } else {
                 Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
-                document.location.href = `/items?filter=search&query=${url}`;
+                // document.location.href = `/items?filter=search&query=${url}`;
+                console.trace(" [ERROR] Failed to send data.");
             }
 
         });
 }
 
 window["api_item_add"] = api_item_add;
+
+
+window["api_item_get"] = async function api_item_get(item_id)
+{
+    let item = await utils.ajax_get("/api2/items/" + item_id);
+    console.log(" [TRACE] item = ");
+    console.table( item );
+}
+
 
 
 window["related_item_add"] = async function related_item_add(item_id)
