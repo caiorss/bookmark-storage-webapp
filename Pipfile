@@ -7,6 +7,8 @@ verify_ssl = true
 pylint = "*"
 pylint-django = "*"
 mypy = "*"
+rope = "*"
+autopep8 = "*"
 
 [packages]
 bs4     = "*"
