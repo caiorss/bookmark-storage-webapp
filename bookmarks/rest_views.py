@@ -73,6 +73,11 @@ class API_Tags(rf_gen.ListAPIView):
     # Return all non-deleted bookmarks that belongs to the current 
     # user (provided by the request)  
     def get_queryset(self):
+        search = self.request.GET.get("search") or None 
+        if search: 
+            return models.Tag2.objects\
+                         .filter( owner = self.request.user
+                                 , name__contains = search )
         return models.Tag2.objects.filter(owner = self.request.user)\
                           .order_by("id").reverse()
 
@@ -86,8 +91,7 @@ class API_Tags_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         queryset = models.Tag2.objects\
-                         .filter(owner = self.request.user)\
-                         .exclude(deleted = True )
+                         .filter(owner = self.request.user)
 
         return queryset
 
