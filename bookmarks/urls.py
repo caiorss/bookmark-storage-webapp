@@ -67,5 +67,5 @@ urlpatterns = [
   , path('api2/items/<int:pk>',  rest_views.API_Items_Detail.as_view()  )
   , path('api2/tags',            rest_views.API_Tags.as_view()          )
   , path('api2/tags/<int:pk>',   rest_views.API_Tags_Detail.as_view()   )
-  , path('api2/search',          rest_views.API_Items_search.as_view()  )
+
 ]
