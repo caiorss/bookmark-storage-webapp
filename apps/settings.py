@@ -78,15 +78,23 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
+
+      'PAGE_SIZE': 15
+    , 'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination'
+
+    , 'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+
+    , 'DEFAULT_PERMISSION_CLASSES': [
          # =>> For no authentication 
          # 'rest_framework.permissions.AllowAny',
 
          # =>> For authentication via tokens 
-          'rest_framework.authentication.TokenAuthentication'  
+           'rest_framework.authentication.TokenAuthentication'  
 
          # =>> For authentication via session cookies 
-         , 'rest_framework.authentication.SessionAuthentication'
+          , 'rest_framework.authentication.SessionAuthentication'
     ]
 }
 
