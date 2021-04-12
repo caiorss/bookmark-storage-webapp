@@ -36,11 +36,54 @@ class API_Items(rf_gen.ListAPIView):
     # Return all non-deleted bookmarks that belongs to the current 
     # user (provided by the request)  
     def get_queryset(self):
+        search = self.request.GET.get("search") or None
+        tag = self.request.GET.get("tag") or None 
+        if search: 
+            return self.search_item()
+        if tag: 
+            return self.filter_tag()
         queryset = models.SiteBookmark.objects\
                          .filter(owner = self.request.user)\
                          .exclude(deleted = True )\
                          .order_by("id").reverse()
         return queryset 
+
+    def search_item(self):
+        import shlex
+        from functools import reduce
+        from django.db.models import Q
+
+        exclude_deleted = self.request.GET.get("exclude-deleted") or False 
+        search = self.request.GET.get('search')
+        mode   = self.request.GET.get('mode', "")
+
+        if not search:
+            return self.filter_latest()        
+        words = shlex.split(search)
+        lam = lambda x, y: x | y
+        if  mode == "OR":
+            lam = lambda x, y: x | y
+        if mode == "AND":
+            lam = lambda x, y: x & y
+        # q = Q(title__contains =   search) | Q(url__contains =  search)       
+        q1 = reduce(lam, [ Q(url__contains=w) for w in words])
+        q2 = reduce(lam, [ Q(title__contains=w) for w in words])
+          
+        queryset = models.SiteBookmark.objects\
+                         .filter(owner = self.request.user)\
+                         .filter( q1 | q2 )\
+                         .order_by("id")\
+                         .reverse()
+
+        if not exclude_deleted:
+            return queryset.exclude(deleted = True) 
+        return queryset 
+
+    def filter_tag(self):
+        tag = self.request.GET.get("tag")
+        if not tag: return models.SiteBookmark.objects.none() 
+        tag = models.Tag2.objects.get(name = tag, owner = self.request.user )
+        return tag.item.filter(deleted = False)
 
 class API_Items_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
     # pagination_class = rf_pag. 
