@@ -16,7 +16,15 @@ class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
         fields = ( 'id', 'url', 'title', 'starred', 'brief', 'owner', 'created', 'updated')
         model = models.SiteBookmark
 
-class API_Item(rf_gen.ListAPIView):
+
+class Serializer_Tags(rest.serializers.ModelSerializer):
+    class Meta:
+        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated' ) 
+        model = models.Tag2
+
+
+
+class API_Items(rf_gen.ListAPIView):
     # pagination_class = rf_pag. 
     serializer_class       = Serializer_SiteBookmark
 
@@ -33,7 +41,7 @@ class API_Item(rf_gen.ListAPIView):
                          .order_by("id").reverse()
         return queryset 
 
-class API_Item_Details(rf_gen.RetrieveUpdateDestroyAPIView):
+class API_Items_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
     # pagination_class = rf_pag. 
     serializer_class       = Serializer_SiteBookmark
 
@@ -47,4 +55,36 @@ class API_Item_Details(rf_gen.RetrieveUpdateDestroyAPIView):
         queryset = models.SiteBookmark.objects\
                          .filter(owner = self.request.user)\
                          .exclude(deleted = True )
-        return queryset 
+        
+        return queryset
+
+    
+class API_Tags(rf_gen.ListAPIView):
+    # pagination_class = rf_pag. 
+    serializer_class       = Serializer_Tags
+
+    authentication_classes = ( rf_auth.SessionAuthentication
+                             , rf_auth.TokenAuthentication )
+    permission_classes     = ( rf_perm.IsAuthenticated, )
+
+    # Return all non-deleted bookmarks that belongs to the current 
+    # user (provided by the request)  
+    def get_queryset(self):
+        return models.Tag2.objects.filter(owner = self.request.user)\
+                          .order_by("id").reverse()
+
+class API_Tags_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
+    # pagination_class = rf_pag. 
+    serializer_class       = Serializer_Tags
+
+    authentication_classes = ( rf_auth.SessionAuthentication
+                             , rf_auth.TokenAuthentication )
+    permission_classes     = ( rf_perm.IsAuthenticated, )
+    
+    def get_queryset(self):
+        queryset = models.Tag2.objects\
+                         .filter(owner = self.request.user)\
+                         .exclude(deleted = True )
+
+        return queryset
+
