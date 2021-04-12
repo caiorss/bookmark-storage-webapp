@@ -697,22 +697,22 @@ async function api_item_add(crfs_token)
 
         console.log(" [TRACE] Payload = ", payload);
 
-        utils.ajax_post("/api2/items", crfs_token, payload).then( res => {
+        let res = await utils.ajax_post("/api2/items", crfs_token, payload); 
+        let body = await res.json();
+        console.log(" Status /api2/items = ", res);
+        
+        if(res.status == 200 || res.status == 201 )
+        {
             
-            console.log(" Status /api2/items = ", res);
-            
-            if(res.status == 200 || res.status == 201 )
-            {
-                
-                Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
-                location.reload();
-            } else {
-                Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
-                // document.location.href = `/items?filter=search&query=${url}`;
-                console.trace(" [ERROR] Failed to send data.");
-            }
+            Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+            location.reload();
+        } else {
+            Dialog_Notify.notify("ERROR",  body, 2000);
+            // document.location.href = `/items?filter=search&query=${url}`;
+            console.trace(" [ERROR] Failed to send data.");
+        }
 
-        });
+        
 }
 
 window["api_item_add"] = api_item_add;

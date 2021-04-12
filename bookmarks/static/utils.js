@@ -11,13 +11,16 @@ export  async function ajax_post(url, crfs_token, data)
 
     const resp = await fetch(url, {
           method:  'POST'
+        , credentials:  "same-origin"
         , headers: {    'Content-Type':     'application/json'
                       , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':      crfs_token 
+                      , 'X-CSRFToken':       crfs_token 
+                      ,  dataType:          'json'
                    }
         , body: payload
     });
-    return resp.json();
+    console.log(" [TRACE] ajax_post = ", resp);
+    return resp;
 }
 
 export async function ajax_get(url, crfs_token)
@@ -25,6 +28,7 @@ export async function ajax_get(url, crfs_token)
 
     const resp = await fetch(url, {
           method:  'GET'
+        , credentials: "same-origin"
         , headers: {    'Content-Type':     'application/json'
                       , 'X-Requested-With': 'XMLHttpRequest'
                       , 'X-CSRFToken':      crfs_token 
