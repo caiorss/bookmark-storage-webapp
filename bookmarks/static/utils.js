@@ -60,7 +60,7 @@ export async function ajax_request(url, crfs_token, method, data =  null)
     }
 
     const resp = await fetch(url, params);
-    return resp.json(); 
+    return resp; 
 }
 
 /** Event fired after content is loaded. */

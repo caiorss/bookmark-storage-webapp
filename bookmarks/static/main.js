@@ -791,15 +791,16 @@ async function item_quick_rename(item_id, old_item_title)
 
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 
-    var payload = { action: "rename", id: item_id, title: new_item_title};    
+    var payload = { title: new_item_title};    
     var token = window["generated_token"];
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
-        
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 500);
+    
+    let resp = await utils.ajax_request('/api2/items/' + item_id, token, "PATCH", payload)
+    let data = await resp.json();
+    if(resp.status == 200 || resp.status == 201){
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1500);
         utils.dom_page_refresh();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to rename item.", 500);
+        Dialog_Notify.notify("ERROR", "Error: " + data, 1500);
     }    
 
 }
