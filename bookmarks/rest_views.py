@@ -99,6 +99,10 @@ class API_Items(rf_gen.ListCreateAPIView):
         url: str= dutils.remove_url_obfuscation( serializer.data["url"] )
 
         try:
+            it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
+            if it is not None:
+                return rf_resp.Response( "{ error: 'Item already exists' }", rf_status.HTTP_409_CONFLICT)
+
             item = models.SiteBookmark.objects.create( 
                   url     = url 
                 , starred = serializer.data.get("starred") or False 
