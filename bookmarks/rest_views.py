@@ -11,6 +11,7 @@ from django.core.paginator import Paginator
 
 from bookmarks import models 
 from bookmarks import dutils
+import bookmarks.views
 
 class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
     class Meta:
@@ -102,6 +103,7 @@ class API_Items(rf_gen.ListCreateAPIView):
                   url     = url 
                 , starred = serializer.data.get("starred") or False 
                 , owner   = request.user )
+            bookmarks.views.update_item_from_metadata(item.id)
         except BaseException as ex:
             return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
 
