@@ -814,12 +814,12 @@ async function item_set_starred(checkbox)
     let item_id = checkbox.getAttribute("value");
     console.log(" [TRACE] item_set_starred() => Item_ID: ", item_id);
 
-    var payload = { action: "starred", id: item_id, value: checkbox.checked};    
+    var payload = { starred: checkbox.checked };    
     var token = window["generated_token"];
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+    let resp = await utils.ajax_request("/api2/items/" + item_id, token, utils.HTTP_PATCH, payload)
         
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 500);
+    if(resp.status == 200 || resp.status == 201){
+        await Dialog_Notify.notify("OK", "Toggle starred settings Ok.", 500);
         utils.dom_page_refresh();
     } else {
         Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");

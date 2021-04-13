@@ -44,6 +44,8 @@ export const HTTP_PUT    = "PUT";
 export const HTTP_GET    = "GET";
 // Http method for deleting a resource 
 export const HTTP_DELETE = "DELETE";
+// Http method for updating/changing a resource 
+export const HTTP_PATCH = "PATCH";
 
 export async function ajax_request(url, crfs_token, method, data =  null)
 {
