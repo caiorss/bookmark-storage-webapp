@@ -951,9 +951,9 @@ async function tag_add(item_id)
 
     console.log(" Resp = ", resp);
 
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201)
     {
-        await Dialog_Notify.notify_ok(resp["message"], 500);
+        await Dialog_Notify.notify_ok("Tag added successfully. Ok.", 500);
         utils.dom_page_refresh();
     } else {
         await Dialog_Notify.notify_error(resp["message"], 500);
