@@ -97,12 +97,12 @@ Order by: <br/>
                 <!--- Button for edding -->
                 <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"
                    title="Edit current bookmark." >
-                    <img src="/static/icon-edit.png">
+                    <img src="static/images/icon-edit.png">
                 </a>
 
                {%if bookmark.isDocumentFile %}
                    <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
-                     <img src="/static/gdriver.png"> 
+                     <img src="static/images/gdriver.png"> 
                    </a>    
                {% endif %}
 
@@ -110,7 +110,7 @@ Order by: <br/>
                <a target="_blank" title="Open snapshot file" 
                   href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}"
                 >
-                <img src="/static/folder-icon.png"> 
+                <img src="/static/images/folder-icon.png"> 
               </a>                                                             
              {% endif %}          
              
@@ -118,7 +118,7 @@ Order by: <br/>
               <a target="_blank" title="View PDF in the web browser" 
                   href="/pdf2html/{{ bookmark.snapshot_file }}"
                 >            
-                <img src="/static/icon-download-item.png"> 
+                <img src="/static/images/icon-download-item.png"> 
               </a>                                                             
            {% endif %} 
 
