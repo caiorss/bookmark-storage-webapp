@@ -1,0 +1,18 @@
+{
+   // Source files
+    "files": [ "tsmain.ts", "tsutils.ts" ] //, "tsutils.ts"]
+
+   , "compilerOptions": {
+    // Location where are the *.ts source files
+    // Target compilation  (default ES6)
+      "target":    "ES6"
+    // Module type =>> supported: 'none', 'system', 'amd', 'es6'
+    // Javascript ES6 modules are loaded by using:
+    //   <script type="module.js" src="/path/module.js"/>
+    , "module":    "ES6"
+    , "sourceMap": true
+    , "lib":       [ "ES2015", "ES6", "ES5", "DOM" ]
+    , "outDir": "."
+  }
+
+}

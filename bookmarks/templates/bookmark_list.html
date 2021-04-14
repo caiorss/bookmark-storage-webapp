@@ -67,13 +67,13 @@ Order by: <br/>
                    {%if bookmark.starred %}
                       <input  type="checkbox" 
                               class="checkbox-starred" 
-                              onchange="item_set_starred(this);"
+                              onchange="tsmain.item_set_starred(this);"
                               value="{{ bookmark.id }}"                               
                               checked/> 
                    {% else %}
                       <input type="checkbox" 
                             class="checkbox-starred" 
-                             onchange="item_set_starred(this);"
+                             onchange="tsmain.item_set_starred(this);"
                              value="{{ bookmark.id }}"/> 
                    {% endif %}
               </li>
@@ -177,7 +177,7 @@ Order by: <br/>
              <tr>
                 <th> 
                   <a class="btn-sm btn-primary" title="Quick rename item" 
-                      href='javascript:item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
+                      href='javascript:tsmain.item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
                 </th>
               </tr>
 

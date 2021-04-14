@@ -18,12 +18,22 @@
 <!-- 
        <script type="text/javascript" src  ="/static/dialog-polyfill.js"></script>
        <link   rel="stylesheet"       href ="/static/dialog-polyfill.css" /> -->
-
+        
        <script type="module" src="/static/dialogs.js"></script>
        
        <script type="module" src="/static/main.js"></script>
       <!--  <script type="text/javascript" src="/static/main.js"></script> -->
-       
+     
+        <script type="module" src="/static/tsutils.js"> </script>
+        <script type="module" src="/static/tsmain.js"> </script>
+
+        <script type="module">
+            import * as tsutils from "/static/tsutils.js";
+            import * as tsmain  from "/static/tsmain.js";
+            window["tsutils"] = tsutils.tsutils;
+            window["tsmain"] = tsmain;
+        </script>
+      
         <script type="text/javascript">
             generated_token = "{{ csrf_token }}";
         </script>
