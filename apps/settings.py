@@ -47,10 +47,14 @@ INSTALLED_APPS = [
     , 'django.contrib.staticfiles'
 
     , 'rest_framework'
+    , 'rest_framework.authtoken'
+    , 'rest_auth'
+
 
     # Main app 
     , 'bookmarks'
-    
+
+
     # DJango-pdb: note - require installing
     # $ pip install django-pdb
     # Reference: https://github.com/HassenPy/django-pdb
@@ -58,20 +62,42 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+      'django.middleware.security.SecurityMiddleware'
+    , 'django.contrib.sessions.middleware.SessionMiddleware'
+    , 'django.middleware.common.CommonMiddleware'
+    , 'django.middleware.csrf.CsrfViewMiddleware'
+    , 'django.contrib.auth.middleware.AuthenticationMiddleware'
+    , 'django.contrib.messages.middleware.MessageMiddleware'
+    , 'django.middleware.clickjacking.XFrameOptionsMiddleware'
 
     # DJango-pdb: note - require installing
     # $ pip install django-pdb
     # Reference: https://github.com/HassenPy/django-pdb
-    'django_pdb.middleware.PdbMiddleware',
+    , 'django_pdb.middleware.PdbMiddleware'
 
 ]
+
+REST_FRAMEWORK = {
+
+      'PAGE_SIZE': 15
+    , 'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination'
+
+    , 'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.TokenAuthentication',
+    ]
+
+    , 'DEFAULT_PERMISSION_CLASSES': [
+         # =>> For no authentication 
+         # 'rest_framework.permissions.AllowAny',
+
+         # =>> For authentication via tokens 
+           'rest_framework.authentication.TokenAuthentication'  
+
+         # =>> For authentication via session cookies 
+          , 'rest_framework.authentication.SessionAuthentication'
+    ]
+}
+
 
 # Call Pdb() on exception =>> See: https://github.com/HassenPy/django-pdb
 POST_MORTEN = True 

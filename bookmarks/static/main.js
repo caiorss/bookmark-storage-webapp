@@ -692,22 +692,39 @@ async function api_item_add(crfs_token)
         }
 
         let starred = query_params.get("filter") == "starred";
-        var payload = {url: url, action: "item_new", starred: starred};
+        // var payload = {url: url, action: "item_new", starred: starred};
+        var payload = { url: url, starred: starred };
 
-        utils.ajax_post("/api/items", crfs_token, payload).then( res => {
-            if(res["result"] == "OK")
-            {
-                Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
-                location.reload();
-            } else {
-                Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
-                document.location.href = `/items?filter=search&query=${url}`;
-            }
+        console.log(" [TRACE] Payload = ", payload);
 
-        });
+        let res = await utils.ajax_post("/api2/items", crfs_token, payload); 
+        let body = await res.json();
+        console.log(" Status /api2/items = ", res);
+        
+        if(res.status == 200 || res.status == 201 )
+        {
+            
+            Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+            location.reload();
+        } else {
+            Dialog_Notify.notify("ERROR",  body, 2000);
+            // document.location.href = `/items?filter=search&query=${url}`;
+            console.trace(" [ERROR] Failed to send data.");
+        }
+
+        
 }
 
 window["api_item_add"] = api_item_add;
+
+
+window["api_item_get"] = async function api_item_get(item_id)
+{
+    let item = await utils.ajax_get("/api2/items/" + item_id);
+    console.log(" [TRACE] item = ");
+    console.table( item );
+}
+
 
 
 window["related_item_add"] = async function related_item_add(item_id)
@@ -774,15 +791,16 @@ async function item_quick_rename(item_id, old_item_title)
 
     console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
 
-    var payload = { action: "rename", id: item_id, title: new_item_title};    
+    var payload = { title: new_item_title};    
     var token = window["generated_token"];
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
-        
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 500);
+    
+    let resp = await utils.ajax_request('/api2/items/' + item_id, token, "PATCH", payload)
+    let data = await resp.json();
+    if(resp.status == 200 || resp.status == 201){
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1500);
         utils.dom_page_refresh();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to rename item.", 500);
+        Dialog_Notify.notify("ERROR", "Error: " + data, 1500);
     }    
 
 }
@@ -796,12 +814,12 @@ async function item_set_starred(checkbox)
     let item_id = checkbox.getAttribute("value");
     console.log(" [TRACE] item_set_starred() => Item_ID: ", item_id);
 
-    var payload = { action: "starred", id: item_id, value: checkbox.checked};    
+    var payload = { starred: checkbox.checked };    
     var token = window["generated_token"];
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+    let resp = await utils.ajax_request("/api2/items/" + item_id, token, utils.HTTP_PATCH, payload)
         
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 500);
+    if(resp.status == 200 || resp.status == 201){
+        await Dialog_Notify.notify("OK", "Toggle starred settings Ok.", 500);
         utils.dom_page_refresh();
     } else {
         Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
@@ -933,9 +951,9 @@ async function tag_add(item_id)
 
     console.log(" Resp = ", resp);
 
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201)
     {
-        await Dialog_Notify.notify_ok(resp["message"], 500);
+        await Dialog_Notify.notify_ok("Tag added successfully. Ok.", 500);
         utils.dom_page_refresh();
     } else {
         await Dialog_Notify.notify_error(resp["message"], 500);
