@@ -317,14 +317,14 @@ class SiteBookmark(models.Model):
 
     def icon(self) -> Optional[str]:
         if self.starred:
-            return "static/icon-favorite.png"
+            return "static/images/icon-favorite.png"
 
         icons_database = {
-              "book":           "static/icon-book.png"   
-            , "music":          "static/icon-music.png"
-            , "news":           "static/icon-news.png"
-            , "online store":   "static/icon-online-store.png"     
-            , "follow":         "static/icon-follow.png"
+              "book":           "static/images/icon-book.png"   
+            , "music":          "static/images/icon-music.png"
+            , "news":           "static/images/icon-news.png"
+            , "online store":   "static/images/icon-online-store.png"     
+            , "follow":         "static/images/icon-follow.png"
         }
         return icons_database.get(self.doctype)
         
