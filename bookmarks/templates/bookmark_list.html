@@ -244,7 +244,7 @@ Order by: <br/>
               
               <tr>
                 <th>
-                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
+                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:tsmain.item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
                 </th>
               </tr>
 
@@ -260,7 +260,7 @@ Order by: <br/>
                   <th> 
                     <a  class="btn-sm btn-primary" 
                         title="Delete current item" 
-                        href="javascript:item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
+                        href="javascript:tsmain.item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
                      >Delete</a>                                                 
                   </th>
                 </tr>

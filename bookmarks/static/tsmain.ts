@@ -321,8 +321,6 @@ async function tag_filter_window()
     dom.redirect_url( `/items?filter=tag-name&A0=${answer["value"]}` );
 }
 
-
-
 /** @description Add new bookmark to collection  */
 export 
 async function api_item_add(crfs_token: string)
@@ -379,4 +377,89 @@ async function api_item_add(crfs_token: string)
 
 
 }
+
+export 
+async function item_delete(flag: boolean, item_id: Number, item_title: string) 
+{
+    
+    let dialog_title = flag ? "Permanently delete item (Irreversible)." : "Delete item (move to trash)";
+
+    let response = await Dialog_YesNo.prompt( dialog_title
+                                      , "Are you sure you want to delete item: " + item_title);
+
+    if(!response) return;
+    let mode = flag ? "hard" : "soft";
+    let payload = { id: item_id, mode: mode };    
+    let token = window["generated_token"];
+    let resp = await tsutils.ajax_request(HttpMethod.HTTP_DELETE, "/api/items", token, payload);
+
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+        dom.page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+    }    
+}
+
+export 
+async function item_upload_file() 
+{
+    let file_dlg = document.querySelector("#file-choose");
+    // let file = file_dlg.files[0];
+
+    let form = new FormData();
+    // form.append("upload-file", file);
+    console.log(form);
+    var token = window["generated_token"];
+
+    let res = await fetch("/api/item_upload", {
+           method: 'POST'
+         , headers: {    // 'Content-Type':     'multipart/form-data'
+                         'X-Requested-With': 'XMLHttpRequest'
+                       , 'X-CSRFToken':       token 
+                    }          
+        , body:    form 
+    });
+    console.log(res);
+    dom.page_refresh();
+}
+
+export
+async function item_snapshot(item_id: Number)
+{
+    let dlg = new Dialog_Notify();
+    dlg.setTitle("Download");
+    dlg.setText("Downloading file snapshot. Wait a while ...");
+    dlg.show();
+
+    let token = window["generated_token"];
+    let payload = { action: "snapshot", id: item_id };
+    let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload);
+    
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        dlg.close();
+        dom.page_refresh(); 
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+        dlg.close();
+    }
+}
+
+export 
+function search_bookmarks()
+{    
+    //console.trace(" [TRACE] I was called. ");
+    let search_box    = document.querySelector("#search-entry");
+    let query         = encodeURIComponent(search_box.value); 
+    let mode_selector = document.querySelector("#search-mode-selector");
+    let mode = mode_selector ? mode_selector.value : "AND";
+    let url        = `/items?filter=search&query=${query}&mode=${mode}`;    
+    //console.log("URL = ", url);
+    // Redirect to search route.
+   dom.redirect_url(url); 
+
+}
+
 

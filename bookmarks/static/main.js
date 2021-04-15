@@ -655,68 +655,6 @@ function open_url_newtab(url)
     win.focus();
 }
 window["open_url_newtab"] = open_url_newtab;
-
-/** @description Add new bookmark to collection  */
-async function api_item_add(crfs_token)
-{
-        let url = await Dialog2_Prompt.prompt("Enter the new URL to be added", "");                            
-        console.log("User entered the URL: ", url);
-
-        var query_params = new URLSearchParams(window.location.search);
-        if(query_params.get("filter") == "collection")
-        {
-            console.trace(" [TRACE] Add item to collection")
-
-            var collection_id = query_params.get("A0");
-            var payload = { url: url, action: "item_new", collection_id: collection_id };
-
-            var token = window["generated_token"];
-
-            utils.ajax_post("/api/collections/add_item", token, payload).then( async res => {
-                if(res["result"] == "OK"){
-                    let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
-                    utils.dom_page_refresh();
-                } else {
-                    Dialog_Notify.notify("Error", "Error 1: Bookmark already exists.", 2000);
-                    //dialog_notify.notify("Error: bookmark already exists", 2000);
-                    console.error("Error: bookmark already exists");
-                    document.location.href = `/items?filter=search&query=${url}`;
-                }
-        
-            }).catch(err => { 
-                console.log("Error: item already exists. [2]");
-                Dialog_Notify.notify("Error: " + err);                
-            });
-
-            return;
-        }
-
-        let starred = query_params.get("filter") == "starred";
-        // var payload = {url: url, action: "item_new", starred: starred};
-        var payload = { url: url, starred: starred };
-
-        console.log(" [TRACE] Payload = ", payload);
-
-        let res = await utils.ajax_post("/api2/items", crfs_token, payload); 
-        let body = await res.json();
-        console.log(" Status /api2/items = ", res);
-        
-        if(res.status == 200 || res.status == 201 )
-        {
-            
-            Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
-            location.reload();
-        } else {
-            Dialog_Notify.notify("ERROR",  body, 2000);
-            // document.location.href = `/items?filter=search&query=${url}`;
-            console.trace(" [ERROR] Failed to send data.");
-        }
-
-        
-}
-
-window["api_item_add"] = api_item_add;
-
  
 
 
@@ -731,30 +669,6 @@ window["related_item_add"] = async function related_item_add(item_id)
 }
 
 
-
-async function item_upload_file() 
-{
-    let file_dlg = document.querySelector("#file-choose");
-    let file = file_dlg.files[0];
-
-    let form = new FormData();
-    form.append("upload-file", file);
-    console.log(form);
-    var token = window["generated_token"];
-
-    let res = await fetch("/api/item_upload", {
-           method: 'POST'
-         , headers: {    // 'Content-Type':     'multipart/form-data'
-                         'X-Requested-With': 'XMLHttpRequest'
-                       , 'X-CSRFToken':       token 
-                    }          
-        , body:    form 
-    });
-    console.log(res);
-    utils.dom_page_refresh();
-}
-
-window["item_upload_file"] = item_upload_file;
 
 async function collection_remove_item(collectionID, itemID)
 {
@@ -780,30 +694,6 @@ window["collection_remove_item"] = collection_remove_item;
 
 
 
-
-async function item_delete(flag, item_id, item_title) 
-{
-    
-    let dialog_title = flag ? "Permanently delete item (Irreversible)." : "Delete item (move to trash)";
-
-    let response = await Dialog_YesNo.prompt( dialog_title
-                                      , "Are you sure you want to delete item: " + item_title);
-
-    if(!response) return;
-    let mode = flag ? "hard" : "soft";
-    let payload = { id: item_id, mode: mode };    
-    let token = window["generated_token"];
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_DELETE, payload);
-
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
-        utils.dom_page_refresh();
-    } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
-    }    
-}
-
-window["item_delete"] = item_delete;
 
 async function item_snapshot(item_id)
 {
@@ -888,37 +778,6 @@ function bookmarks_order_by(order)
 
 }
 window["bookmarks_order_by"] = bookmarks_order_by;
-
-
-async function tag_filter_window()
-{
-    let dlg = new Dialog_Datalist_Prompt();
-    dlg.setTitle("Select a tag");    
-    // dlg.setInputText(last_input.get());
-
-    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
-    let token = window["generated_token"];
-    let all_tags = await utils.ajax_get("/api/tags", token);
-    console.log(all_tags);   
-    
-    for(let n in all_tags){
-        let row = all_tags[n];
-        console.log(" row = ", row);
-        console.log(` name = ${row[name]} - id = ${row["id"]}`)
-        dlg.add_option(row["name"], row["id"]);
-    }    
-
-    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
-    let answer = await dlg.prompt_selected();
-    console.log(" ANSWER = ", answer);
-
-    if(answer == null){ return; }
-
-    // Redirect URL 
-    document.location = `/items?filter=tag-name&A0=${answer["value"]}`;
-}
-
-window["tag_filter_window"] = tag_filter_window;
 
 
 function keypress_return_adapter(funct)
