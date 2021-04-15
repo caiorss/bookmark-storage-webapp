@@ -1,13 +1,13 @@
 @font-face {
     font-family: medieval_old_english;
     /* src: url(/static/OldeEnglish.ttf); */
-    src: url(/static/SktMedieval.ttf);
+    src: url(/static/fonts/SktMedieval.ttf);
    
   }
 
  @font-face {
     font-family: unknown_font;
-    src: url(/static/CoolFont.woff);
+    src: url(/static/fonts/CoolFont.woff);
    
   }
 
