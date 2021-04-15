@@ -122,6 +122,13 @@ dom.event_onContentLoaded(() =>
     var theme_selection_box: HTMLSelectElement = document.querySelector("#theme-selector-box");
     theme_selection_box.onchange = selection_changed;
 
+    var theme = site_theme.get("dark_mode");
+    set_theme(theme);
+
+    if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
+    if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
+
+
  });
 
 export 

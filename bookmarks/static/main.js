@@ -29,50 +29,6 @@ function DOM_set_visibility(m, flag)
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
 
-let flagItemDetailsVisible = new LocalStorageFlag("itemsTableVisible", true);
-
-
-function set_theme(mode)
-{
-    var root = document.documentElement;
-
-    if(mode == "dark_mode")
-    {           
-        root.style.setProperty("--main-background-color", "#3c3c3c");
-        root.style.setProperty("--foreground-color",      "white");
-        root.style.setProperty("--item-background-color", "#2f2f2f");
-        root.style.setProperty("--hyperlink-color",       "lightskyblue");
-        
-        root.style.setProperty("--right-row-label-color", "black");
-        root.style.setProperty("--left-row-label-color", "#1b1b1b");
-
-        root.style.setProperty("--btn-primary-bgcolor", "#007bff");
-    }
-
-    if(mode == "light_mode")
-    {
-        root.style.setProperty("--main-background-color", "lightgray");
-        root.style.setProperty("--foreground-color",      "black");
-        root.style.setProperty("--item-background-color", "ligthblue");
-        root.style.setProperty("--hyperlink-color",       "darkblue");
-        
-        root.style.setProperty("--right-row-label-color", "#bdb3b3");
-        root.style.setProperty("--left-row-label-color", "#82c5bc");
-
-        root.style.setProperty("--btn-primary-bgcolor", "black");
-    }
-}
-
-
-let site_theme = new LocalStorageString("site_theme");
-
-function selection_changed(mode)
-{
-    var mode = this.value;
-    set_theme(mode);
-    site_theme.set(mode);
-}
-
 
 const ACTION_RESTORE     = "RESTORE";
 const ACTION_DELETE      = "DELETE";
@@ -343,14 +299,7 @@ utils.dom_onContentLoaded(() => {
     // ---------- Event handlers ----------------------------------// 
 
     // dialog_notify.notify("Page created Ok", 900);
-
-    var flag = flagItemDetailsVisible.get();
-    var obs = document.querySelectorAll(".item-details");
-    obs.forEach(x => DOM_set_visibility(x, flag));    
-    
-
-    var theme_selection_box = document.querySelector("#theme-selector-box");
-    theme_selection_box.onchange = selection_changed;
+   
 
     var theme = site_theme.get("dark_mode");
     set_theme(theme);
@@ -544,6 +493,7 @@ utils.dom_onContentLoaded(() => {
 
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
+
 async function collection_remove_item(collectionID, itemID)
 {
 
