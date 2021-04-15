@@ -16,7 +16,7 @@ namespace dom {
     }
     
     // Toggle DOM element 
-    export function toggle(m: HTMLElement) {
+    export function toggle(m: any) {
         if (m == null) { alert(" Error: element not found"); }
         var d = m.style.display;
         var v = window.getComputedStyle(m);
@@ -483,4 +483,11 @@ async function related_item_add(item_id: Number)
     dom.page_refresh();    
 }
 
+
+export 
+function toggle_sidebar()
+{
+    var s = dom.select(".sidebar");
+    dom.toggle(s);
+}
 
