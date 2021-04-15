@@ -6,6 +6,124 @@ import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
       , DialogForm, Dialog_Notify, Dialog_Datalist_Prompt
         } from "./dialogs.js";
 
+
+
+// Boolean flag ('true' or 'false') stored in html5
+// local storage API. It is useful for storing non critical 
+// user preference data on client-side. 
+export 
+class LocalStorageFlag {
+   
+    name: string;
+    
+    constructor(name: string, value: Boolean) 
+    {
+        this.name = name;    
+        
+        var q = localStorage.getItem(name);
+        
+        if (q == null || q == "undefined") 
+        {
+            localStorage.setItem(name, String(value) );
+        }
+    }
+
+    set(value){ localStorage.setItem(this.name, value); }
+
+    get(){
+        var result = localStorage.getItem(this.name);
+        if (result == "undefined") {
+            this.set(false);
+            return false;
+        }
+        return JSON.parse(result) || false;
+    };
+
+    toggle(){ this.set(!this.get()); return this.get(); };
+
+};
+
+export 
+class LocalStorageString {
+
+    name: string; 
+
+    constructor(name: string, value: string = null) 
+    {
+        this.name = name;
+
+        var q = localStorage.getItem(name);
+        if (q == null || q == "undefined") {
+            localStorage.setItem(name, value);
+        }
+   }
+
+    get(default_value: string = null)
+    {
+        var result = localStorage.getItem(this.name);
+        if (result == "undefined") {
+            this.set(default_value);
+            return default_value;
+     }
+     return result;
+    }
+    
+    set(value: string){ localStorage.setItem(this.name, value); } 
+ 
+};
+
+let site_theme = new LocalStorageString("site_theme");
+
+
+function set_theme(mode)
+{
+    var root = document.documentElement;
+
+    if(mode == "dark_mode")
+    {           
+        root.style.setProperty("--main-background-color", "#3c3c3c");
+        root.style.setProperty("--foreground-color",      "white");
+        root.style.setProperty("--item-background-color", "#2f2f2f");
+        root.style.setProperty("--hyperlink-color",       "lightskyblue");
+        
+        root.style.setProperty("--right-row-label-color", "black");
+        root.style.setProperty("--left-row-label-color", "#1b1b1b");
+
+        root.style.setProperty("--btn-primary-bgcolor", "#007bff");
+    }
+
+    if(mode == "light_mode")
+    {
+        root.style.setProperty("--main-background-color", "lightgray");
+        root.style.setProperty("--foreground-color",      "black");
+        root.style.setProperty("--item-background-color", "ligthblue");
+        root.style.setProperty("--hyperlink-color",       "darkblue");
+        
+        root.style.setProperty("--right-row-label-color", "#bdb3b3");
+        root.style.setProperty("--left-row-label-color", "#82c5bc");
+
+        root.style.setProperty("--btn-primary-bgcolor", "black");
+    }
+}
+
+
+function selection_changed()
+{
+    console.log(" [TRACE] Theme changed Ok. \n");
+    //  var mode = this.value;
+    set_theme(this.value);
+    site_theme.set(this.value);
+}
+
+dom.event_onContentLoaded(() =>
+ {
+    console.trace(" [TRACE] I was loaded from tsmain.ts - typescript file. ");
+ 
+    var theme_selection_box: HTMLSelectElement = document.querySelector("#theme-selector-box");
+    theme_selection_box.onchange = selection_changed;
+
+ });
+
 export 
 async function item_quick_rename(item_id: Number, old_item_title: string)
 {
@@ -85,7 +203,7 @@ async function tag_create()
 export 
 async function tag_add(item_id: Number)
 {
-    // let last_input = new LocalStorageString("tag-last-input", "");
+    let last_input = new LocalStorageString("tag-last-input", "");
         
     let dlg = new Dialog_Datalist_Prompt();
     dlg.setTitle("Select a tag");    
@@ -100,8 +218,8 @@ async function tag_add(item_id: Number)
     
     for(let n in all_tags){
         let row = all_tags[n];
-        console.log(" row = ", row);
-        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        // console.log(" row = ", row);
+        // console.log(` name = ${row[name]} - id = ${row["id"]}`)
         dlg.add_option(row["name"], row["id"]);
     }
     
@@ -110,7 +228,7 @@ async function tag_add(item_id: Number)
     console.log(" ANSWER = ", answer);
 
     let resp = null;
-    // last_input.set(answer["value"]);
+    last_input.set(answer["value"]);
 
     if(answer["key"] == null)
     {  

@@ -25,56 +25,6 @@ function DOM_set_visibility(m, flag)
 } /* -- End of - DOM_toggle() --- */
 
 
-// Boolean flag ('true' or 'false') stored in html5
-// local storage API. It is useful for storing non critical 
-// user preference data on client-side. 
-class LocalStorageFlag {
-    constructor(name, value) {
-        this.name = name;
-        this._dummy = (function () {
-            var q = localStorage.getItem(name);
-            if (q == null || q == "undefined") {
-                localStorage.setItem(name, value);
-            }
-        } ());
-        this.get = () => {
-            var result = localStorage.getItem(this.name);
-            if (result == "undefined") {
-                this.set(false);
-                return false;
-            }
-            return JSON.parse(result) || false;
-        };
-        this.set = (value) => localStorage.setItem(this.name, value);
-        this.toggle = () => { this.set(!this.get()); return this.get(); };
-    }
-}
-;
-
-
-
-class LocalStorageString {
-    constructor(name, value) {
-        this.name = name;
-        this._dummy = (function () {
-            var q = localStorage.getItem(name);
-            if (q == null || q == "undefined") {
-                localStorage.setItem(name, value);
-            }
-        } ());
-        this.get = (default_value) => {
-            var result = localStorage.getItem(this.name);
-            if (result == "undefined") {
-                this.set(default_value);
-                return default_value;
-            }
-            return result;
-        };
-        this.set = (value) => localStorage.setItem(this.name, value);
-    }
-}
-;
-
 
 
 // ---- Executed after document (DOM objects) is loaded ---------- //
@@ -594,15 +544,6 @@ utils.dom_onContentLoaded(() => {
 
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
-
-function open_url_newtab(url)
-{
-    var win = window.open(url, '_blank');
-    win.focus();
-}
-window["open_url_newtab"] = open_url_newtab;
-
-
 async function collection_remove_item(collectionID, itemID)
 {
 

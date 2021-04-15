@@ -38,7 +38,12 @@ namespace dom {
             elem.addEventListener("click", callback);
         }
     }
- 
+
+    /** Event fired after content is loaded. */
+    export function event_onContentLoaded(callback) 
+    {
+        document.addEventListener("DOMContentLoaded", callback);
+    }
 
     /** Reload current page. (same as hit F5 in the web browser) */
     export function page_refresh()
