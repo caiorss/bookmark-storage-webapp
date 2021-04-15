@@ -5,32 +5,6 @@ import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
 import * as utils from "/static/utils.js";
 
 
-function DOM_select(selector)
-{
-    return document.querySelector(selector);
-}
-
-// Toggle DOM element 
-function DOM_toggle(m)
-{
-    if(m == null){ alert(" Error: element not found");  }
-    var d = m.style.display;
-    var v = window.getComputedStyle(m);
-
-    // if(m.style.visibility == "" || m.style.visibility == "visible")
-    if(v.visibility == "visible")
-    {
-        console.log(" [TRACE] => Hide element");
-        m.style.visibility = "hidden";
-        m.style.display = "none";
-    } else {
-        console.log(" [TRACE] => Show element");
-        m.style.visibility = "visible";
-        m.style.display = "block";
-    }        
-} /* -- End of - DOM_toggle() --- */
-
-
 // Set visibility of DOM element 
 function DOM_set_visibility(m, flag)
 {
