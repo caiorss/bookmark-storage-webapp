@@ -215,13 +215,13 @@ async function tag_add(item_id: Number)
     let dlg = new Dialog_Datalist_Prompt();
     dlg.setTitle("Select a tag");    
     
-    // dlg.setInputText(last_input.get());
-    dlg.setInputText("");
+    dlg.setInputText(last_input.get());
+    // dlg.setInputText("");
 
     // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
     let token = window["generated_token"];
     let all_tags = await tsutils.ajax_get("/api/tags", token);
-    console.log(all_tags);   
+    // console.log(all_tags);
     
     for(let n in all_tags){
         let row = all_tags[n];
