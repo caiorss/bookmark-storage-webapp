@@ -491,3 +491,15 @@ function toggle_sidebar()
     dom.toggle(s);
 }
 
+export 
+function toggle_items_table_info(table_info_id: string)
+{
+    // alert("Button toggle clicked ok.");
+    let obs = document.querySelector(table_info_id);
+    if(obs == null){ alert(`Error: object #${table_info_id} not found. `); }
+    // console.assert(obs, "Table info supposed not null.");
+    dom.toggle(obs); 
+}
+
+
+
