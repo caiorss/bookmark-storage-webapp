@@ -321,6 +321,62 @@ async function tag_filter_window()
     dom.redirect_url( `/items?filter=tag-name&A0=${answer["value"]}` );
 }
 
-// window["item_quick_rename"] = item_quick_rename;
 
+
+/** @description Add new bookmark to collection  */
+export 
+async function api_item_add(crfs_token: string)
+{
+    let url = await Dialog2_Prompt.prompt("Enter the new URL to be added", "");
+    console.log("User entered the URL: ", url);
+
+    var query_params = new URLSearchParams(window.location.search);
+
+    if (query_params.get("filter") == "collection") 
+    {
+        console.trace(" [TRACE] Add item to collection")
+
+        var collection_id = query_params.get("A0");
+        var payload1 = { url: url, action: "item_new", collection_id: collection_id };
+
+        var token = window["generated_token"];
+
+        let res = await tsutils.ajax_post("/api/collections/add_item", token, payload1);
+
+
+        if (res.status == 200 || res.status == 201) {
+            let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
+            dom.page_refresh();
+        } else {
+            Dialog_Notify.notify("Error", "Error 1: Bookmark already exists.", 2000);
+            //dialog_notify.notify("Error: bookmark already exists", 2000);
+            console.error("Error: bookmark already exists");
+            document.location.href = `/items?filter=search&query=${url}`;
+        }
+
+        return;
+    }
+
+    let starred = query_params.get("filter") == "starred";
+    // var payload = {url: url, action: "item_new", starred: starred};
+    let payload: any = { url: url, starred: starred };
+
+    console.log(" [TRACE] Payload = ", payload);
+
+    let res = await tsutils.ajax_post("/api2/items", crfs_token, payload);
+    let body = await res.json();
+    console.log(" Status /api2/items = ", res);
+
+    if (res.status == 200 || res.status == 201) {
+
+        Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+        location.reload();
+    } else {
+        Dialog_Notify.notify("ERROR", body, 2000);
+        // document.location.href = `/items?filter=search&query=${url}`;
+        console.trace(" [ERROR] Failed to send data.");
+    }
+
+
+}
 

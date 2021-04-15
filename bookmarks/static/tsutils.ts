@@ -40,7 +40,7 @@ export async function ajax_request(method: HttpMethod, url: string
  *  @param {string} crfs_token  - Django CRFSS token from global variable (generated_token)
  *  @param {object} data        - HTTP request body, aka payload  
  */
-export async function ajax_post(url: string, crfs_token: string, data: JSON) {
+export async function ajax_post(url: string, crfs_token: string, data: any) {
 
     var payload = JSON.stringify(data);
 
