@@ -5,30 +5,6 @@ import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
 import * as utils from "/static/utils.js";
 
 
-// Set visibility of DOM element 
-function DOM_set_visibility(m, flag)
-{
-    if(m == null){ alert(" Error: element not found");  }
-    var d = m.style.display;
-    var v = window.getComputedStyle(m);
-    // if(m.style.visibility == "" || m.style.visibility == "visible")
-    if(flag == true)
-    {
-        console.log(" [TRACE] => Hide element");
-        m.style.visibility = "hidden";
-        m.style.display = "none";
-    } else {
-        console.log(" [TRACE] => Show element");
-        m.style.visibility = "visible";
-        m.style.display = "block";
-    }        
-} /* -- End of - DOM_toggle() --- */
-
-
-
-
-// ---- Executed after document (DOM objects) is loaded ---------- //
-
 
 const ACTION_RESTORE     = "RESTORE";
 const ACTION_DELETE      = "DELETE";
@@ -300,13 +276,6 @@ utils.dom_onContentLoaded(() => {
 
     // dialog_notify.notify("Page created Ok", 900);
    
-
-    var theme = site_theme.get("dark_mode");
-    set_theme(theme);
-
-    if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
-    if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
-
     var body = document.body;
 
     var dialog = utils.dom_append_html(body, `
@@ -375,51 +344,6 @@ utils.dom_onContentLoaded(() => {
         utils.ajax_post("/api/collections", crfs_token, payload).then( res => {
             console.log(" Response = ", res);
         });
-    });
-
-    let dialog_collection_edit = new DialogForm();
-    dialog_collection_edit.detach_on_close(false);
-    dialog_collection_edit.setTitle("Create new collection");
-    dialog_collection_edit.setText("Enter the following informations:");
-    dialog_collection_edit.add_row_input("title", "Title:");
-    dialog_collection_edit.add_row_input("desc", "Description:");
-
-
-    async function collection_create_new()
-    {
-        // alert(" Clicked at create new collection Ok. ");
-        // dialog_collection_edit.show();
-
-        let sender = await dialog_collection_edit.onConfirm();
-        let title = sender.get_widget("title").value;
-        let desc  = sender.get_widget("desc").value;
-
-        console.log(" [INFO] Creating collection with title = ", title);
-
-        let res = await utils.ajax_request(  "/api/collections"
-                                           , window["generated_token"]
-                                           , utils.HTTP_POST
-                                           , {
-                                               title:       title 
-                                             , description: desc 
-                                          });
-
-        if(res["result"] == "OK")
-        {
-            let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
-            utils.dom_page_refresh();
-        } else {
-            Dialog_Notify.notify("Error", "Failed to create collection.");
-        }
-    
-        dialog.close();
-    }
-
-
-    utils.dom_onClicked("#btn-create-new-collection", () => {         
-        collection_create_new();
-        console.log(" I was clicked OK. ");
-
     });
 
 
