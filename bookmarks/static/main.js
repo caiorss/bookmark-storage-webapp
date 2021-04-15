@@ -693,48 +693,6 @@ async function collection_remove_item(collectionID, itemID)
 window["collection_remove_item"] = collection_remove_item;
 
 
-
-
-async function item_snapshot(item_id)
-{
-    let dlg = new Dialog_Notify();
-    dlg.setTitle("Download");
-    dlg.setText("Downloading file snapshot. Wait a while ...");
-    dlg.show();
-
-    let token = window["generated_token"];
-    let payload = { action: "snapshot", id: item_id };
-    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload);
-    
-    if(resp["result"] == "OK")
-    {
-        await Dialog_Notify.notify_ok(resp["message"]);
-        dlg.close();
-        utils.dom_page_refresh();
-    } else {
-        await Dialog_Notify.notify_error(resp["message"]);
-        dlg.close();
-    }
-}
-
-window["item_snapshot"] = item_snapshot;
-
-
-function search_bookmarks()
-{    
-    //console.trace(" [TRACE] I was called. ");
-    let search_box    = document.querySelector("#search-entry");
-    let query         = encodeURIComponent(search_box.value); 
-    let mode_selector = document.querySelector("#search-mode-selector");
-    let mode = mode_selector ? mode_selector.value : "AND";
-    let url        = `/items?filter=search&query=${query}&mode=${mode}`;    
-    //console.log("URL = ", url);
-    // Redirect to search route.
-    document.location = url;
-
-}
-window["search_bookmarks"] = search_bookmarks;
-
 // How can add or update a query string parameter.
 // Reference: https://stackoverflow.com/questions/5999118
 function UpdateQueryString(key, value, url) {
@@ -791,17 +749,6 @@ function keypress_return_adapter(funct)
 };
 
 window["keypress_return_adapter"] = keypress_return_adapter;
-
-function clear_entry_field(dom_element_id)
-{
-    let field = document.querySelector(dom_element_id);
-    console.assert(field != null, `Cannot find entry field to be cleared`);
-    field.value = "";
-    field.focus();
-}
-
-window["clear_entry_field"] = clear_entry_field;
-
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

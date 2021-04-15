@@ -272,7 +272,7 @@ async function tag_update(tag_name: string, tag_id: Number, tag_desc: string)
     let sender = await dialog.onConfirm();
 
     let resp = await tsutils.ajax_request(
-                               tsutils.HttpMethod.HTTP_PUT
+                               HttpMethod.HTTP_PUT
                             , "/api/tags"
                             , window["generated_token"]
                             , { 
@@ -451,15 +451,25 @@ export
 function search_bookmarks()
 {    
     //console.trace(" [TRACE] I was called. ");
-    let search_box    = document.querySelector("#search-entry");
+    let search_box    = <HTMLInputElement> document.querySelector("#search-entry");
     let query         = encodeURIComponent(search_box.value); 
-    let mode_selector = document.querySelector("#search-mode-selector");
-    let mode = mode_selector ? mode_selector.value : "AND";
-    let url        = `/items?filter=search&query=${query}&mode=${mode}`;    
+    let mode_selector = <HTMLInputElement> document.querySelector("#search-mode-selector");
+    let mode          = mode_selector ? mode_selector.value : "AND";
+    let url           = `/items?filter=search&query=${query}&mode=${mode}`;    
     //console.log("URL = ", url);
     // Redirect to search route.
    dom.redirect_url(url); 
 
 }
+
+export 
+function clear_entry_field(dom_element_id: string)
+{
+    let field: HTMLInputElement = document.querySelector(dom_element_id);
+    console.assert(field != null, `Cannot find entry field to be cleared`);
+    field.value = "";
+    field.focus();
+}
+
 
 
