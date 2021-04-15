@@ -1,73 +1,10 @@
 
 import * as tsutils from "./tsutils.js";
-import { HttpMethod } from "./tsutils.js";
+import { HttpMethod, dom} from "./tsutils.js";
 
 import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
       , DialogForm, Dialog_Notify, Dialog_Datalist_Prompt
         } from "./dialogs.js";
-
-export 
-namespace dom {
-
-    // Select DOM element by CSS selector 
-    export function select(selector: string) 
-    {
-        return document.querySelector(selector)
-    }
-    
-    // Toggle DOM element 
-    export function toggle(m: any) {
-        if (m == null) { alert(" Error: element not found"); }
-        var d = m.style.display;
-        var v = window.getComputedStyle(m);
-
-        // if(m.style.visibility == "" || m.style.visibility == "visible")
-        if (v.visibility == "visible") {
-            console.log(" [TRACE] => Hide element");
-            m.style.visibility = "hidden";
-            m.style.display = "none";
-        } else {
-            console.log(" [TRACE] => Show element");
-            m.style.visibility = "visible";
-            m.style.display = "block";
-        }
-    } /* -- End of - DOM_toggle() --- */
-
-    export function event_onClicked(selector: string, callback) 
-    {
-        var elem = document.querySelector(selector);
-
-        if (!elem) {
-            console.warn(` dom_onClicked() => CSS selector ${selector} not found.`);
-        }
-        if (elem) {
-            elem.addEventListener("click", callback);
-        }
-    }
- 
-
-    /** Reload current page. (same as hit F5 in the web browser) */
-    export function page_refresh()
-    {
-        document.location.reload(true);
-    }
-
-    /** Redirect URL */
-    export function url_redirect(url: string) 
-    {
-        document.location.href = url;
-    }
-
-    export  function url_newtab(url: string)
-    {
-       var win = window.open(url, '_blank');
-       win.focus();
-    }
-
-
-
-} // End of namespace 
-
 
 export 
 async function item_quick_rename(item_id: Number, old_item_title: string)
@@ -519,7 +456,3 @@ function open_url_newtab(url: string)
 {
    dom.url_newtab(url); 
 }
-
-
-
-
