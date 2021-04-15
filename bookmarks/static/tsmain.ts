@@ -53,12 +53,18 @@ namespace dom {
     }
 
     /** Redirect URL */
-    export function redirect_url(url: string) 
+    export function url_redirect(url: string) 
     {
         document.location.href = url;
     }
 
-  
+    export  function url_newtab(url: string)
+    {
+       var win = window.open(url, '_blank');
+       win.focus();
+    }
+
+
 
 } // End of namespace 
 
@@ -318,7 +324,7 @@ async function tag_filter_window()
     if(answer == null){ return; }
 
     // Redirect URL 
-    dom.redirect_url( `/items?filter=tag-name&A0=${answer["value"]}` );
+    dom.url_redirect( `/items?filter=tag-name&A0=${answer["value"]}` );
 }
 
 /** @description Add new bookmark to collection  */
@@ -458,7 +464,7 @@ function search_bookmarks()
     let url           = `/items?filter=search&query=${query}&mode=${mode}`;    
     //console.log("URL = ", url);
     // Redirect to search route.
-   dom.redirect_url(url); 
+   dom.url_redirect(url); 
 
 }
 
@@ -500,6 +506,20 @@ function toggle_items_table_info(table_info_id: string)
     // console.assert(obs, "Table info supposed not null.");
     dom.toggle(obs); 
 }
+
+export 
+function toggle_action_menu(actionID)
+{
+    var elem = document.querySelector(actionID);
+    dom.toggle(elem);
+}
+
+export 
+function open_url_newtab(url: string)
+{
+   dom.url_newtab(url); 
+}
+
 
 
 

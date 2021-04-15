@@ -595,53 +595,12 @@ utils.dom_onContentLoaded(() => {
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
 
-
-function toggle_sidebar()
-{
-    var s = DOM_select(".sidebar");
-    DOM_toggle(s);
-}
-
-// Allows accessing this variable from html templates 
-window["toggle_sidebar"] = toggle_sidebar;
-
-function toggle_items_table_info(table_info_id)
-{
-    // alert("Button toggle clicked ok.");
-    let obs = document.querySelector(table_info_id);
-    if(obs == null){ alert(`Error: object #${table_info_id} not found. `); }
-    console.assert(obs, "Table info supposed not null.");
-    DOM_toggle(obs);    
-}
-
-window["toggle_items_table_info"] = toggle_items_table_info;
-
-function toggle_action_menu(actionID)
-{
-    var elem = document.querySelector(actionID);
-    DOM_toggle(elem);
-}
-window["toggle_action_menu"] = toggle_action_menu;
-
 function open_url_newtab(url)
 {
     var win = window.open(url, '_blank');
     win.focus();
 }
 window["open_url_newtab"] = open_url_newtab;
- 
-
-
-window["related_item_add"] = async function related_item_add(item_id)
-{
-    let related_id = await Dialog2_Prompt.prompt("Enter related item id:", "");                            
-    let token = window["generated_token"];
-    let payload = { item_id: item_id, related_ids: [ related_id ] };
-    let res = await utils.ajax_post("/api/related", token, payload);
-    console.log(res);
-    utils.dom_page_refresh();    
-}
-
 
 
 async function collection_remove_item(collectionID, itemID)
