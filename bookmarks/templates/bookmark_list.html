@@ -91,7 +91,7 @@ Order by: <br/>
 
                 <!-- Button for adding new tags -->
                 <a class="btn-sm btn-primary btn-toggle-details" 
-                    href="javascript:tag_add( {{ bookmark.id }} );" 
+                    href="javascript:tsmain.tag_add( {{ bookmark.id }} );" 
                     >Add tag</a>
 
                 <!--- Button for edding -->
@@ -132,13 +132,13 @@ Order by: <br/>
                 <li>
                     <!-- Button for removing tag from element. -->
                     <a class="tag-remove-button" 
-                        href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                        href="javascript:tsmain.tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
                         title="Remove tag '{{ tag.name }}' from bookmark."
                     >[X]</a>
 
                   <!-- Button for Editing tag -->
                   <a class="tag-remove-button" 
-                        href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                        href="javascript:tsmain.tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
                         title="Update/Edit tag '{{ tag.name }}' from bookmark."
                     >[E]</a>
 
