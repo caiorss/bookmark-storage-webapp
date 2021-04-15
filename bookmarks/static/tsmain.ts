@@ -115,6 +115,45 @@ function selection_changed()
     site_theme.set(this.value);
 }
 
+let dialog_collection_edit = new DialogForm();
+dialog_collection_edit.detach_on_close(false);
+dialog_collection_edit.setTitle("Create new collection");
+dialog_collection_edit.setText("Enter the following informations:");
+dialog_collection_edit.add_row_input("title", "Title:");
+dialog_collection_edit.add_row_input("desc", "Description:");
+
+
+async function collection_create_new() 
+{
+    // alert(" Clicked at create new collection Ok. ");
+    // dialog_collection_edit.show();
+
+    let sender = await dialog_collection_edit.onConfirm();
+    let title = sender.get_widget("title").value;
+    let desc = sender.get_widget("desc").value;
+
+    console.log(" [INFO] Creating collection with title = ", title);
+
+    let res = await tsutils.ajax_request(
+                                  HttpMethod.HTTP_POST    
+                                , "/api/collections"
+                                , window["generated_token"]
+                                , {
+                                      title:       title
+                                    , description: desc
+                                });
+
+    if (res["result"] == "OK") {
+        let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+        dom.page_refresh();
+    } else {
+        Dialog_Notify.notify("Error", "Failed to create collection.");
+    }
+
+    // dialog.close();
+}
+
+
 dom.event_onContentLoaded(() =>
  {
     console.trace(" [TRACE] I was loaded from tsmain.ts - typescript file. ");
@@ -127,6 +166,13 @@ dom.event_onContentLoaded(() =>
 
     if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
     if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
+
+
+    dom.event_onClicked("#btn-create-new-collection", () => {
+        collection_create_new();
+        console.log(" I was clicked OK. ");
+    });
+
 
 
  });
