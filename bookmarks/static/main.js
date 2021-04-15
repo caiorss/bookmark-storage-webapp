@@ -452,7 +452,7 @@ utils.dom_onContentLoaded(() => {
             selectbox.add(opt, -1);    
         }
         
-        console.log(" [TRACE] collections = ", colls);
+        // console.log(" [TRACE] collections = ", colls);
     });
 
     const ACTION_COLLECTION_ADD = "ADD";
@@ -463,8 +463,8 @@ utils.dom_onContentLoaded(() => {
         var selectionbox = document.querySelector("#selector-collection-add");
         var collectionID = selectionbox[selectionbox.selectedIndex]["value"];
 
-        console.log(" items = ", items);
-        console.log(" collection = ", collectionID);
+        // console.log(" items = ", items);
+        // console.log(" collection = ", collectionID);
 
         var payload = {
              items:        items
