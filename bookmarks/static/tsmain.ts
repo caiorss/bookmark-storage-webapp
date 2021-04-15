@@ -472,4 +472,15 @@ function clear_entry_field(dom_element_id: string)
 }
 
 
+export
+async function related_item_add(item_id: Number)
+{
+    let related_id = await Dialog2_Prompt.prompt("Enter related item id:", "");                            
+    let token = window["generated_token"];
+    let payload = { item_id: item_id, related_ids: [ related_id ] };
+    let res = await tsutils.ajax_post("/api/related", token, payload);
+    console.log(res);
+    dom.page_refresh();    
+}
+
 
