@@ -13,19 +13,32 @@ from bookmarks import models
 from bookmarks import dutils
 import bookmarks.views
 
-class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
-    class Meta:
-        fields = ( 'id', 'url', 'title', 'deleted', 'starred'
-                   , 'brief',  'created', 'updated')
-        model = models.SiteBookmark
-
 
 class Serializer_Tags(rest.serializers.ModelSerializer):
+    
+    #item = rest.serializers.PrimaryKeyRelatedField(  queryset = models.SiteBookmark.objects.all()
+    #                                               , many = True )
+
     class Meta:
-        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated' ) 
+        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated'
+                  , 'item' 
+                  ) 
+        extra_kwargs = { 'item': { 'required': False } }
         model = models.Tag2
 
+class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
+    tags = Serializer_Tags(read_only= True, many = True, source = 'item')
 
+    #tag = rest.serializers.PrimaryKeyRelatedField( queryset = models.Tag2.objects.all(), many = True)
+
+    class Meta:
+        model = models.SiteBookmark
+        fields = ( 'id', 'url', 'title', 'deleted', 'starred'
+                   , 'brief',  'created', 'updated'
+                   , 'tags'
+                   )
+        #fields = "__all__"
+        #depth = 1
 
 class API_Items(rf_gen.ListCreateAPIView):
     # pagination_class = rf_pag. 
