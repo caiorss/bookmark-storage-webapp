@@ -319,7 +319,7 @@ async function tag_add(item_id: Number)
 
 
 export 
-async function tag_remove(tag_id, bookmark_id)
+async function tag_remove(tag_id: Number, bookmark_id: Number)
 {    
     let payload = {   action:   "remove_tag_item"
                     , tag_id:    tag_id
@@ -329,7 +329,7 @@ async function tag_remove(tag_id, bookmark_id)
     let token = window["generated_token"];
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/tags", token, payload);
 
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201)
     {
         await Dialog_Notify.notify_ok(resp["message"], 500);
         dom.page_refresh(); 
