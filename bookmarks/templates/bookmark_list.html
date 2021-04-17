@@ -4,15 +4,17 @@
 
 <h3> {{ page_title }} </h3>
 
-<div id="div-additional-buttons"> </div>
-
-Order by: <br/>
-
-<button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('new')">Newest</button>
-<button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('old')">Oldest</button>
-<button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('updated')">Last updated</button>
-
 <div id="bookmark-list" class="container">   
+
+<div id="div-additional-buttons">
+  Order by: <br />
+
+  <button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('new')">Newest</button>
+  <button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('old')">Oldest</button>
+  <button class="btn-sm btn-primary btn-toggle-details" onclick="bookmarks_order_by('updated')">Last updated</button>
+</div>
+
+
 
     {% for bookmark in object_list %}
         <div class = "well item item_div" value="{{ bookmark.id}}">   
