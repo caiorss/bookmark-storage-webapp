@@ -17,8 +17,8 @@
             <p> {{ tag.description }} </p>
             <br/>
 
-            <button onclick="tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' )" >Update</button>
-            <button onclick="tag_delete( '{{ tag.name | escapejs }}', {{ tag.id }} )" >Delete</button>
+            <button onclick="tsmain.tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' )" >Update</button>
+            <button onclick="tsmain.tag_delete( '{{ tag.name | escapejs }}', {{ tag.id }} )" >Delete</button>
 
             <br/>            
   

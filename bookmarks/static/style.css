@@ -317,6 +317,7 @@ h5 { color: white }
 
 .table-buttons th a {
     color:white;
+    
 }
 
 .table-buttons select {
@@ -333,6 +334,7 @@ h5 { color: white }
     width: 400px;
     border-radius: 25px;
     padding: 10px;
+   
 }
 
 .div-file-upload input[type=file] {

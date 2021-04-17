@@ -359,7 +359,7 @@ async function tag_delete(tag_name: string, tag_id: Number)
                                 });
 
 
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201)
     { 
         Dialog_Notify.notify("Information", "Tag deleted. Ok.")
         dom.page_refresh();
@@ -396,7 +396,7 @@ async function tag_update(tag_name: string, tag_id: Number, tag_desc: string)
                                 , "tag_id":          tag_id
                                 });
 
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201)
     { 
         Dialog_Notify.notify("Information", "Tag deleted. Ok.")
         dom.page_refresh();
@@ -550,7 +550,7 @@ async function item_snapshot(item_id: Number)
     let payload = { action: "snapshot", id: item_id };
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload);
     
-    if(resp["result"] == "OK")
+    if(resp.status == 200 || resp.status == 201 )
     {
         await Dialog_Notify.notify_ok(resp["message"]);
         dlg.close();
