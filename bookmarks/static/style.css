@@ -78,13 +78,13 @@ h1 {
     color: white; 
     font-family: medieval_old_english;
     font-size: 3.0em;
-    text-align: center; 
+    
 }
 
 h2 { color: white; 
     font-family: medieval_old_english; 
     font-size: 3.0em;
-    text-align: center;
+    
 }
 
 h3 { 
@@ -162,8 +162,9 @@ h5 { color: white }
     background:  #2b2b2d;
     position:      fixed;
     z-index:       1000;
-    width:         600px;
-    padding-left:  10px; 
+    min-width:     800px;
+    padding-left:  10px;
+    
   /*   border-radius: 10px; 
     padding-bottom: 50px;  */    
 }
