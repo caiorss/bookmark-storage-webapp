@@ -191,7 +191,7 @@ async function item_quick_rename(item_id: Number, old_item_title: string)
     
     // .ajax_request('/api2/items/' + item_id, token, "PATCH", payload)
     let data = await resp.json();
-    if(resp.status == 200 || resp.status == 201){
+    if( resp.is_status_success() ){
         let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1500);
         dom.page_refresh(); 
     } else {
@@ -211,7 +211,8 @@ async function item_set_starred(checkbox)
     var token = window["generated_token"];
     // let resp = await utils.ajax_request("/api2/items/" + item_id, token, utils.HTTP_PATCH, payload)
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PATCH, `/api2/items/${item_id}`, token, payload);
-    if(resp.status == 200 || resp.status == 201){
+    if( resp.is_status_success() ) 
+    {
         await Dialog_Notify.notify("OK", "Toggle starred settings Ok.", 500);
         dom.page_refresh();
     } else {
@@ -266,13 +267,16 @@ async function tag_add(item_id: Number)
 
     // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
     let token = window["generated_token"];
-    let all_tags = await tsutils.ajax_get("/api/tags", token);
+    let resp_: tsutils.HttpRestResult = await tsutils.ajax_get("/api/tags", token);
     // console.log(all_tags);
     
-    for(let n in all_tags){
-        let row = all_tags[n];
-        // console.log(" row = ", row);
-        // console.log(` name = ${row[name]} - id = ${row["id"]}`)
+    let data = await resp_.json();
+
+    for(let n in data)
+    {
+        let row = data[n]; 
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
         dlg.add_option(row["name"], row["id"]);
     }
     
@@ -280,7 +284,7 @@ async function tag_add(item_id: Number)
     let answer = await dlg.prompt_selected();
     console.log(" ANSWER = ", answer);
 
-    let resp = null;
+    var resp = null;
     last_input.set(answer["value"]);
 
     if(answer["key"] == null)
@@ -307,7 +311,7 @@ async function tag_add(item_id: Number)
 
     console.log(" Resp = ", resp);
 
-    if(resp.status == 200 || resp.status == 201)
+    if( resp.is_status_success() )
     {
         await Dialog_Notify.notify_ok("Tag added successfully. Ok.", 500);
         dom.page_refresh();
@@ -329,7 +333,7 @@ async function tag_remove(tag_id: Number, bookmark_id: Number)
     let token = window["generated_token"];
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/tags", token, payload);
 
-    if(resp.status == 200 || resp.status == 201)
+    if( resp.is_status_success() ) 
     {
         await Dialog_Notify.notify_ok(resp["message"], 500);
         dom.page_refresh(); 
@@ -359,7 +363,7 @@ async function tag_delete(tag_name: string, tag_id: Number)
                                 });
 
 
-    if(resp.status == 200 || resp.status == 201)
+    if( resp.is_status_success() )
     { 
         Dialog_Notify.notify("Information", "Tag deleted. Ok.")
         dom.page_refresh();
@@ -396,7 +400,7 @@ async function tag_update(tag_name: string, tag_id: Number, tag_desc: string)
                                 , "tag_id":          tag_id
                                 });
 
-    if(resp.status == 200 || resp.status == 201)
+    if( resp.is_status_success() )
     { 
         Dialog_Notify.notify("Information", "Tag deleted. Ok.")
         dom.page_refresh();
@@ -455,8 +459,8 @@ async function api_item_add(crfs_token: string)
 
         let res = await tsutils.ajax_post("/api/collections/add_item", token, payload1);
 
-
-        if (res.status == 200 || res.status == 201) {
+        if( res.is_status_success() ) 
+        {
             let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
             dom.page_refresh();
         } else {
@@ -479,8 +483,8 @@ async function api_item_add(crfs_token: string)
     let body = await res.json();
     console.log(" Status /api2/items = ", res);
 
-    if (res.status == 200 || res.status == 201) {
-
+    if( res.is_status_success() )
+    { 
         Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
         location.reload();
     } else {
@@ -488,7 +492,6 @@ async function api_item_add(crfs_token: string)
         // document.location.href = `/items?filter=search&query=${url}`;
         console.trace(" [ERROR] Failed to send data.");
     }
-
 
 }
 
@@ -550,7 +553,7 @@ async function item_snapshot(item_id: Number)
     let payload = { action: "snapshot", id: item_id };
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload);
     
-    if(resp.status == 200 || resp.status == 201 )
+    if( resp.is_status_success() )
     {
         await Dialog_Notify.notify_ok(resp["message"]);
         dlg.close();

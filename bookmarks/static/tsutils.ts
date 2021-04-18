@@ -1,7 +1,6 @@
 
-
-export 
-namespace dom {
+// ------------ Utitlity functions for DOM manipulation -----------------//
+export namespace dom {
 
     // Select DOM element by CSS selector 
     export function select(selector: string) 
@@ -84,8 +83,34 @@ export enum HttpMethod {
 };
 
 
+export class HttpRestResult 
+{
+    resp: Response = null;
+
+    constructor(resp: Response)
+    {
+        this.resp = resp;
+    }
+
+    /// Returns true is the status code is 200 or 201 
+    is_status_success(): Boolean 
+    {
+        return this.resp.status == 200 || this.resp.status == 201;
+    }
+
+    status(): Number 
+    {
+        return this.resp.status;
+    }
+
+    async json(): Promise<any> {
+        let data = await this.resp.json();
+        return data;
+    } 
+};
+
 export async function ajax_request(method: HttpMethod, url: string
-    , crfs_token: string, data: any = null) {
+    , crfs_token: string, data: any = null): Promise<HttpRestResult> {
     let params = {
         method: method
         , headers: {
@@ -100,7 +125,7 @@ export async function ajax_request(method: HttpMethod, url: string
     }
 
     const resp = await fetch(url, params);
-    return resp;
+    return new HttpRestResult(resp);
 }
 
 
@@ -110,7 +135,9 @@ export async function ajax_request(method: HttpMethod, url: string
  *  @param {string} crfs_token  - Django CRFSS token from global variable (generated_token)
  *  @param {object} data        - HTTP request body, aka payload  
  */
-export async function ajax_post(url: string, crfs_token: string, data: any) {
+export async function ajax_post(  url: string
+                                , crfs_token: string
+                                , data: any): Promise<HttpRestResult> {
 
     var payload = JSON.stringify(data);
 
@@ -126,10 +153,11 @@ export async function ajax_post(url: string, crfs_token: string, data: any) {
         , body: payload
     });
     console.log(" [TRACE] ajax_post = ", resp);
-    return resp;
+    return new HttpRestResult(resp);
 }
 
-export async function ajax_get(url: string, crfs_token: string) {
+export async function ajax_get(url: string, crfs_token: string): Promise<HttpRestResult> 
+{
 
     const resp = await fetch(url, {
         method: 'GET'
@@ -140,7 +168,8 @@ export async function ajax_get(url: string, crfs_token: string) {
             , 'X-CSRFToken': crfs_token
         }
     });
-    return resp.json();
+    // return resp.json();
+    return new HttpRestResult(resp);  
 }
 
 
