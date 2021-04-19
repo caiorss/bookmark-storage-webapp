@@ -13,6 +13,8 @@ from bookmarks import models
 from bookmarks import dutils
 import bookmarks.views
 
+# Http custom status code for indicating API domain-specific errors. 
+STATUS_CODE_DOMAIN_ERROR = 600
 
 class Serializer_Tags(rest.serializers.ModelSerializer):
     
@@ -20,16 +22,15 @@ class Serializer_Tags(rest.serializers.ModelSerializer):
     #                                               , many = True )
 
     class Meta:
-        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated'
-                  , 'item' 
-                  ) 
-        extra_kwargs = { 'item': { 'required': False } }
         model = models.Tag2
+        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated'
+                  # , 'item'
+                 ) 
+        extra_kwargs = { 'item': { 'required': False } }
 
 class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
-    tags = Serializer_Tags(read_only= True, many = True, source = 'item')
-
-    #tag = rest.serializers.PrimaryKeyRelatedField( queryset = models.Tag2.objects.all(), many = True)
+    
+    tags = Serializer_Tags(source = "tag2_set", many = True, read_only=True)
 
     class Meta:
         model = models.SiteBookmark
@@ -37,8 +38,13 @@ class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
                    , 'brief',  'created', 'updated'
                    , 'tags'
                    )
-        #fields = "__all__"
-        #depth = 1
+    # Override this method from super class for intercepting the Json 
+    # representation =>> See: https://stackoverflow.com/questions/63065639/ 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        print(" [TYPE] Instance = ", type(rep), " - Type type(instance) = ", type(instance))
+        print(" [TRACE] to_representation() => rep = ", rep)
+        return rep 
 
 class API_Items(rf_gen.ListCreateAPIView):
     # pagination_class = rf_pag. 
@@ -107,22 +113,22 @@ class API_Items(rf_gen.ListCreateAPIView):
         print(" [TRACE REQUEST] ", request)
         serializer = self.get_serializer( data = request.data )
         if not serializer.is_valid():
+            print(" [TRACE] Serializer = ", serializer)
             return rf_resp.Response( serializer.errors
                                     , status = rf_status.HTTP_400_BAD_REQUEST)
         url: str= dutils.remove_url_obfuscation( serializer.data["url"] )
+       
+        it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
+        if it is not None:
+            return rf_resp.Response( "{ error: 'Item already exists' }", rf_status.HTTP_409_CONFLICT)
 
-        try:
-            it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
-            if it is not None:
-                return rf_resp.Response( "{ error: 'Item already exists' }", rf_status.HTTP_409_CONFLICT)
-
-            item = models.SiteBookmark.objects.create( 
-                  url     = url 
-                , starred = serializer.data.get("starred") or False 
-                , owner   = request.user )
-            bookmarks.views.update_item_from_metadata(item.id)
-        except BaseException as ex:
-            return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
+        item = models.SiteBookmark.objects.create( 
+                url     = url 
+            , starred = serializer.data.get("starred") or False 
+            , owner   = request.user )
+        bookmarks.views.update_item_from_metadata(item.id)
+    # except BaseException as ex:
+       #     return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
 
         result = Serializer_SiteBookmark(item)
         return rf_resp.Response(result.data , status = rf_status.HTTP_201_CREATED )
