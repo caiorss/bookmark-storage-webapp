@@ -38,7 +38,7 @@ docker-build:
 # Command for testing the docker image
 docker-test:
 	docker run -it --rm  \
-		-p 9000:9000 \
+		-p 9045:9000 \
 		django-bookmark-server
 
 # Run docker Image container
@@ -46,7 +46,7 @@ docker-test:
 docker-run1:
 	docker volume create django-server-volume
 	docker run --detach  \
-		-p 9000:9000 \
+		-p 9045:9000 \
 		-v django-server-volume:/app/data \
 		--name django-server \
 		django-bookmark-server
@@ -56,7 +56,7 @@ docker-run2:
 	# Remove container if it already exists.
 	docker rm -f django-server \
 	|| docker run --detach  \
-		-p 9000:9000 \
+		-p 9000:9020 \
 		-v $(shell pwd)/data:/app/data \
 		--name django-server \
 		--restart=always \
