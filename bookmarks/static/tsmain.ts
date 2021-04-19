@@ -402,10 +402,10 @@ async function tag_update(tag_name: string, tag_id: Number, tag_desc: string)
 
     if( resp.is_status_success() )
     { 
-        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        Dialog_Notify.notify("Information", "Tag changed. Ok.")
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+        Dialog_Notify.notify("Error:", "Failed to change tag.");                  
     }    
 
 }
