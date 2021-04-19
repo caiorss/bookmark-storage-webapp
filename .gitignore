@@ -21,3 +21,5 @@ data/*
 *.pex
 *.pid
 *.log
+*.bin
+*.js.map
