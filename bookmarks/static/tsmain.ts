@@ -522,14 +522,16 @@ async function item_delete(flag: boolean, item_id: Number, item_title: string)
     }    
 }
 
+// Upload file to server. 
 export 
 async function item_upload_file() 
 {
-    let file_dlg = document.querySelector("#file-choose");
-    // let file = file_dlg.files[0];
+    let file_dlg: HTMLInputElement = document.querySelector("#file-choose");
+    let file = file_dlg.files[0];
+    // console.trace(" [TRACE] Entered function item_upload_file() ");
 
     let form = new FormData();
-    // form.append("upload-file", file);
+    form.append("upload-file", file);
     console.log(form);
     var token = window["generated_token"];
 
@@ -541,8 +543,17 @@ async function item_upload_file()
                     }          
         , body:    form 
     });
-    console.log(res);
-    dom.page_refresh();
+
+    // console.log(res);
+    if(res.status == 200 || res.status == 201)
+    {
+         // Show dialog and block for 1.5 seconds (15000 milliseconds.)
+         await Dialog_Notify.notify("Information", "Upload successful.", 1500);
+         dom.page_refresh();
+    } else {
+         await Dialog_Notify.notify("Error", "Upload failure.", 1500);
+    }
+    // dom.page_refresh();
 }
 
 export
