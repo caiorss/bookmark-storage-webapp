@@ -464,9 +464,11 @@ async function api_item_add(crfs_token: string)
         {
             let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
             dom.page_refresh();
-        } else {
-            Dialog_Notify.notify("Error", "Error 1: Bookmark already exists.", 2000);
-            //dialog_notify.notify("Error: bookmark already exists", 2000);
+        } else if( res.is_domain_error() )
+        {
+            let msg = await res.json();
+            Dialog_Notify.notify("Error", msg["error"], 2000);
+
             console.error("Error: bookmark already exists");
             document.location.href = `/items?filter=search&query=${url}`;
         }
@@ -488,8 +490,9 @@ async function api_item_add(crfs_token: string)
     { 
         Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
         location.reload();
-    } else {
-        Dialog_Notify.notify("ERROR", body, 2000);
+    } else if( res.is_domain_error() )
+    {
+        Dialog_Notify.notify("Domain Error", body["error"], 2000);
         // document.location.href = `/items?filter=search&query=${url}`;
         console.trace(" [ERROR] Failed to send data.");
     }

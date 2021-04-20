@@ -14,7 +14,7 @@ from bookmarks import dutils
 import bookmarks.views
 
 # Http custom status code for indicating API domain-specific errors. 
-STATUS_CODE_DOMAIN_ERROR = 600
+STATUS_CODE_DOMAIN_ERROR = 599
 
 
     # =========================================#
@@ -55,10 +55,9 @@ class SerializerSiteBookmark(rest.serializers.ModelSerializer):
     #==========================================#
 
 class RestItems(rf_gen.ListCreateAPIView):
-    """Rest API view for class SiteBookmark => endpoint /api2/items. """ 
+    """Rest API view for class SiteBookmark => endpoint /api2/items.""" 
 
     serializer_class       = SerializerSiteBookmark
-
     authentication_classes = ( rf_auth.SessionAuthentication
                              , rf_auth.TokenAuthentication )
     permission_classes     = ( rf_perm.IsAuthenticated, )
@@ -129,14 +128,14 @@ class RestItems(rf_gen.ListCreateAPIView):
        
         it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
         if it is not None:
-            return rf_resp.Response( "{ error: 'Item already exists' }", rf_status.HTTP_409_CONFLICT)
+            return rf_resp.Response( { 'error': 'Item already exists' }, STATUS_CODE_DOMAIN_ERROR)
 
         item = models.SiteBookmark.objects.create( 
                 url     = url 
             , starred = serializer.data.get("starred") or False 
             , owner   = request.user )
         bookmarks.views.update_item_from_metadata(item.id)
-    # except BaseException as ex:
+        # except BaseException as ex:
        #     return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
 
         result = SerializerSiteBookmark(item)

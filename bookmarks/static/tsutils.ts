@@ -83,6 +83,9 @@ export enum HttpMethod {
 };
 
 
+// Const for custom http status code that represents domain error.   
+const STATUS_DOMAIN_ERROR: Number = 599;
+
 export class HttpRestResult 
 {
     resp: Response = null;
@@ -92,10 +95,22 @@ export class HttpRestResult
         this.resp = resp;
     }
 
-    /// Returns true is the status code is 200 or 201 
+    /// Returns true is the status code is 2xxx (200, 201 and more) 
     is_status_success(): Boolean 
     {
-        return this.resp.status == 200 || this.resp.status == 201;
+        return Math.floor(this.resp.status / 100) == 2; 
+    }
+
+    // Server internal error: 5xx status code.
+    is_server_error(): Boolean
+    {
+        return Math.floor(this.resp.status / 100) == 5;
+    }
+
+    // Rest API domain-specific error.
+    is_domain_error(): Boolean 
+    {
+        return this.resp.status == STATUS_DOMAIN_ERROR;
     }
 
     status(): Number 
