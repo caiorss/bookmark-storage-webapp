@@ -503,9 +503,22 @@ class FileSnapshot(models.Model):
         return self.fileMimeType == "application/pdf"
     
     def getFilePath(self):
+        """Get absolute path to snapshot file."""
         media_dir: str = django.conf.settings.MEDIA_ROOT 
         return os.path.join(media_dir, str(self.id), self.fileName)
-    
+
+    def getDirectoryPath(self):
+        """Get absolute path to directory where snapshot file is stored."""
+        media_dir: str = django.conf.settings.MEDIA_ROOT 
+        return os.path.join(media_dir, str(self.id) )
+
+    # Override delete method 
+    def delete(self):
+        import shutil
+        import pathlib 
+        shutil.rmtree( self.getDirectoryPath() )
+        super(FileSnapshot, self).delete()
+
     def readFile(self):
         file_path = self.getFilePath()
         with open(file_path, mode = 'rb') as fd:

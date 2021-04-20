@@ -225,16 +225,6 @@
                 </th>
               </tr>
 
-
-              <tr>
-                <th> 
-                  {% if  bookmark.snapshot_exists %}
-                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
-                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                                                             
-                  {% endif %}                      
-                </th>
-              </tr>
-
               {% if  bookmark.snapshot_exists %}
                 <tr>
                   <th>
@@ -242,7 +232,16 @@
                       href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
                   </th>
                 </tr>             
-              {% endif %}
+      
+                <tr>
+                  <th>
+                    <a class="btn-sm btn-primary" title="Delete snapshot file" 
+                       onclick="tsmain.item_snapshot_delete( {{ bookmark.id }} )" > Delete snapshot </a>                                            
+                  </th>
+                </tr>             
+            
+      
+             {% endif %}
               
               <tr>
                 <th>

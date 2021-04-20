@@ -556,6 +556,9 @@ async function item_upload_file()
     // dom.page_refresh();
 }
 
+
+// Download file from URL storing a file snapshot on the server. 
+// It is useful for storing PDF and DOCX and documents on server-side.  
 export
 async function item_snapshot(item_id: Number)
 {
@@ -578,6 +581,29 @@ async function item_snapshot(item_id: Number)
         dlg.close();
     }
 }
+
+export async function item_snapshot_delete(item_id: Number)
+{
+    let answer = await Dialog_YesNo.prompt(
+          "Delete snapshot file."
+        , `Are you sure you want to delete this snapshot file:` 
+    );
+
+    if (!answer) { return; }
+
+    let token = window["generated_token"];
+    let payload = { action: "snapshot-delete", id: item_id };
+    let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload); 
+ 
+    if (resp.is_status_success()) {
+        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        dom.page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete tag.");
+    }
+
+}
+
 
 export 
 function search_bookmarks()
