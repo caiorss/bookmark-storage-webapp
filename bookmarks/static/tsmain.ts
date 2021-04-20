@@ -599,7 +599,7 @@ export async function item_snapshot_delete(item_id: Number)
         Dialog_Notify.notify("Information", "Tag deleted. Ok.")
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to delete tag.");
+        Dialog_Notify.notify("Error:", "Failed to delete file snapshot.");
     }
 
 }
