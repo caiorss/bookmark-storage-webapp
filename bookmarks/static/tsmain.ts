@@ -514,11 +514,12 @@ async function item_delete(flag: boolean, item_id: Number, item_title: string)
     let token = window["generated_token"];
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_DELETE, "/api/items", token, payload);
 
-    if(resp["result"] == "OK"){
-        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
-        dom.page_refresh();
+    if( resp.is_status_success() )
+    {
+       let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+       dom.page_refresh();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+        Dialog_Notify.notify("ERROR", "Error: failed to delete item.");
     }    
 }
 
