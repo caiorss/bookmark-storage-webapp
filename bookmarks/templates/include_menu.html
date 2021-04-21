@@ -107,55 +107,64 @@
     </ul>
 </div>  
 
-<div id="top-panel">
-    <h1>Bookmarks Storage</h1>
 
-    <div class="div-form-search">       
+<div id="main-panel">
+
+    <div id="top-panel">
+        <h1>Bookmarks Storage</h1>
+
+        <div class="div-form-search">
             <input id="search-entry" type='text' name='query' value='{{ request.GET.query }}'
-                   onkeypress="keypress_return_adapter(search_bookmarks)(event);">
+                onkeypress="keypress_return_adapter(search_bookmarks)(event);">
             </br>
             <input class="btn-sm btn-info" type='submit' value="Search" onclick="tsmain.search_bookmarks();">
-            <input class="btn-sm btn-info" type="reset" value="Clear"   onclick="tsmain.clear_entry_field('#search-entry');">
+            <input class="btn-sm btn-info" type="reset" value="Clear"
+                onclick="tsmain.clear_entry_field('#search-entry');">
 
             <!-- Set search mode  -->
             <select name="mode" id="search-mode-selector" title="Select search mode.">
                 <option value="AND">AND</option>
                 <option value="OR">OR</option>
-            </select>        
-            <a class="topbar-svg-button" href="/search/list" title="Saved search."> 
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
-            </a>       
-    </div>
-</div>
-
-<table class="table-buttons">
-    <tr>
-        <th  onclick="tsmain.api_item_add(generated_token)">
-            Quick Add Bookmark
-        </th>
-    </tr>
-    <tr>
-        <th onclick="tsmain.tag_filter_window()"> Filter by tag</th>
-    </tr>
-    <tr>
-        <th>
-            <!-- Set search mode  -->
-            <select id="theme-selector-box" title="Select web site theme" onChange="selection_changed">
-                <option value="dark_mode">Dark mode</option>
-                <option value="light_mode">Light mode</option>
             </select>
-        </th>
-    </tr>
-</table>
+            <a class="topbar-svg-button" href="/search/list" title="Saved search.">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path class="heroicon-ui"
+                        d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
+                </svg>
+            </a>
+        </div>
+    </div>
 
-<div class="div-file-upload" >
-    <span>File Upload</span> <br>
-           <input id="file-upload" class="btn-sm btn-info" type="submit" name="submit" value="Upload"
-                   onclick="tsmain.item_upload_file();" />
-          <input id="file-choose" type="file" name="file-data" />
- </div>
+    <table class="table-buttons">
+        <tr>
+            <th onclick="tsmain.api_item_add(generated_token)">
+                Quick Add Bookmark
+            </th>
+        </tr>
+        <tr>
+            <th onclick="tsmain.tag_filter_window()"> Filter by tag</th>
+        </tr>
+        <tr>
+            <th>
+                <!-- Set search mode  -->
+                <select id="theme-selector-box" title="Select web site theme" onChange="selection_changed">
+                    <option value="dark_mode">Dark mode</option>
+                    <option value="light_mode">Light mode</option>
+                </select>
+            </th>
+        </tr>
+    </table>
 
-<span style="font-weight:bold">
-    Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.          
-</span>  
+    <div class="div-file-upload">
+        <span>File Upload</span> <br>
+        <input id="file-upload" class="btn-sm btn-info" type="submit" name="submit" value="Upload"
+            onclick="tsmain.item_upload_file();" />
+        <input id="file-choose" type="file" name="file-data" />
+    </div>
+
+    <span style="font-weight:bold">
+        Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+</div>
 
