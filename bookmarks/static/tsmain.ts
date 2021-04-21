@@ -678,9 +678,17 @@ function open_url_newtab(url: string)
     
 let event_manager = new EventManager();
 
-// Button for cleaning search box in file include_menu.html 
-event_manager.event_onClick( "#btn-top-clear"
-                            , () =>  clear_entry_field("#search-entry") );
+// ----- Events for template file: include_menu.html --------// 
+event_manager.event_onClick("#btn-top-clear",      () =>  clear_entry_field("#search-entry") );
+event_manager.event_onClick("#btn-file-upload",    item_upload_file);
+event_manager.event_onClick("#btn-search",         search_bookmarks);
+event_manager.event_onClick("#btn-tag-filter",     tag_filter_window );
 
-event_manager.event_onClick("#btn-search",  search_bookmarks);
+event_manager.event_onClick("#btn-table-add-bookmark", () => 
+    {
+        console.log("Clicked at button btn-table-add-bookmark");
+        let token = window["generated_token"];
+        api_item_add(token);
+    });
+
 event_manager.event_onHitReturn( "#search-entry" , search_bookmarks ); 
