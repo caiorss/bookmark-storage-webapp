@@ -1,6 +1,6 @@
 
 import * as tsutils from "./tsutils.js";
-import { HttpMethod, dom} from "./tsutils.js";
+import { HttpMethod, dom, EventManager} from "./tsutils.js";
 
 import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
       , DialogForm, Dialog_Notify, Dialog_Datalist_Prompt
@@ -672,3 +672,15 @@ function open_url_newtab(url: string)
 {
    dom.url_newtab(url); 
 }
+
+    // ================== Events Setup =================== // 
+    //                                                     // 
+    
+let event_manager = new EventManager();
+
+// Button for cleaning search box in file include_menu.html 
+event_manager.event_onClick( "#btn-top-clear"
+                            , () =>  clear_entry_field("#search-entry") );
+
+event_manager.event_onClick("#btn-search",  search_bookmarks);
+event_manager.event_onHitReturn( "#search-entry" , search_bookmarks ); 
