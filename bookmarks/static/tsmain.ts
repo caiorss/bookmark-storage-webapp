@@ -574,11 +574,11 @@ async function item_snapshot(item_id: Number)
     
     if( resp.is_status_success() )
     {
-        await Dialog_Notify.notify_ok(resp["message"]);
+        await Dialog_Notify.notify_ok("Download successful Ok.");
         dlg.close();
         dom.page_refresh(); 
     } else {
-        await Dialog_Notify.notify_error(resp["message"]);
+        await Dialog_Notify.notify_error( resp["message"] );
         dlg.close();
     }
 }
