@@ -46,13 +46,20 @@
                   {{  bookmark.favicon | safe }}
 
                   <!-- Bookmark main link -->
+                  
                   <a  class="item-bookmark-link"
                       target='_blank' 
-                      title="{{bookmark.brief}}" 
-                      href="{{ bookmark.url }}" >                       
+                      title="{{bookmark.brief}}"
 
-                      {{ bookmark.modified_title | default:bookmark.url }}                                                                        
-                  </a>                  
+                      {%if bookmark.is_upload %}
+                           href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}"
+                      {% else %}
+                           href="{{ bookmark.url }}"
+                      {% endif %}
+                    >                       
+                        {{ bookmark.modified_title | default:bookmark.url }}                                                                        
+                  </a>    
+
             </h5>
             
             <ul>
@@ -185,8 +192,8 @@
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" title="Fetch bookmark metdata automatically" 
-                     href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Get metadata</a>
+                  <a class="btn-sm btn-primary" title="Update bookmark metdata automatically" 
+                     href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Update metadata</a>
                 </th>
               </tr>
 
@@ -211,7 +218,7 @@
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" href="#" onclick="open_url_newtab('http://{{ bookmark.hostname }}')" 
+                  <a class="btn-sm btn-primary" href="#" onclick="tsmain.open_url_newtab('http://{{ bookmark.hostname }}')" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 
                   </a>
@@ -226,13 +233,7 @@
               </tr>
 
               {% if  bookmark.snapshot_exists %}
-                <tr>
-                  <th>
-                    <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" 
-                      href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
-                  </th>
-                </tr>             
-      
+     
                 <tr>
                   <th>
                     <a class="btn-sm btn-primary" title="Delete snapshot file" 
