@@ -66,6 +66,58 @@ export namespace dom {
 
 } // End of namespace 
 
+export class EventManager {    
+    observers: Array<() => void> = [];
+
+    constructor() {
+
+        document.addEventListener("DOMContentLoaded", () => {
+            for(let func of this.observers) {
+                func();
+            }
+        });
+    }
+
+    add_observer(obs: () => void )
+    {
+        this.observers.push(obs);
+    }
+
+    event_onClick(selector: string, callback: () => void)
+    {
+        let action = () => {
+            let elem = document.querySelector(selector);
+
+            if (!elem) {
+                console.warn(` dom_onClicked() => CSS selector ${selector} not found.`);
+            }
+            if (elem) {
+                elem.addEventListener("click", callback);
+            }
+
+        };
+        this.observers.push( action );
+    }
+
+    // Event that is invoked when html DOM element has focus and user hits return.
+    event_onHitReturn(selector: string, callback: () => void)
+    {
+        let action = () => {
+            let elem = document.querySelector(selector);
+             if (!elem) {
+                console.warn(` dom_onClicked() => CSS selector ${selector} not found.`);
+            }
+            elem.addEventListener("keypress", (event: KeyboardEvent) => {
+                if(event.keyCode != 13) { return; }
+                callback();
+            });           
+            
+       };
+
+       this.observers.push( action );
+    }
+};
+
 
 
 export enum HttpMethod {
