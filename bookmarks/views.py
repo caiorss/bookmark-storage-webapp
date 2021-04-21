@@ -942,7 +942,9 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         mode:   str = body["mode"]      
         item = SiteBookmark.objects.get(id = item_id, owner = request.user)
         if mode == "soft": item.delete() 
-        if mode == "hard": item.hard_delete()
+        if mode == "hard": 
+            self.delete_file_snapshot(request, item_id)
+            item.hard_delete()
         return  JsonResponse({ "result": "OK" })
 
     # Backend REST-like API 
@@ -965,7 +967,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             return Http404("Error: invalid request")
         
         try:
-            item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)    
+            item = SiteBookmark.objects.get(id = item_id, owner  = request.user)    
         except SiteBookmark.DoesNotExist:
             item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = None)    
         
