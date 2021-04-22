@@ -321,9 +321,9 @@ async function tag_add(item_id: Number)
 
 }
 
-
+/** Delete tag from bookmark */ 
 export 
-async function tag_remove(tag_id: Number, bookmark_id: Number)
+async function tag_delete_from_item(tag_id: Number, bookmark_id: Number)
 {    
     let payload = {   action:   "remove_tag_item"
                     , tag_id:    tag_id
@@ -335,10 +335,10 @@ async function tag_remove(tag_id: Number, bookmark_id: Number)
 
     if( resp.is_status_success() ) 
     {
-        await Dialog_Notify.notify_ok(resp["message"], 500);
+        await Dialog_Notify.notify_ok("Tag removed from item. Ok.", 1000);
         dom.page_refresh(); 
     } else {
-        await Dialog_Notify.notify_error(resp["message"], 500);
+        await Dialog_Notify.notify_error(" [FAILURE] " + resp["message"], 1000);
     }
 }
 
@@ -748,7 +748,7 @@ event_manager.event_onClickMany(".btn-bookmark-tag-edit", function(){
 event_manager.event_onClickMany(".btn-bookmark-tag-delete", function(){
         let item_id = this.getAttribute("data-bookmark-id");
         let tag_id  = this.getAttribute("data-tag-id");
-        tag_remove(tag_id, item_id);
+        tag_delete_from_item(tag_id, item_id);
 });
 
 
