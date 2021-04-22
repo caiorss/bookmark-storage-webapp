@@ -116,6 +116,18 @@ export class EventManager {
 
        this.observers.push( action );
     }
+
+
+    event_onClickMany(class_selector: string, callback: (HTMLElement) => void)
+    {
+        let action = () => {
+            document.querySelectorAll(class_selector).forEach(elem => {
+                elem.addEventListener("click", callback);
+            });
+        };
+
+        this.observers.push( action );
+    }
 };
 
 
