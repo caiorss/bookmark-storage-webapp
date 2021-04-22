@@ -679,7 +679,7 @@ function open_url_newtab(url: string)
 let event_manager = new EventManager();
 
 // ----- Events for template file: include_menu.html --------// 
-//                                                           // 
+// ----------------------------------------------------------// 
 event_manager.event_onClick("#btn-top-clear",      () =>  clear_entry_field("#search-entry") );
 event_manager.event_onClick("#btn-file-upload",    item_upload_file);
 event_manager.event_onClick("#btn-search",         search_bookmarks);
@@ -695,9 +695,19 @@ event_manager.event_onClick("#btn-table-add-bookmark", () =>
 event_manager.event_onHitReturn( "#search-entry" , search_bookmarks ); 
 
 
+// ----- Events for template file: bookmark_list.html -------// 
+// ----------------------------------------------------------//
+
+event_manager.event_onClickMany(".btn-bookmark-rename", function(){
+    let div   = this.closest(".div-item-container");
+    let id    = div.getAttribute("data-id");
+    let title = div.getAttribute("data-title");
+    // let brief = div.getAttribute("data-brief");
+    item_quick_rename(id, title);
+});
 
 // ---- Events for template file: 'tags_list.html' ----------//
-//                 
+// ----------------------------------------------------------//               
 
 // Event installed on button for updating and editing tags. 
 event_manager.event_onClickMany(".btn-tag-update", function() 
@@ -724,3 +734,4 @@ event_manager.event_onClickMany(".btn-tag-delete", function()
         tag_delete(tag_name, tag_id );
 
     });
+

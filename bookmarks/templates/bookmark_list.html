@@ -17,7 +17,12 @@
 
 
     {% for bookmark in object_list %}
-        <div class = "well item item_div" value="{{ bookmark.id}}">   
+        <div class = "well item item_div div-item-container" 
+             data-id="{{ bookmark.id}}"
+             data-title="{{ bookmark.title }}"
+             data-url="{{ bookmark.url }}"
+             data-brief="{{ bookmark.brief }}"
+             >   
            
             <h5>  
 
@@ -185,8 +190,7 @@
 
              <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" title="Quick rename item" 
-                      href='javascript:tsmain.item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
+                  <a class="btn-sm btn-primary btn-bookmark-rename" title="Quick rename item">Rename</a>
                 </th>
               </tr>
 
@@ -218,7 +222,7 @@
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" href="#" onclick="tsmain.open_url_newtab('http://{{ bookmark.hostname }}')" 
+                  <a class="btn-sm btn-primary btn-bookmark-open-domain" href="#" onclick="tsmain.open_url_newtab('http://{{ bookmark.hostname }}')" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 
                   </a>
