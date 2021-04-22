@@ -706,6 +706,52 @@ event_manager.event_onClickMany(".btn-bookmark-rename", function(){
     item_quick_rename(id, title);
 });
 
+event_manager.event_onClickMany(".btn-bookmark-open-domain", function(){
+    let div = this.closest(".div-item-container");
+    let hostname = div.getAttribute("data-hostname");
+    open_url_newtab(`http://${hostname}`); 
+});
+
+event_manager.event_onClickMany(".btn-bookmark-tag-add", function(){
+    let div = this.closest(".div-item-container");
+    let  item_id = div.getAttribute("data-id");
+    // javascript:tsmain.tag_add( {{ bookmark.id }} );" 
+    console.log(" [TRACE] Item_id = ", item_id);
+    tag_add(item_id);
+});
+
+event_manager.event_onClickMany(".btn-bookmark-snapshot-delete", function(){
+    let div = this.closest(".div-item-container");
+    let item_id = div.getAttribute("data-id");
+    console.log(" [TRACE] item_id = ", item_id);
+    item_snapshot_delete(item_id);
+});
+
+
+
+event_manager.event_onClickMany(".btn-bookmark-add-related", function(){
+    let div = this.closest(".div-item-container");
+    let item_id = div.getAttribute("data-id");
+    related_item_add(item_id); 
+    
+});
+
+// Edit tag of current bookmark 
+event_manager.event_onClickMany(".btn-bookmark-tag-edit", function(){
+        let id = this.getAttribute("data-id");
+        let name = this.getAttribute("data-name");
+        let desc = this.getAttribute("data-description");
+        tag_update(name, id, desc);
+});
+
+// Remove tag from bookmark 
+event_manager.event_onClickMany(".btn-bookmark-tag-delete", function(){
+        let item_id = this.getAttribute("data-bookmark-id");
+        let tag_id  = this.getAttribute("data-tag-id");
+        tag_remove(tag_id, item_id);
+});
+
+
 // ---- Events for template file: 'tags_list.html' ----------//
 // ----------------------------------------------------------//               
 

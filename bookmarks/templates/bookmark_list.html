@@ -22,6 +22,7 @@
              data-title="{{ bookmark.title }}"
              data-url="{{ bookmark.url }}"
              data-brief="{{ bookmark.brief }}"
+             data-hostname="{{ bookmark.hostname }}"
              >   
            
             <h5>  
@@ -104,8 +105,8 @@
                     >Details</a>
 
                 <!-- Button for adding new tags -->
-                <a class="btn-sm btn-primary btn-toggle-details" 
-                    href="javascript:tsmain.tag_add( {{ bookmark.id }} );" 
+                <a class="btn-sm btn-primary btn-toggle-details btn-bookmark-tag-add" 
+                    
                     >Add tag</a>
 
                 <!--- Button for edding -->
@@ -145,14 +146,20 @@
                 {% for tag in bookmark.tag2_set.all %}
                 <li>
                     <!-- Button for removing tag from element. -->
-                    <a class="tag-remove-button" 
-                        href="javascript:tsmain.tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                    <a class="btn-bookmark-tag-delete"
+                        data-bookmark-id="{{ bookmark.id }}"
+                        data-tag-id="{{ tag.id }}" 
+                        
                         title="Remove tag '{{ tag.name }}' from bookmark."
                     >[X]</a>
 
-                  <!-- Button for Editing tag -->
-                  <a class="tag-remove-button" 
-                        href="javascript:tsmain.tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                  <!-- Button for Editing tag tag -->
+                  <a class="btn-bookmark-tag-edit"
+                        data-id="{{ tag.id }}"
+                        data-name="{{ tag.name }}" 
+                        data-desc="{{ tag.description }}"
+
+                        
                         title="Update/Edit tag '{{ tag.name }}' from bookmark."
                     >[E]</a>
 
@@ -166,8 +173,8 @@
             <br/>
             <strong>Related:</strong>
             
-            <a class="tag-remove-button" 
-                href="javascript:tsmain.related_item_add( {{ bookmark.id}}  );"
+            <a class="btn-bookmark-add-related" 
+                href="#"
                 title="Add related item to current bookmark."
             >[+]</a>
 
@@ -189,13 +196,15 @@
                    style="visibility: hidden; display: none;"  >              
 
              <tr>
-                <th> 
+                <th>
+                  <!-- Button for renaming current bookmark --> 
                   <a class="btn-sm btn-primary btn-bookmark-rename" title="Quick rename item">Rename</a>
                 </th>
               </tr>
 
               <tr>
                 <th> 
+                  <!-- Button for extracting bookmark metadata -->
                   <a class="btn-sm btn-primary" title="Update bookmark metdata automatically" 
                      href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Update metadata</a>
                 </th>
@@ -222,7 +231,7 @@
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary btn-bookmark-open-domain" href="#" onclick="tsmain.open_url_newtab('http://{{ bookmark.hostname }}')" 
+                  <a class="btn-sm btn-primary btn-bookmark-open-domain" href="#" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 
                   </a>
@@ -240,9 +249,8 @@
      
                 <tr>
                   <th>
-                    <a class="btn-sm btn-primary" title="Delete snapshot file" 
-                       onclick="tsmain.item_snapshot_delete( {{ bookmark.id }} )" > Delete snapshot </a>                                            
-                  </th>
+                    <a class="btn-sm btn-primary btn-snapshot-delete" 
+                       title="Delete snapshot file" > Delete snapshot </a>                                            </th>
                 </tr>             
             
       
@@ -264,7 +272,7 @@
                 
                 <tr>
                   <th> 
-                    <a  class="btn-sm btn-primary" 
+                    <a  class="btn-sm btn-primary btn-bookmark-delete" 
                         title="Delete current item" 
                         href="javascript:tsmain.item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
                      >Delete</a>                                                 
