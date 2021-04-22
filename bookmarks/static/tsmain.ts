@@ -679,6 +679,7 @@ function open_url_newtab(url: string)
 let event_manager = new EventManager();
 
 // ----- Events for template file: include_menu.html --------// 
+//                                                           // 
 event_manager.event_onClick("#btn-top-clear",      () =>  clear_entry_field("#search-entry") );
 event_manager.event_onClick("#btn-file-upload",    item_upload_file);
 event_manager.event_onClick("#btn-search",         search_bookmarks);
@@ -692,3 +693,34 @@ event_manager.event_onClick("#btn-table-add-bookmark", () =>
     });
 
 event_manager.event_onHitReturn( "#search-entry" , search_bookmarks ); 
+
+
+
+// ---- Events for template file: 'tags_list.html' ----------//
+//                 
+
+// Event installed on button for updating and editing tags. 
+event_manager.event_onClickMany(".btn-tag-update", function() 
+    {
+        let elem = this;
+            // console.log(" Element = ", elem);
+        // Html5 custom attribute 
+        let tag_id   = elem.getAttribute("data-id");
+        let tag_name = elem.getAttribute("data-name");
+        let tag_desc = elem.getAttribute("data-description");
+        tag_update(tag_name, tag_id, tag_desc );
+
+    });
+         
+// onclick="tsmain.tag_delete( '{{ tag.name | escapejs }}', {{ tag.id }} )" 
+
+event_manager.event_onClickMany(".btn-tag-delete", function() 
+    {
+        let elem = this;
+            // console.log(" Element = ", elem);
+        // Html5 custom attribute 
+        let tag_id   = elem.getAttribute("data-id");
+        let tag_name = elem.getAttribute("data-name");
+        tag_delete(tag_name, tag_id );
+
+    });
