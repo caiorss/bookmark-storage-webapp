@@ -347,72 +347,7 @@ utils.dom_onContentLoaded(() => {
     });
 
 
-    window["collection_delete"] =  async (collection_id, collection_title) => {
 
-        let answer = await Dialog_YesNo.prompt(
-                      "Delete collection."
-                    , `Are you sure you want to delete the collection: '${collection_title}' ` );
-
-        if(!answer) { return; }
-
-        let resp = await utils.ajax_request("/api/collections"
-                                , window["generated_token"]
-                                , utils.HTTP_DELETE
-                                , { "collection_id": collection_id });
-
-
-        if(resp["result"] == "OK")
-        { 
-            Dialog_Notify.notify("Information", "Collection deleted. Ok.")
-            utils.dom_page_refresh();
-        } else {
-            Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
-        }
-    };
-
-    async function collection_edit(collection_id, collection_title) 
-    {
-        dialog_collection_edit.setTitle("Edit Collection");
-        // alert(" Clicked at create new collection Ok. ");
-        dialog_collection_edit.show();
-
-        let entry_title = dialog_collection_edit.get_widget("title");
-        entry_title.value = collection_title;
-
-        let sender = await dialog_collection_edit.onConfirm();
-        let title  = sender.get_widget("title").value;
-
-        console.log(" Collection title = ", title);
-
-        //let desc  = sender.get_widget("desc").value;
-
-        console.log(" [INFO] Creating collection with title = ", title);
-
-        let res = await utils.ajax_request(  "/api/collections"
-                                           , window["generated_token"]
-                                           , utils.HTTP_PUT
-                                           , {
-                                                 id:    collection_id
-                                               , title: title 
-                                             //, description: desc 
-                                          });
-
-        if(res["result"] == "OK")
-        {
-            dialog_notify.notify("Bookmark added successfuly");
-            location.reload();
-        } else {
-            dialog_notify.notify("Error: bookmark already exists");
-        }
-    
-        dialog.close();        
-    }
-
-
-    window["collection_edit"] = (collection_id, collection_title) => {     
-        
-        collection_edit(collection_id, collection_title);
-    };
 
 
 

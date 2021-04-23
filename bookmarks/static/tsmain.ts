@@ -115,43 +115,7 @@ function selection_changed()
     site_theme.set(this.value);
 }
 
-let dialog_collection_edit = new DialogForm();
-dialog_collection_edit.detach_on_close(false);
-dialog_collection_edit.setTitle("Create new collection");
-dialog_collection_edit.setText("Enter the following informations:");
-dialog_collection_edit.add_row_input("title", "Title:");
-dialog_collection_edit.add_row_input("desc", "Description:");
 
-
-async function collection_create_new() 
-{
-    // alert(" Clicked at create new collection Ok. ");
-    // dialog_collection_edit.show();
-
-    let sender = await dialog_collection_edit.onConfirm();
-    let title = sender.get_widget("title").value;
-    let desc = sender.get_widget("desc").value;
-
-    console.log(" [INFO] Creating collection with title = ", title);
-
-    let res = await tsutils.ajax_request(
-                                  HttpMethod.HTTP_POST    
-                                , "/api/collections"
-                                , window["generated_token"]
-                                , {
-                                      title:       title
-                                    , description: desc
-                                });
-
-    if (res["result"] == "OK") {
-        let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
-        dom.page_refresh();
-    } else {
-        Dialog_Notify.notify("Error", "Failed to create collection.");
-    }
-
-    // dialog.close();
-}
 
 
 dom.event_onContentLoaded(() =>
@@ -167,12 +131,12 @@ dom.event_onContentLoaded(() =>
     if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
     if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
 
-
+    /*
     dom.event_onClicked("#btn-create-new-collection", () => {
         collection_create_new();
         console.log(" I was clicked OK. ");
     });
-
+    */
 
 
  });
@@ -673,6 +637,108 @@ function open_url_newtab(url: string)
    dom.url_newtab(url); 
 }
 
+let dialog_collection_edit = new DialogForm();
+dialog_collection_edit.detach_on_close(false);
+dialog_collection_edit.setTitle("Create new collection");
+dialog_collection_edit.setText("Enter the following informations:");
+dialog_collection_edit.add_row_input("title", "Title:");
+dialog_collection_edit.add_row_input("desc", "Description:");
+
+
+async function collection_create_new() 
+{
+    // alert(" Clicked at create new collection Ok. ");
+    // dialog_collection_edit.show();
+
+    let sender = await dialog_collection_edit.onConfirm();
+    let title = sender.get_widget("title").value;
+    let desc = sender.get_widget("desc").value;
+
+    console.log(" [INFO] Creating collection with title = ", title);
+
+    let res = await tsutils.ajax_request(
+                                  HttpMethod.HTTP_POST    
+                                , "/api/collections"
+                                , window["generated_token"]
+                                , {
+                                      title:       title
+                                    , description: desc
+                                });
+
+    if (res["result"] == "OK") {
+        let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+        dom.page_refresh();
+    } else {
+        Dialog_Notify.notify("Error", "Failed to create collection.");
+    }
+
+    // dialog.close();
+}
+
+
+
+async function collection_edit(collection_id, collection_title) 
+{
+    dialog_collection_edit.setTitle("Edit Collection");
+    // alert(" Clicked at create new collection Ok. ");
+    dialog_collection_edit.show();
+
+    let entry_title = dialog_collection_edit.get_widget("title");
+    entry_title.value = collection_title;
+
+    let sender = await dialog_collection_edit.onConfirm();
+    let title  = sender.get_widget("title").value;
+
+    console.log(" Collection title = ", title);
+
+    //let desc  = sender.get_widget("desc").value;
+
+    console.log(" [INFO] Creating collection with title = ", title);
+
+    let res = await tsutils.ajax_request( HttpMethod.HTTP_PUT  
+                                         , "/api/collections"
+                                         , window["generated_token"]
+                                         , {
+                                             id:    collection_id
+                                            , title: title 
+                                            //, description: desc 
+                                        });
+
+    if( res.is_status_success() )
+    {
+        Dialog_Notify.notify("Bookmark added successfuly");
+        location.reload();
+    } else {
+        Dialog_Notify.notify("Error: bookmark already exists");
+    }
+}
+
+async function collection_delete(collection_id, collection_title)
+{
+    let answer = await Dialog_YesNo.prompt(
+                    "Delete collection."
+                , `Are you sure you want to delete the collection: '${collection_title}' ` );
+
+    if(!answer) { return; }
+
+    let resp = await tsutils.ajax_request(
+                              HttpMethod.HTTP_DELETE
+                            , "/api/collections"
+                            , window["generated_token"]
+                            , { "collection_id": collection_id });
+
+
+    if( resp.is_status_success() ) 
+    { 
+        Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+        dom.page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+    }
+};
+
+
+
     // ================== Events Setup =================== // 
     //                                                     // 
     
@@ -780,4 +846,24 @@ event_manager.event_onClickMany(".btn-tag-delete", function()
         tag_delete(tag_name, tag_id );
 
     });
+
+
+// ---- Events for template file: 'collection_list.html' ----------//
+// ----------------------------------------------------------------//               
+
+event_manager.event_onClickMany(".btn-collection-edit", function(){
+    let div   = this.closest(".div-collection-container");
+    let id    = div.getAttribute("data-id");
+    let title = div.getAttribute("data-title");
+    collection_edit(id, title);
+});
+
+event_manager.event_onClickMany(".btn-collection-delete", function(){
+    let div   = this.closest(".div-collection-container");
+    let id    = div.getAttribute("data-id");
+    let title = div.getAttribute("data-title"); 
+    collection_delete(id, title);
+    // href="javascript:tsmain.collection_delete({{collection.id}}, '{{ collection.title }}' )"  
+    // href="javascript:tsmain.collection_edit({{collection.id}}, '{{ collection.title }}' )"  
+});
 
