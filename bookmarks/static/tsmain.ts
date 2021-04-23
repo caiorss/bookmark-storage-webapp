@@ -786,7 +786,7 @@ event_manager.event_onClickMany(".btn-bookmark-tag-add", function(){
     tag_add(item_id);
 });
 
-event_manager.event_onClickMany(".btn-bookmark-snapshot-delete", function(){
+event_manager.event_onClickMany(".btn-snapshot-delete", function(){
     let div = this.closest(".div-item-container");
     let item_id = div.getAttribute("data-id");
     console.log(" [TRACE] item_id = ", item_id);
