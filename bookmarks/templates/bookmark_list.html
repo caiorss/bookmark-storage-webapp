@@ -101,13 +101,10 @@
 
                 <!-- Button for toggling details -->
                 <a class="btn-sm btn-primary btn-toggle-details" 
-                    href="javascript:tsmain.toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" 
-                    >Details</a>
+                    href="javascript:tsmain.toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );">Details</a>
 
                 <!-- Button for adding new tags -->
-                <a class="btn-sm btn-primary btn-toggle-details btn-bookmark-tag-add" 
-                    
-                    >Add tag</a>
+                <a href="#/" class="btn-sm btn-primary btn-toggle-details btn-bookmark-tag-add" >Add tag</a>
 
                 <!--- Button for edding -->
                 <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"
@@ -155,16 +152,17 @@
 
                   <!-- Button for Editing tag tag -->
                   <a class="btn-bookmark-tag-edit"
+                        href="#/"
                         data-id="{{ tag.id }}"
                         data-name="{{ tag.name }}" 
                         data-desc="{{ tag.description }}"
 
-                        
+
                         title="Update/Edit tag '{{ tag.name }}' from bookmark."
                     >[E]</a>
 
                     <!-- Button for filtering all bookmarks with this tag. -->
-                    <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+                    <a class="tag-hyperlink" href="#/" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
                 </li>
                 {% endfor %}
             </lu>            
@@ -174,7 +172,7 @@
             <strong>Related:</strong>
             
             <a class="btn-bookmark-add-related" 
-                href="#"
+                href="#/"
                 title="Add related item to current bookmark."
             >[+]</a>
 
