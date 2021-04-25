@@ -739,6 +739,54 @@ async function collection_delete(collection_id, collection_title)
 
 
 
+
+// How can add or update a query string parameter.
+// Reference: https://stackoverflow.com/questions/5999118
+function UpdateQueryString(key, value, url) {
+    if (!url) url = window.location.href;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        hash;
+
+    if (re.test(url)) {
+        if (typeof value !== 'undefined' && value !== null) {
+            return url.replace(re, '$1' + key + "=" + value + '$2$3');
+        } 
+        else {
+            hash = url.split('#');
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+    }
+    else {
+        if (typeof value !== 'undefined' && value !== null) {
+            var separator = url.indexOf('?') !== -1 ? '&' : '?';
+            hash = url.split('#');
+            url = hash[0] + separator + key + '=' + value;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+        else {
+            return url;
+        }
+    }
+}
+
+function bookmarks_order_by(order)
+{
+    var url = document.location.href;
+    document.location.href = UpdateQueryString("order", order, url);
+
+}
+// window["bookmarks_order_by"] = bookmarks_order_by;
+
+
+
+
     // ================== Events Setup =================== // 
     //                                                     // 
     
@@ -763,6 +811,20 @@ event_manager.event_onHitReturn( "#search-entry" , search_bookmarks );
 
 // ----- Events for template file: bookmark_list.html -------// 
 // ----------------------------------------------------------//
+
+event_manager.event_onClick("#btn-order-newest", () => {
+   bookmarks_order_by("new"); 
+});
+
+event_manager.event_onClick("#btn-order-oldest", () => {
+   bookmarks_order_by("old"); 
+});
+
+event_manager.event_onClick("#btn-order-updated", () => {
+   bookmarks_order_by("updated"); 
+});
+
+
 
 event_manager.event_onClickMany(".btn-bookmark-rename", function(){
     let div   = this.closest(".div-item-container");
