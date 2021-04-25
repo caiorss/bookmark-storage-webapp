@@ -25,6 +25,8 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18 21H7a4 4 0 0 1-4-4V5c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v11a3 3 0 0 1-3 3zm-3-3V5H5v12c0 1.1.9 2 2 2h8.17a3 3 0 0 1-.17-1zm-7-3h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2zm0-4h4a1 1 0 0 1 0 2H8a1 1 0 1 1 0-2zm9 11a1 1 0 0 0 2 0V7h-2v11z"/></svg>            
     </a>
 
+        <!-- Button in top bar for opening bulk actions window -->
+    <!-- 
     <a class="topbar-svg-button"  href="#" id="btn-bulk-actions" title="Perform bulk actions. Apply actions to multiple bookmarks." >
         <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
@@ -34,6 +36,8 @@
             <circle cx="3.5" cy="10.5" r=".5"/>
         </svg>
     </a>
+    -->
+
 
     {% if page_obj.has_previous %}
         <a id="page-prev-button" title="Pagination / List previous items" class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
@@ -139,8 +143,8 @@
                 Quick Add Bookmark
             </th>
         </tr>
-        <tr>
-            <th onclick="tsmain.tag_filter_window()"> Filter by tag</th>
+        <tr >
+            <th oid="btn-tag-filter"> Filter by tag</th>
         </tr>
         <tr>
             <th>
