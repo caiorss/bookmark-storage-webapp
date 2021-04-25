@@ -824,7 +824,20 @@ event_manager.event_onClick("#btn-order-updated", () => {
    bookmarks_order_by("updated"); 
 });
 
+event_manager.event_onClickMany(".btn-toggle-action-table", function(){
+    let div1 =  this.closest(".div-item-container")
+    let div2 =  div1.querySelector(".action-menu-table");
+    // console.log(" [TRACE] Action tagle toggled = ", div2);
+    dom.toggle(div2);
+});
 
+
+event_manager.event_onClickMany(".btn-toggle-details", function(){
+    let div1 =  this.closest(".div-item-container")
+    let div2 =  div1.querySelector(".item-table-info");
+    // console.log(" [TRACE] Action tagle toggled = ", div2);
+    dom.toggle(div2);
+});
 
 event_manager.event_onClickMany(".btn-bookmark-rename", function(){
     let div   = this.closest(".div-item-container");
