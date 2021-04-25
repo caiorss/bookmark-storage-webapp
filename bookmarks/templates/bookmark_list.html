@@ -104,7 +104,7 @@
                 <!-- href="javascript:tsmain.toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" -->
                 
                 <!-- Button for adding new tags -->
-                <a href="#/" class="btn-sm btn-primary btn-toggle-details btn-bookmark-tag-add" >Add tag</a>
+                <a href="#/" class="btn-sm btn-primary  btn-bookmark-tag-add" >Add tag</a>
 
                 <!--- Button for edding -->
                 <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"

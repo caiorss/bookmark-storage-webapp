@@ -561,7 +561,7 @@ export async function item_snapshot_delete(item_id: Number)
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload); 
  
     if (resp.is_status_success()) {
-        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        Dialog_Notify.notify("Information", "Snapshot file deleted successfully. Ok.")
         dom.page_refresh();
     } else {
         Dialog_Notify.notify("Error:", "Failed to delete file snapshot.");
