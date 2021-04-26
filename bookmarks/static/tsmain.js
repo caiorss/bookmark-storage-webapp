@@ -35,6 +35,66 @@ export class LocalStorageFlag {
     ;
 }
 ;
+export class ObservervableLocalStorageFlag {
+    constructor(name, value = false) {
+        this.observers = [];
+        this.name = name;
+        // console.log(" [TRACE] Created Ok. ");
+        let q = localStorage.getItem(name);
+        if (q == null || q == "undefined") {
+            localStorage.setItem(name, String(value));
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            this.notifyObservers();
+        });
+    }
+    set(value) {
+        if (value == this.get()) {
+            return;
+        }
+        localStorage.setItem(this.name, value);
+        this.notifyObservers();
+    }
+    get() {
+        var result = localStorage.getItem(this.name);
+        if (result == "undefined") {
+            this.set(false);
+            return false;
+        }
+        return JSON.parse(result) || false;
+    }
+    ;
+    toggle() { this.set(!this.get()); return this.get(); }
+    ;
+    notifyObservers() {
+        let flag = this.get();
+        for (let obs of this.observers) {
+            obs(flag);
+        }
+    }
+    addObserver(obs) {
+        this.observers.push(obs);
+    }
+    addLoggerObserver() {
+        this.observers.push(x => {
+            console.log(` [EVENT] Observable local storage '${this.name}' flag changed to  ${x}`);
+        });
+    }
+    // 2 way data binding with an html input element, such as checkbox.
+    bindElement(selector) {
+        document.addEventListener("DOMContentLoaded", () => {
+            let elem = document.querySelector(selector);
+            elem.addEventListener("change", () => {
+                this.set(elem.checked);
+            });
+            this.addObserver((flag) => {
+                elem.checked = flag;
+            });
+            this.notifyObservers();
+        });
+    }
+}
+;
 export class LocalStorageString {
     constructor(name, value = null) {
         this.name = name;
@@ -593,6 +653,16 @@ function bookmarks_order_by(order) {
     document.location.href = UpdateQueryString("order", order, url);
 }
 // window["bookmarks_order_by"] = bookmarks_order_by;
+export let flag_details = new ObservervableLocalStorageFlag("details-opened", false);
+flag_details.addLoggerObserver();
+flag_details.bindElement("#checkbox-toggle-details");
+flag_details.addObserver((flag) => {
+    dom.selectAll(".details-item")
+        .forEach((elem) => elem.open = flag);
+});
+export function toggle_details() {
+    dom.selectAll(".details-item").forEach((elem) => elem.open = !elem.open);
+}
 // ================== Events Setup =================== // 
 //                                                     // 
 let event_manager = new EventManager();

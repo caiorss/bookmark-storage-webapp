@@ -15,6 +15,10 @@ export var dom;
         return document.querySelector(selector);
     }
     dom.select = select;
+    function selectAll(selector) {
+        return document.querySelectorAll(selector);
+    }
+    dom.selectAll = selectAll;
     // Toggle DOM element 
     function toggle(m) {
         if (m == null) {

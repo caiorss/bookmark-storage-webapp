@@ -3,9 +3,15 @@
 export namespace dom {
 
     // Select DOM element by CSS selector 
-    export function select(selector: string) 
+    export function select(selector: string): HTMLElement 
     {
         return document.querySelector(selector)
+    }
+
+
+    export function selectAll(selector: string): NodeListOf<HTMLElement>
+    {
+        return document.querySelectorAll(selector);
     }
     
     // Toggle DOM element 
@@ -118,7 +124,7 @@ export class EventManager {
     }
 
 
-    event_onClickMany(class_selector: string, callback: (HTMLElement) => void)
+    event_onClickMany(class_selector: string, callback: () => void)
     {
         let action = () => {
             document.querySelectorAll(class_selector).forEach(elem => {
