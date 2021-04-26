@@ -4,6 +4,8 @@
 
 <h3> {{ page_title }} </h3>
 
+ 
+
 <div id="bookmark-list" class="container">   
 
 <div id="div-additional-buttons">
@@ -13,6 +15,35 @@
   <button id="btn-order-oldest"  class="btn-sm btn-primary btn-toggle-details">Oldest</button>
   <button id="btn-order-updated" class="btn-sm btn-primary btn-toggle-details">Last updated</button>
 </div>
+
+   <br>
+
+   <span style="font-weight:bold">
+        Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    <br>
+
+    <!-- Buttons for browsing next page (next set of results) -->
+    {% if page_obj.has_previous %}
+        <a id="page-prev-button" class="btn-page-listing" title="Pagination / List previous items" class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg>
+        </a>
+    {% else %}
+        <!-- <li class="btn btn-primary disabled"><span>&laquo;</span></li>  -->
+        <span class=" btn-page-listing"  > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg> </span>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+        <a id="page-next-button" class="btn-page-listing" title="Pagination / List next items" class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </a>
+    {% else %}
+        <span class="btn-page-listing">
+            <svg xmlns="http://www.w3.org/2000/svg"  class="btn-page-listing" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </span>
+        <!-- <li class="btn btn-primary disabled"><span>&raquo;</span></li>  -->
+    {% endif %}            
 
 
 

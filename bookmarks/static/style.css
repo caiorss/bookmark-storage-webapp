@@ -256,6 +256,15 @@ h5 { color: white }
    /*  display: block; */
 }
 
+
+
+.btn-page-listing {
+    background-color: #005aff;
+    margin-left: 10px;
+    padding: 6px;
+    border-radius: 20px;
+ }
+
 /** --------- Action Menu Table Style  -----------*/
 
 .action-menu-table {
