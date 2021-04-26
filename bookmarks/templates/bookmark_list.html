@@ -98,6 +98,8 @@
                   </a>    
 
             </h5>
+      
+           <details class="details-item">
             
             <ul>
               <li>                  
@@ -124,6 +126,8 @@
                    {% endif %}
               </li>
             </ul>
+
+           
 
             <div class="item-additional-buttons"></div>
               <a class="btn-sm btn-primary btn-toggle-action-table" 
@@ -197,6 +201,7 @@
                 </li>
                 {% endfor %}
             </lu>            
+
 
             <!-- =================== I T E M - R E L A T E D ================== -->
             <br/>
@@ -347,7 +352,7 @@
                   </tr>
             </table>                        
 
-            <p class = ""> {{ bookmark.brief|default:"" }} </p>
+            <p class=""> {{ bookmark.brief|default:"" }} </p>
 
             {% if bookmark.is_youtube_video %}
               <youtube-thumb video="{{ bookmark.youtube_id }}"></youtube-thumb>              
@@ -357,7 +362,7 @@
             {% if  bookmark.snapshot_is_pdf %}
                 <img src="/thumbnail/{{ bookmark.snapshot_id }}" >            
             {% endif %} 
-
+        </details>
         </div>        
         
         
