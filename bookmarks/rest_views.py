@@ -7,30 +7,57 @@ import rest_framework.response       as rf_resp
 import rest_framework.permissions    as rf_perm
 import rest_framework.pagination     as rf_pag 
 
-from django.core.paginator import Paginator 
+# from django.core.paginator import Paginator 
 
 from bookmarks import models 
 from bookmarks import dutils
 import bookmarks.views
 
-class Serializer_SiteBookmark(rest.serializers.ModelSerializer):
-    class Meta:
-        fields = ( 'id', 'url', 'title', 'deleted', 'starred'
-                   , 'brief',  'created', 'updated')
-        model = models.SiteBookmark
+# Http custom status code for indicating API domain-specific errors. 
+STATUS_CODE_DOMAIN_ERROR = 599
 
 
-class Serializer_Tags(rest.serializers.ModelSerializer):
+    # =========================================#
+    #  S E R I A L I Z E R S                   # 
+    #==========================================#
+
+class SerializerTags(rest.serializers.ModelSerializer):
+    """DRF framework serializer for Tags2 model class."""
+
     class Meta:
-        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated' ) 
         model = models.Tag2
+        fields = ( 'id', 'name', 'description', 'starred', 'created', 'updated'
+                  # , 'item'
+                 ) 
+        extra_kwargs = { 'item': { 'required': False } }
 
+class SerializerSiteBookmark(rest.serializers.ModelSerializer):
+    """ Serializer for model class SiteBookmark."""
 
+    tags = SerializerTags(source = "tag2_set", many = True, read_only=True)
 
-class API_Items(rf_gen.ListCreateAPIView):
-    # pagination_class = rf_pag. 
-    serializer_class       = Serializer_SiteBookmark
+    class Meta:
+        model = models.SiteBookmark
+        fields = ( 'id', 'url', 'title', 'deleted', 'starred'
+                   , 'brief',  'created', 'updated'
+                   , 'tags'
+                   )
+    # Override this method from super class for intercepting the Json 
+    # representation =>> See: https://stackoverflow.com/questions/63065639/ 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        # print(" [TYPE] Instance = ", type(rep), " - Type type(instance) = ", type(instance))
+        # print(" [TRACE] to_representation() => rep = ", rep)
+        return rep 
 
+    # =========================================#
+    #  R E S T - A P I - E N D P O I N T S     #
+    #==========================================#
+
+class RestItems(rf_gen.ListCreateAPIView):
+    """Rest API view for class SiteBookmark => endpoint /api2/items.""" 
+
+    serializer_class       = SerializerSiteBookmark
     authentication_classes = ( rf_auth.SessionAuthentication
                              , rf_auth.TokenAuthentication )
     permission_classes     = ( rf_perm.IsAuthenticated, )
@@ -94,30 +121,31 @@ class API_Items(rf_gen.ListCreateAPIView):
         print(" [TRACE REQUEST] ", request)
         serializer = self.get_serializer( data = request.data )
         if not serializer.is_valid():
+            print(" [TRACE] Serializer = ", serializer)
             return rf_resp.Response( serializer.errors
                                     , status = rf_status.HTTP_400_BAD_REQUEST)
         url: str= dutils.remove_url_obfuscation( serializer.data["url"] )
+       
+        it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
+        if it is not None:
+            return rf_resp.Response( { 'error': 'Item already exists' }, STATUS_CODE_DOMAIN_ERROR)
 
-        try:
-            it = models.SiteBookmark.objects.filter(owner = request.user, url = url).first()
-            if it is not None:
-                return rf_resp.Response( "{ error: 'Item already exists' }", rf_status.HTTP_409_CONFLICT)
+        item = models.SiteBookmark.objects.create( 
+                url     = url 
+            , starred = serializer.data.get("starred") or False 
+            , owner   = request.user )
+        bookmarks.views.update_item_from_metadata(item.id)
+        # except BaseException as ex:
+       #     return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
 
-            item = models.SiteBookmark.objects.create( 
-                  url     = url 
-                , starred = serializer.data.get("starred") or False 
-                , owner   = request.user )
-            bookmarks.views.update_item_from_metadata(item.id)
-        except BaseException as ex:
-            return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
-
-        result = Serializer_SiteBookmark(item)
+        result = SerializerSiteBookmark(item)
         return rf_resp.Response(result.data , status = rf_status.HTTP_201_CREATED )
 
 
-class API_Items_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
-    # pagination_class = rf_pag. 
-    serializer_class = Serializer_SiteBookmark
+class RestItemsDetail(rf_gen.RetrieveUpdateDestroyAPIView):
+    """Rest API view/endpoit for class SiteBookmark."""
+
+    serializer_class = SerializerSiteBookmark
 
     authentication_classes = ( rf_auth.SessionAuthentication
                              , rf_auth.TokenAuthentication )
@@ -141,11 +169,11 @@ class API_Items_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
     ##    return rf_resp.Response()
 
 
-class API_Tags(rf_gen.ListAPIView):
-    # pagination_class = rf_pag.
+class RestTags(rf_gen.ListAPIView):
+    """Rest API endpoint for model calss Tags2."""
     
-    paginate_by = 50  
-    serializer_class = Serializer_Tags
+    paginate_by = 50
+    serializer_class = SerializerTags
     authentication_classes = ( rf_auth.SessionAuthentication
                              , rf_auth.TokenAuthentication )
     permission_classes = ( rf_perm.IsAuthenticated, )
@@ -162,10 +190,10 @@ class API_Tags(rf_gen.ListAPIView):
         return models.Tag2.objects.filter(owner = self.request.user)\
                           .order_by("id").reverse()
 
-class API_Tags_Detail(rf_gen.RetrieveUpdateDestroyAPIView):
-    # pagination_class = rf_pag. 
-    serializer_class       = Serializer_Tags
+class RestTagsDetail(rf_gen.RetrieveUpdateDestroyAPIView):
+    """Rest API endpoint for model class Tags2."""
 
+    serializer_class       = SerializerTags
     authentication_classes = ( rf_auth.SessionAuthentication
                              , rf_auth.TokenAuthentication )
     permission_classes     = ( rf_perm.IsAuthenticated, )

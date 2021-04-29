@@ -1,13 +1,13 @@
 @font-face {
     font-family: medieval_old_english;
     /* src: url(/static/OldeEnglish.ttf); */
-    src: url(/static/SktMedieval.ttf);
+    src: url(/static/fonts/SktMedieval.ttf);
    
   }
 
  @font-face {
     font-family: unknown_font;
-    src: url(/static/CoolFont.woff);
+    src: url(/static/fonts/CoolFont.woff);
    
   }
 
@@ -76,18 +76,25 @@ p {
 
 h1 { 
     color: white; 
-    font-family: medieval_old_english; 
+    font-family: medieval_old_english;
+    font-size: 3.0em;
+    
 }
 
 h2 { color: white; 
     font-family: medieval_old_english; 
+    font-size: 3.0em;
+    
 }
 
 h3 { 
     
     color:      rgb(221, 89, 89); 
     font-family:  medieval_old_english;
-    margin-left:  20px;
+
+    margin:     20px;
+    font-size:  3.0em;
+    text-align: center;
 }
 
 h4 { color: white }
@@ -155,8 +162,9 @@ h5 { color: white }
     background:  #2b2b2d;
     position:      fixed;
     z-index:       1000;
-    width:         600px;
-    padding-left:  10px; 
+    min-width:     800px;
+    padding-left:  10px;
+    
   /*   border-radius: 10px; 
     padding-bottom: 50px;  */    
 }
@@ -248,6 +256,15 @@ h5 { color: white }
    /*  display: block; */
 }
 
+
+
+.btn-page-listing {
+    background-color: #005aff;
+    margin-left: 10px;
+    padding: 6px;
+    border-radius: 20px;
+ }
+
 /** --------- Action Menu Table Style  -----------*/
 
 .action-menu-table {
@@ -272,6 +289,66 @@ h5 { color: white }
   width: 100%;
   display: block;
   background-color: #1b1b1b;
+}
+
+.div-form-search {
+    border-radius: 20px;
+    border: 20p;
+    padding: 10px;
+}
+
+/* --- Buttons for chaning  settings ----------- */
+
+.table-buttons {
+    width: 300px;
+    padding: 10px;
+    margin: 10px; 
+    border-radius: 15px;
+    background-color: #616365;
+    display: block;
+    
+}
+
+.table-buttons th {
+    border: 0;
+    width: 200px;
+    display: block;
+    padding: 8px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    color: white; 
+    background-color: var(--btn-primary-bgcolor);
+}
+
+.table-buttons th:hover {
+    background-color: #565858;
+}
+
+.table-buttons th a {
+    color:white;
+    
+}
+
+.table-buttons select {
+    display: block;
+    background-color: #565858;
+    width: 100%;
+    border-radius: 5px;
+    color: white;
+}
+
+.div-file-upload {
+    margin: 10px;
+    background-color: gray;
+    width: 400px;
+    border-radius: 25px;
+    padding: 10px;
+   
+}
+
+.div-file-upload input[type=file] {
+     background-color: #323235;
+     border-radius: 10px;
 }
 
   /** =============== Mobile-specific Style ================ */

@@ -17,9 +17,11 @@
             <p> {{ tag.description }} </p>
             <br/>
 
-            <button onclick="tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' )" >Update</button>
-            <button onclick="tag_delete( '{{ tag.name | escapejs }}', {{ tag.id }} )" >Delete</button>
-
+            <button class="btn-sm btn-info btn-tag-update" 
+                    data-id="{{ tag.id }}" data-name="{{ tag.name }}" data-description="{{ tag.description }}" >Edit</button> 
+            
+            <button class="btn-sm btn-info btn-tag-delete" 
+                    data-id="{{ tag.id }}" data-name="{{ tag.name }}" data-description="{{ tag.description }}" >Delete</button> 
             <br/>            
   
         </div>                            

@@ -36,17 +36,6 @@ export async function ajax_get(url, crfs_token)
     return resp.json();
 }
 
-// Http method for creating new resource
-export const HTTP_POST   = "POST";
-// Http method for updating an existing resource  
-export const HTTP_PUT    = "PUT";
-// Http method for getting a resource             
-export const HTTP_GET    = "GET";
-// Http method for deleting a resource 
-export const HTTP_DELETE = "DELETE";
-// Http method for updating/changing a resource 
-export const HTTP_PATCH = "PATCH";
-
 export async function ajax_request(url, crfs_token, method, data =  null)
 {
     let params = {

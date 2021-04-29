@@ -942,7 +942,9 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         mode:   str = body["mode"]      
         item = SiteBookmark.objects.get(id = item_id, owner = request.user)
         if mode == "soft": item.delete() 
-        if mode == "hard": item.hard_delete()
+        if mode == "hard": 
+            self.delete_file_snapshot(request, item_id)
+            item.hard_delete()
         return  JsonResponse({ "result": "OK" })
 
     # Backend REST-like API 
@@ -965,7 +967,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             return Http404("Error: invalid request")
         
         try:
-            item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)    
+            item = SiteBookmark.objects.get(id = item_id, owner  = request.user)    
         except SiteBookmark.DoesNotExist:
             item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = None)    
         
@@ -980,7 +982,10 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         if action == "snapshot":       
             print(" [INFO] Downloading file snapshot. Ok.")     
             return self.download_file_snapshot(request, item_id)
-            
+
+        if action == "snapshot-delete":
+            return self.delete_file_snapshot(request, item_id)
+
         item.save()
         return JsonResponse({ "result": "OK" }, safe = False)
 
@@ -1007,6 +1012,19 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
                     ,"message": "Error: urrlib Exception = {ex}".format(ex = ex)
                    })
         return JsonResponse({'result': "OK", "message": "File downloaded Ok."})
+
+    def delete_file_snapshot(self, request: WSGIRequest, item_id):
+        try:
+            item = SiteBookmark.objects.get(id = item_id, owner = request.user)
+        except SiteBookmark.DoesNotExist: 
+            return JsonResponse({ 'result': 'ERROR', 'message': "Item does not exist"})
+
+        sn: FileSnapshot = item.filesnapshot_set.first()
+        path = sn.getDirectoryPath()
+        print(" [TRACE] File snapshot path = ", path)
+        item.filesnapshot_set.remove(sn)
+        sn.delete() 
+        return JsonResponse({'result': "OK", "message": "File snapshot deleted Ok."})
 
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
