@@ -271,10 +271,10 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return c.item.all()        
 
     def filter_search(self):
-        search = self.request.GET.get('query')
+        search: str = self.request.GET.get('query').strip()
         mode   = self.request.GET.get('mode', "")
-        if not search:
-            return self.filter_latest()        
+        if not search or search == "":
+            return self.filter_all()  
         words = shlex.split(search)
         lam = lambda x, y: x | y
         if  mode == "OR":
