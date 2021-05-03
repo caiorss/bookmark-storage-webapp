@@ -46,7 +46,7 @@ Search Items:
 
             <input type="hidden" name="filter" value="search" /> 
             <input id="search-entry" type='text' name='search' value='{{ request.GET.search }}' > 
-            <input id="btn-search" class="btn btn-info" type='button' value="Search" > 
+            <input id="btn-search"    class="btn-sm btn-info" type='button' value="Search" > 
             <input id="btn-top-clear" class="btn-sm btn-info" type="reset" value="Clear">
 </div>      
 <h2> Items </h2>
@@ -103,13 +103,5 @@ Tooling:
     <li> <a href='/items?filter=doctype&A0=developer_tool'>Developer tool, tooling</a> </li>    
 </ul>
 
-
-<h2> Bookmarklet </h2>
-
-<ul>    
-    <li> <a href="javascript:(function()%7Bvar%20baseUrl%20%3D%20%22http%3A%2F%2Flocalhost%3A8000%2Fitems%2Fadd%3F%22%3B%0Awindow.location.href%20%3D%20baseUrl%20%2B%20%22title%3D%22%20%2B%20encodeURI(document.title)%20%2B%20%22%26url%3D%22%20%2B%20encodeURI(document.URL)%3B%7D)()%3B">save to bmanager (localhost)</a> </li>
-    <li> <a href="javascript:(function()%7Bvar%20baseUrl%20%3D%20%22http%3A%2F%2Flocalhost%3A8000%2Fitems%2Fadd%3F%22%3B%0Awindow.location.href%20%3D%20baseUrl%20%2B%20%22title%3D%22%20%2B%20document.title%20%2B%20%22%26url%3D%22%20%2B%20document.URL%3B%7D)()%3B">Save bookmark to pybm (localhost)</a> </li>
-    <li> <a href="javascript:(function()%7Bvar%20baseUrl%20%3D%20%22http%3A%2F%2F192.168.18.157%3A8000%2Fitems%2Fadd%3F%22%3B%0Awindow.location.href%20%3D%20baseUrl%20%2B%20%22title%3D%22%20%2B%20document.title%20%2B%20%22%26url%3D%22%20%2B%20document.URL%3B%7D)()%3B">Save to Bookmark Manager (local network)</a> </li>
-</ul>
 
 {% endblock %}
