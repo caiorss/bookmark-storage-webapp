@@ -414,6 +414,10 @@ h5 { color: white }
   /** =============== Mobile-specific Style ================ */
   @media only screen and (max-width: 960px) 
   {
+    body {
+        max-width: 95%;
+    }
+
     #top-panel {
         margin-top: 50px;
     }
@@ -430,6 +434,9 @@ h5 { color: white }
         margin-bottom: 10px;
     }
 
+    img {
+        max-width: 95%;
+    }
 
   }
 
