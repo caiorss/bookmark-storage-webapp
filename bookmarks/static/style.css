@@ -11,6 +11,22 @@
    
   }
 
+ @font-face {
+    font-family: font_stencil;
+    src: url(/static/fonts/BlackOpsOne-Regular.ttf);
+  }
+
+ @font-face {
+    font-family: font_wunderbach;
+    src: url(/static/fonts/WC_Wunderbach.otf);
+  }
+
+ @font-face {
+    font-family: font_major_shift;
+    src: url(/static/fonts/major_shift.ttf);
+  }
+
+
 /*  Change global style with 
  * 
  *  let root = document.documentElement;
@@ -18,6 +34,7 @@
  *  
  */  
 :root {
+    --title-font: font_stencil;
     --main-background-color:  #3c3c3c; 
     --foreground-color:       white;
     --item-background-color:  #2f2f2f;
@@ -76,28 +93,29 @@ p {
 
 h1 { 
     color: white; 
-    font-family: medieval_old_english;
+    font-family: var(--title-font);
     font-size: 3.0em;
     
 }
 
 h2 { color: white; 
-    font-family: medieval_old_english; 
+    font-family: var(--title-font); 
     font-size: 3.0em;
     
 }
 
-h3 { 
+h3, h4 { 
     
     color:      rgb(221, 89, 89); 
-    font-family:  medieval_old_english;
+    font-family:  var(--title-font);
 
-    margin:     20px;
+    margin:     18px;
     font-size:  3.0em;
     text-align: center;
 }
 
-h4 { color: white }
+
+
 h5 { color: white }
 
 .item { 
@@ -280,7 +298,6 @@ h5 { color: white }
 
 
 .details-controls {
-    max-width:  60%;
     border: 2px solid #aaa;
     background: #1a8894;
     border-radius: 10px;
@@ -405,6 +422,10 @@ h5 { color: white }
         max-width:  100%;
     }
 
+    #page-title-header {
+        margin-bottom: 10px;
+    }
+
 
   }
 
@@ -426,7 +447,7 @@ h5 { color: white }
 
     #top-panel{
         visibility:   visible;
-        width:         60%;
+        width:         90%;
         position:      relative;
         display:       block;    
         margin-top:    60px;           
@@ -435,6 +456,11 @@ h5 { color: white }
         
         /* z-index:       999999; */
        /*  top: 0; */
+    }
+
+    .details-controls {
+        width: 90%;
+        max-width:  90%;
     }
 
     #bookmark-list{
