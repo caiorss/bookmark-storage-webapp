@@ -234,8 +234,8 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return  query
     
     def filter_removed(self):        
-        return self.model.objects.filter(deleted = True)\
-            .filter(owner = self.request.user).order_by("id").reverse()    
+        return self.model.objects.filter(deleted = True or deleted == None ) \
+            .filter(owner = self.request.user)
 
     # Url example: /items?filter=domain&A0=www.reddit.com
     def filter_domain(self):
