@@ -114,6 +114,12 @@ h5 { color: white }
     padding: 2%                
 }
 
+.item-bookmark-link {
+    width:     90%;
+    word-wrap: break-word;
+   /* display:inline-block; */
+}
+
 .container {
     display:    block;
     visibility: visible;
@@ -123,6 +129,13 @@ h5 { color: white }
    /*  background: red; */
    /*  position: relative; */
 }
+
+#page-title-header {
+    margin-bottom: -50px;
+    margin-top: 40px;
+}
+
+
 
 .item-table-info {
     font-size: 10pt;
