@@ -1,5 +1,14 @@
 PYTHON=python
 
+# Install dependencies for running this application.
+setup:
+	@# Install pipenv 
+	pip3 install --user pipenv
+	@# Install the dependencies 
+	pipenv setup 
+	@# Install image magick policy
+        sudo image-magic-policy.xml /etc/ImageMagick-6/policy.xml 	
+
 # Run application
 run:
 	# ${PYTHON} manage.py runserver 0.0.0.0:8000
