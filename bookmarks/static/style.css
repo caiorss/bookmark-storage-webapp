@@ -265,6 +265,32 @@ h5 { color: white }
     border-radius: 20px;
  }
 
+
+.details-controls {
+    max-width:  60%;
+    border: 2px solid #aaa;
+    background: #1a8894;
+    border-radius: 10px;
+    padding: .5em .5em 0;
+}
+
+.details-controls > summary {
+  padding: 4px;
+  width: 200px;
+  color:            white;
+  background-color: var(--btn-primary-bgcolor);
+  border: none;
+  box-shadow: 1px 1px 2px #bbbbbb;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.details-controls-div {
+    background: #025c66;
+    border: 1px solid rgb(30, 255, 0); 
+    border-radius: 15px;
+}
+
 /** --------- Action Menu Table Style  -----------*/
 
 .action-menu-table {
@@ -340,7 +366,7 @@ h5 { color: white }
 .div-file-upload {
     margin: 10px;
     background-color: gray;
-    width: 400px;
+    width: 90%;
     border-radius: 25px;
     padding: 10px;
    
@@ -361,6 +387,11 @@ h5 { color: white }
     .container {
         margin-top: 30px;
     }
+
+    .details-controls {
+        max-width:  100%;
+    }
+
 
   }
 
@@ -396,6 +427,11 @@ h5 { color: white }
     #bookmark-list{
         margin-top: 160px;
         position: relative;
+    }
+
+    #page-title-header {
+        margin-bottom: -50px;
+        margin-top: 40px;
     }
 
 
