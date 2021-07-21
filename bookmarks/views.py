@@ -33,6 +33,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db.models import Count
 
 #from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import django.core.paginator as dj_paginator 
@@ -120,6 +121,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         self.add_filter("tag-name",     "Filter tag by name",              self.filter_by_tag_name)
         self.add_filter("created-date", "Filter by created date",          self.filter_by_created_date)
         self.add_filter("upload",       "File uploads",                    self.filter_uploads)
+        self.add_filter("snapshot",     "Items with snapshots",            self.filter_has_snapshot)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
@@ -295,7 +297,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.filter(owner = self.request.user, created = created_date)\
             .exclude(deleted = True )
 
+    def filter_has_snapshot(self) -> QuerySet:
+        """Filter items that has snapshot attachment files."""
+        return SiteBookmark.objects.annotate( c = Count("filesnapshot") )\
+            .filter( owner = self.request.user, deleted = False, c__gte = 1 )
+
     def filter_uploads(self):
+        """Filter items that have uploaded files (snapshot file)."""
         return self.model.objects.filter(owner = self.request.user, is_upload = True).exclude(deleted = True)
 
 # URL route for adding item through bookmarklet 
