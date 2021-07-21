@@ -411,6 +411,12 @@ h5 { color: white }
      border-radius: 10px;
 }
 
+.img-snapshot-image {
+    max-width: 90%;
+    /* max-height: px; */
+    /* margin-top: -30px; */
+}
+
   /** =============== Mobile-specific Style ================ */
   @media only screen and (max-width: 960px) 
   {

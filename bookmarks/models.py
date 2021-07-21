@@ -379,6 +379,13 @@ class SiteBookmark(models.Model):
             return False        
         return sn.fileMimeType == "application/pdf"
 
+    def snapshot_is_image(self) -> bool:
+        image_mime_types = [ "image/gif", "image/jpeg", "image/png", "image/svg+xml" ]        
+        sn: ManyRelatedManager = self.filesnapshot_set.first()
+        if sn is None: return False        
+        return sn.fileMimeType in image_mime_types
+
+
 
 class Tag(models.Model):
     name        = models.CharField(max_length=300, unique = True, help_text="Tag title or name")

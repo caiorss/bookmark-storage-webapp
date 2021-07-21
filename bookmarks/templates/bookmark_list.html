@@ -170,14 +170,15 @@
               </a>                                                             
              {% endif %}          
              
-             {% if  bookmark.snapshot_is_pdf %}
+            {% if  bookmark.snapshot_is_pdf %}
               <a target="_blank" title="View PDF in the web browser" 
                   href="/pdf2html/{{ bookmark.snapshot_file }}"
                 >            
                 <img src="/static/images/icon-download-item.png"> 
               </a>                                                             
-           {% endif %} 
+            {% endif %} 
 
+        
             <br/></br>
             
             <!-- =================== I T E M - T A G S ================== -->
@@ -367,6 +368,12 @@
               <youtube-thumb video="{{ bookmark.youtube_id }}"></youtube-thumb>              
             {% endif %}
 
+            {% if  bookmark.snapshot_is_image %}
+              <br/>
+              <img class="img-snapshot-image" src="/snapshot/file/{{ bookmark.snapshot_file }}?title=" >            
+            {% endif %} 
+
+  
 
             {% if  bookmark.snapshot_is_pdf %}
                 <img src="/thumbnail/{{ bookmark.snapshot_id }}" >            
