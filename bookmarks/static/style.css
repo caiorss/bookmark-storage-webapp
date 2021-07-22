@@ -76,7 +76,6 @@ body {
      */
     overscroll-behavior-y: contain;
 
-    margin: 10px;
 }
 
 a { color: var(--hyperlink-color); }
@@ -101,7 +100,7 @@ h1 {
     color: white; 
     font-family: var(--title-font);
     font-size: 3.0em;
-    
+    padding: 10px;
 }
 
 h2 { 
@@ -123,7 +122,7 @@ h3 {
     font-family:  var(--title-font);
 
     margin:     18px;
-    font-size:  3.0em;
+    font-size:  2.5em;
     text-align: center;
 }
 
@@ -142,13 +141,17 @@ h5 { color: white }
     /* background-color: #3f3f3f; */
     /* border-color: black; */
     border: 1px solid #607D8B;
-    padding: 2%                
+   
+    font-size: medium;
 }
 
 .item-bookmark-link {
+    margin: 10px;
     width:     90%;
     word-wrap: break-word;
    /* display:inline-block; */
+   font-size: medium;
+   
 }
 
 .container {
@@ -208,7 +211,7 @@ h5 { color: white }
     z-index:       1000;
     min-width:     800px;
     padding-left:  10px;
-    
+    margin-left:  -10px;   
   /*   border-radius: 10px; 
     padding-bottom: 50px;  */    
 }
@@ -430,7 +433,8 @@ h5 { color: white }
   @media only screen and (max-width: 960px) 
   {
     body {
-        max-width: 95%;
+        max-width: 100%;
+        padding: 5px;
     }
 
     #top-panel {
@@ -455,10 +459,15 @@ h5 { color: white }
 
   }
 
-   /** =============== Desktop-specific Style ================ */
+   /** =============== Desktop - specific Style ================ */
    @media only screen and (min-width: 960px) {
 
     html { width: 800px; }
+
+    body {
+        margin: 10px;
+        padding: 10px;
+    }
 
     .header {
        font-size: 12pt;
