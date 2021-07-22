@@ -75,6 +75,8 @@ body {
      * (for instance ,android browsers)
      */
     overscroll-behavior-y: contain;
+
+    margin: 10px;
 }
 
 a { color: var(--hyperlink-color); }
@@ -102,13 +104,20 @@ h1 {
     
 }
 
-h2 { color: white; 
+h2 { 
+    color: white; 
     font-family: var(--title-font); 
-    font-size: 3.0em;
-    
+    font-size: 3.0em;    
 }
 
-h3, h4 { 
+h3 { 
+    color: white; 
+    font-family: var(--title-font); 
+    font-size: 1.5em; 
+    margin-top: 10px;   
+}
+
+.centered-title { 
     
     color:      rgb(221, 89, 89); 
     font-family:  var(--title-font);
