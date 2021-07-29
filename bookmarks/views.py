@@ -423,6 +423,19 @@ def update_item_from_metadata(itemID: int) -> None:
             m = soup.find("meta", attrs={'name': 'twitter:description'})         
             brief: str = m["content"] if m is not None else ""        
 
+        # Extract JSON metadata from youtube video such as Author and Channel URL
+        if "youtube.com" or "m.youtube.com" in url:
+            import urllib.request
+            import http.client
+            import json
+            turl: str = f"https://www.youtube.com/oembed?url={url}&format=json"
+            resp: http.client.HTTPResponse = urllib.request.urlopen(turl)
+            metadata = json.loads(resp.read())
+            title = "( {0} ) {1}".format(  metadata["author_name"], title) 
+            brief = "Author name = " + metadata["author_name"] + "\n" \
+                + "Channel URL = " + metadata["author_url"] + "\n" \
+                + brief
+
         b.url   = real_url
         b.title = title 
         b.brief = brief 
