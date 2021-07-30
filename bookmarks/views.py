@@ -424,7 +424,8 @@ def update_item_from_metadata(itemID: int) -> None:
             brief: str = m["content"] if m is not None else ""        
 
         # Extract JSON metadata from youtube video such as Author and Channel URL
-        if "youtube.com" or "m.youtube.com" in url:
+        if ("youtube.com" in url) or ("m.youtube.com" in url):
+            print(" [TRACE] Site is Youtube.")
             import urllib.request
             import http.client
             import json
