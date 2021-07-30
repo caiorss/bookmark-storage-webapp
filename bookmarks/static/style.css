@@ -143,6 +143,7 @@ h5 { color: white }
     border: 1px solid #607D8B;
    
     font-size: medium;
+    padding: 5px;
 }
 
 .item-bookmark-link {
@@ -422,6 +423,11 @@ h5 { color: white }
      background-color: #323235;
      border-radius: 10px;
 }
+
+ .div-form-search input[type=text] {
+    width: 100%;
+}
+
 
 .img-snapshot-image {
     max-width: 90%;
