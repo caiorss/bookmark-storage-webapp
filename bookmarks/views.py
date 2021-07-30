@@ -198,6 +198,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
+       
+        order = self.request.GET.get("order") or "new" 
+        
+        if   order == "new": context["item_sorting"] = "Newest items"
+        elif order == "old": context["item_sorting"] = "Oldest items"
+        elif order == "updated": context["item_sorting"] = "Latest updated items"
+
         return context
 
     #---------- Utility methods  -------------------------------#
@@ -296,6 +303,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         assert filter_type == "created-date"
         return self.model.objects.filter(owner = self.request.user, created = created_date)\
             .exclude(deleted = True )
+            
 
     def filter_has_snapshot(self) -> QuerySet:
         """Filter items that has snapshot attachment files."""
