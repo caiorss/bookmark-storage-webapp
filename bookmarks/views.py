@@ -111,7 +111,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # ---------- Set callbacks ------------#   
     def start(self):
         self.add_filter("id",           "Select single item by ID",        self.filter_by_id)
-        self.add_filter("all",          "Listing items by newest added",   self.filter_all)
+        self.add_filter("all",          "Listing all items",               self.filter_all)
         self.add_filter("starred",      "Starred items",                   self.filter_starred)
         self.add_filter("removed",      "Removed items",                   self.filter_removed)
         self.add_filter("doctype",      "Items fitered by type",           self.filter_doctype)
