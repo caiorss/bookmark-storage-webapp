@@ -431,6 +431,17 @@ def update_item_from_metadata(itemID: int) -> None:
             m = soup.find("meta", attrs={'name': 'twitter:description'})         
             brief: str = m["content"] if m is not None else ""        
 
+        # Extract title of RFC internet standard from IETF web page
+        if domain == "datatracker.ietf.org":
+            print(" [TRACE] Found IETF domain RFC document")
+            m = soup.find("span", attrs={'class': 'h1'})         
+
+            if "https://datatracker.ietf.org/doc/html/rfc" in url:
+                rfc: str = real_url.strip("https://datatracker.ietf.org/doc/html/").upper()
+                title = "IETF - RFC" + rfc + " /  " + getattr( m, "text", "" )
+            else:
+                title = "IETF - " + getattr( m, "text", "" )
+
         # Extract JSON metadata from youtube video such as Author and Channel URL
         if ("youtube.com" in url) or ("m.youtube.com" in url):
             print(" [TRACE] Site is Youtube.")
@@ -1256,6 +1267,7 @@ class ViewPaginatorMixin(object):
         }
         
         return data
+
 
 
 class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View):
