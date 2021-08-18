@@ -281,6 +281,8 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
     def filter_search(self):
         search: str = self.request.GET.get('query').strip()
+        search: str = dutils.remove_url_obfuscation(search)
+
         mode   = self.request.GET.get('mode', "")
         if not search or search == "":
             return self.filter_all()  
