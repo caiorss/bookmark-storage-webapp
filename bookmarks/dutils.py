@@ -202,7 +202,7 @@ def download_file(url: str) -> DownloadedFile:
     raise Exception("There is no handle function for this type of URL.") 
 
 
-def remove_url_obfuscation(url: str):
+def remove_url_obfuscation(url: str) -> str:
     """Clean URLs obfuscated by search engines."""
     # Remove google search engine obfuscated URLs.
     if re.match(".*google.*/url?", url) != None: 
