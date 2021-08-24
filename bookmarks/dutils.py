@@ -204,12 +204,21 @@ def download_file(url: str) -> DownloadedFile:
 
 def remove_url_obfuscation(url: str) -> str:
     """Clean URLs obfuscated by search engines."""
+
+    from urllib.parse import ParseResult 
+    
     # Remove google search engine obfuscated URLs.
     if re.match(".*google.*/url?", url) != None: 
-        u = urllib.parse.urlparse(url)
+        u: ParseResult = urllib.parse.urlparse(url)
         q = urllib.parse.parse_qs(u.query) 
-        # print(f" q = {q}")
         if "url" in q: 
             return q["url"][0]
         return url 
+
+    if url.startswith("https://out.reddit.com") != None:
+        u: ParseResult = urllib.parse.urlparse(url)
+        q = urllib.parse.parse_qs(u.query) 
+        if "url" in q: 
+            return q["url"][0]
+ 
     return url 
