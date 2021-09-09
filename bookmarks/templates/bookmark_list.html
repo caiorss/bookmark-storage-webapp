@@ -119,6 +119,11 @@
                 Update time: {{ bookmark.updated }}
               </li>
               <li>
+                Created time: <a href="items?filter=created-date&A0={{ bookmark.created | date:'Y-m-d' }}" 
+                                 title="Filter bookmarks by this created data">{{ bookmark.created }}</a> 
+              </li>
+              <li>
+
                   Starred: 
 
                    {%if bookmark.starred %}

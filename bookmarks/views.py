@@ -168,6 +168,13 @@ class BookmarksList(LoginRequiredMixin, ListView):
         ## print(f" Trace = { self.context_object_name }")
         query: QuerySet = context[self.context_object_name]
         assert query is not None 
+
+        narrow = self.request.GET.get("narrow") or "off"
+        search = self.request.GET.get("search") or ""
+
+        if narrow != "off":
+            query = query.filter( title__contains = search) 
+            pass 
        
         url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}&order={order}"\
             .format(  filter = self.request.GET.get("filter") or ""
@@ -300,11 +307,19 @@ class BookmarksList(LoginRequiredMixin, ListView):
             .filter(q1 | q2).exclude( deleted = True )
 
     def filter_by_created_date(self):
-        created_date: str = self.request.GET.get("A0")
+        date: str = self.request.GET.get("A0")
+        year, month, day = date.split("-")
         filter_type:  str = self.request.GET.get("filter")
         assert filter_type == "created-date"
-        return self.model.objects.filter(owner = self.request.user, created = created_date)\
-            .exclude(deleted = True )
+
+        return self.model.objects.filter( owner = self.request.user
+                                        , created__year = year
+                                        , created__month = month
+                                        , created__day = day     )\
+            .exclude( deleted = True )
+
+      #  return self.model.objects.filter(owner = self.request.user, created = created_date)\
+      #      .exclude(deleted = True )
             
 
     def filter_has_snapshot(self) -> QuerySet:
@@ -355,7 +370,7 @@ def update_item_from_metadata(itemID: int) -> None:
     b: SiteBookmark = SiteBookmark.objects.get(id = itemID)    
     # URL with obfuscation removed 
     real_url: str = dutils.remove_url_obfuscation(b.url)
-    print(f" [TRACE] real_url = { real_url }")    
+    print(f" [TRACE] Called update_item_from_metadata() real_url = { real_url }")    
     
     import urllib
     from urllib.parse import urlparse, ParseResult
@@ -376,6 +391,8 @@ def update_item_from_metadata(itemID: int) -> None:
 
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
+    
+    
     try:
         # Reference: https://stackoverflow.com/a/18269491
         url_ = urllib.parse.urlsplit(real_url)
@@ -390,79 +407,83 @@ def update_item_from_metadata(itemID: int) -> None:
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
         })
         page = urllib.request.urlopen(req, timeout = 4)
+        info = page.info()
         #page = urllib.request.urlopen(b.url)
-    except (urllib.error.URLError, socket.timeout) as ex:          
-        return 
 
-    info = page.info()
+        if "pdf" in info.get_content_type():
+            data = page.read() 
+            view = io.BytesIO(data)
+            pdf  = PyPDF2.PdfFileReader(view)
+            inf  = pdf.documentInfo
+            assert(inf is not None)
 
-    if "pdf" in info.get_content_type():
-        data = page.read() 
-        view = io.BytesIO(data)
-        pdf  = PyPDF2.PdfFileReader(view)
-        inf  = pdf.documentInfo
-        assert(inf is not None)
-
-        if inf.author is None:
-            b.title = (inf.title or inf.subject or real_url) + " [PDF] "
-        else:
-            b.title = (inf.title or inf.subject or real_url) + " [PDF] / " + inf.author 
-        
-        if inf.subject is None:
-            text_len_max = 400 
-            text = pdf.getPage(0).extractText() 
-            b.brief = (text[:text_len_max] + " ... ") if len(text) > text_len_max else text 
-        else: 
-            b.brief = inf.subject or "" 
-        b.save()
-        return 
-
-    if not ("pdf" in info.get_content_type()):
-        soup = bs4.BeautifulSoup(page, features = "lxml")
-
-        # title <- soup.find("title").text if soup is not None, otherwise
-        # , it is set to "" (empty string)
-        title: str = getattr( soup.find("title"), "text", "")
-        
-        # Extract tag <meta name='description' content="Website description here ...." />
-        m = soup.find("meta", attrs={'name': 'description'})             
-        brief: str = m.get("content") if m is not None else ""
-
-        url: str = b.url
-        if "stackoverflow.com/questions" in url:
-            m = soup.find("meta", attrs={'name': 'twitter:description'})         
-            brief: str = m["content"] if m is not None else ""        
-
-        # Extract title of RFC internet standard from IETF web page
-        if domain == "datatracker.ietf.org":
-            print(" [TRACE] Found IETF domain RFC document")
-            m = soup.find("span", attrs={'class': 'h1'})         
-
-            if "https://datatracker.ietf.org/doc/html/rfc" in url:
-                rfc: str = real_url.strip("https://datatracker.ietf.org/doc/html/").upper()
-                title = "IETF - RFC" + rfc + " /  " + getattr( m, "text", "" )
+            if inf.author is None:
+                b.title = (inf.title or inf.subject or real_url) + " [PDF] "
             else:
-                title = "IETF - " + getattr( m, "text", "" )
+                b.title = (inf.title or inf.subject or real_url) + " [PDF] / " + inf.author 
+            
+            if inf.subject is None:
+                text_len_max = 400 
+                text = pdf.getPage(0).extractText() 
+                b.brief = (text[:text_len_max] + " ... ") if len(text) > text_len_max else text 
+            else: 
+                b.brief = inf.subject or "" 
+            b.save()
+            return 
 
-        # Extract JSON metadata from youtube video such as Author and Channel URL
-        if ("youtube.com" in url) or ("m.youtube.com" in url):
-            print(" [TRACE] Site is Youtube.")
-            import urllib.request
-            import http.client
-            import json
-            turl: str = f"https://www.youtube.com/oembed?url={url}&format=json"
-            resp: http.client.HTTPResponse = urllib.request.urlopen(turl)
-            metadata = json.loads(resp.read())
-            title = "( {0} ) {1}".format(  metadata["author_name"], title) 
-            brief = "Author name = " + metadata["author_name"] + "\n" \
-                + "Channel URL = " + metadata["author_url"] + "\n" \
-                + brief
 
-        b.url   = real_url
-        b.title = title 
-        b.brief = brief 
-        b.save()
-        return 
+        if not ("pdf" in info.get_content_type()):
+            soup = bs4.BeautifulSoup(page, features = "lxml")
+
+            # title <- soup.find("title").text if soup is not None, otherwise
+            # , it is set to "" (empty string)
+            title: str = getattr( soup.find("title"), "text", "")
+            
+            # Extract tag <meta name='description' content="Website description here ...." />
+            m = soup.find("meta", attrs={'name': 'description'})             
+            brief: str = m.get("content") if m is not None else ""
+
+            url: str = b.url
+            if "stackoverflow.com/questions" in url:
+                m = soup.find("meta", attrs={'name': 'twitter:description'})         
+                brief: str = m["content"] if m is not None else ""        
+
+            # Extract title of RFC internet standard from IETF web page
+            if domain == "datatracker.ietf.org":
+                print(" [TRACE] Found IETF domain RFC document")
+                m = soup.find("span", attrs={'class': 'h1'})         
+
+                if "https://datatracker.ietf.org/doc/html/rfc" in url:
+                    rfc: str = real_url.strip("https://datatracker.ietf.org/doc/html/").upper()
+                    title = "IETF - RFC" + rfc + " /  " + getattr( m, "text", "" )
+                else:
+                    title = "IETF - " + getattr( m, "text", "" )
+
+            # Extract JSON metadata from youtube video such as Author and Channel URL
+            if ("youtube.com" in url) or ("m.youtube.com" in url):
+                print(" [TRACE] Site is Youtube.")
+                import urllib.request
+                import http.client
+                import json
+                turl: str = f"https://www.youtube.com/oembed?url={url}&format=json"
+                resp: http.client.HTTPResponse = urllib.request.urlopen(turl)
+                metadata = json.loads(resp.read())
+                title = "( {0} ) {1}".format(  metadata["author_name"], title) 
+                brief = "Author name = " + metadata["author_name"] + "\n" \
+                    + "Channel URL = " + metadata["author_url"] + "\n" \
+                    + brief
+
+            b.url   = real_url
+            b.title = title 
+            b.brief = brief 
+            print(" [TRACE] URL = ", b.url)
+            b.save()
+
+    except (urllib.error.URLError, socket.timeout) as ex:          
+        print(" [FAULT] Exit codepath")
+        # return 
+    # print(" [TRACE] Test code path 2")
+    return 
 
 @login_required
 def extract_metadata(request: WSGIRequest):
