@@ -215,10 +215,22 @@ def remove_url_obfuscation(url: str) -> str:
             return q["url"][0]
         return url 
 
-    if url.startswith("https://out.reddit.com") != None:
+    if url.startswith("https://out.reddit.com"):
+        print(" [TRACE] Remove Reddit URL obfuscation(). ")
         u: ParseResult = urllib.parse.urlparse(url)
         q = urllib.parse.parse_qs(u.query) 
         if "url" in q: 
+            print(" q = ", q["url"])
             return q["url"][0]
+        return url
+
+    if url.startswith("https://redirect.viglink.com"):
+        print(" [TRACE] Remove Reddit URL obfuscation(). ")
+        u: ParseResult = urllib.parse.urlparse(url)
+        q = urllib.parse.parse_qs(u.query) 
+        if "u" in q: 
+            print(" q = ", q["u"])
+            return q["u"][0]
+        return url
  
     return url 
