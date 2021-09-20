@@ -13,6 +13,8 @@ from bookmarks import models
 from bookmarks import dutils
 import bookmarks.views
 
+import logging
+
 # Http custom status code for indicating API domain-specific errors. 
 STATUS_CODE_DOMAIN_ERROR = 599
 
@@ -118,6 +120,9 @@ class RestItems(rf_gen.ListCreateAPIView):
     # Override method for interception and debugging 
     # (Printing request).  
     def create(self, request):
+
+        logger = logging.getLogger(__name__)
+
         print(" [TRACE REQUEST] ", request)
         serializer = self.get_serializer( data = request.data )
         if not serializer.is_valid():
@@ -138,6 +143,8 @@ class RestItems(rf_gen.ListCreateAPIView):
         # except BaseException as ex:
        #     return rf_resp.Response( str(ex) , rf_status.HTTP_500_INTERNAL_SERVER_ERROR )
 
+        logger.info(f" Added bookmark URL = {url}")
+        
         result = SerializerSiteBookmark(item)
         return rf_resp.Response(result.data , status = rf_status.HTTP_201_CREATED )
 

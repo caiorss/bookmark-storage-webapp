@@ -1,5 +1,6 @@
 import typing
 from typing import Dict, List, NamedTuple
+from django.forms.widgets import FILE_INPUT_CONTRADICTION
 
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.generic import TemplateView,ListView
@@ -34,7 +35,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Count
-
+import logging
 #from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import django.core.paginator as dj_paginator 
 
@@ -71,6 +72,9 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', )
 
 def signup(request):
+
+    logger = logging.getLogger(__name__)
+
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -83,6 +87,8 @@ def signup(request):
             return ds.redirect('/items')
     else:
         form = SignUpForm()
+
+    logger.info("User registered Ok.")
     return ds.render(request, 'registration.html', {'form': form})
 
 
@@ -92,6 +98,8 @@ class BookMarkFilter(NamedTuple):
     callback: typing.Any 
 
 class BookmarksList(LoginRequiredMixin, ListView):
+
+    logger = logging.getLogger(__name__)
 
     # --- overriden variables --------
     model         = SiteBookmark
@@ -133,6 +141,8 @@ class BookmarksList(LoginRequiredMixin, ListView):
         ORDER_BY_UPDATE = "updated"   # Order items by last updated 
         order: str = self.request.GET.get("order") or ORDER_BY_NEWEST
         print(" [TRACE] ORDER = ", order)
+
+        logging.debug(f" Order search results by {order}")
 
         if order == ORDER_BY_NEWEST:
             ## print(" [TRACE] Order by newest")
@@ -637,9 +647,13 @@ def rest_item_create(request: WSGIRequest):
     except SiteBookmark.DoesNotExist:
         pass         
 
+    logger = logging.getLogger(__name__)
+
     item = SiteBookmark.objects.create(url = url_, owner = user)
     item.save()
     update_item_from_metadata(item.id)
+
+    logger.debug(f"Add bookmark: f{url_} ")
     return  JsonResponse({ "result": "OK" })
 
 
@@ -705,6 +719,10 @@ def pdf2hml(request: WSGIRequest, fileUUID: str, fileName: str):
     """ Converts PDF (Portable Document) to html by using the pf2htmlEx application. 
     
     """
+
+    logger = logging.getLogger(__name__)
+    logger.info(f" Converting PDF to HTML =>> UUID = f{fileUUID} ; file name = {fileName}  ")
+
     import subprocess
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileUUID)
     data_dir:   str = os.path.join(django.conf.settings.BASE_DIR, "data")
@@ -758,6 +776,8 @@ def document_thumbnail(request: WSGIRequest, fileUUID: str):
     data_dir:   str = os.path.join(django.conf.settings.BASE_DIR, "data")
     cache_dir:  str = os.path.join(data_dir,"thumbnail-cache")    
 
+
+
     print(f" [TRACE] cache_dir = {cache_dir} ")
     print(f" [TRACE]  data_dir = {data_dir} ")
     
@@ -769,8 +789,10 @@ def document_thumbnail(request: WSGIRequest, fileUUID: str):
     # Thumbnail file 
     thumb_file: str = os.path.join(cache_dir, f"{fileUUID}.png")
 
-    if not os.path.exists( thumb_file ):
+    logger = logging.getLogger(__name__)
 
+    if not os.path.exists( thumb_file ):
+        logger.info(f" Generating thumbinail of document =>> file = ${sn.fileName} ; uuid = {fileUUID}  ")
         proc = subprocess.run( [  # 'convert' => Utility from ImageMagick suite 
                                   "convert"
                                 , "-density",    "300"
