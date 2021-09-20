@@ -123,6 +123,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'apps.wsgi.application'
 
 
+  # ======== SECTION:  DATABASE ===================================//
+
+
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -168,6 +171,7 @@ USE_TZ = True
 # Allow connection from any hosts
 ALLOWED_HOSTS = [ "*"]
 
+  # ======== SECTION: STATIC FILES ===================================//
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -180,8 +184,58 @@ STATICFILES_DIRS = [
 
 ]
 
+
+  # ======== SECTION: AUTHENTICATION ===================================//
+
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 AUTH_USER_MODEL = "bookmarks.Account"
+
+
+  # ======== SECTION: LOGGING ===================================//
+
+# --- Constants -----# 
+LEVEl_INFO = "INFO"
+LEVEL_DEBUG = "DEBUG"
+
+LOGGING = {
+      "version": 1
+    , "disable_existing_loggers": False
+
+    , 'formatters': {
+        'verbose': {
+            'format': '%(levelname)s - [%(asctime)s] - %(name)s.%(funcName)s:%(lineno)s - %(message)s'
+        }
+    }
+
+    , "handlers": {
+        "file": {
+              "class":     "logging.FileHandler"
+            , "filename":  "server.log"
+            , "formatter": "verbose"
+            , "level":     LEVEl_INFO
+            
+        }
+
+    , "syslog": {
+               "class":    "logging.handlers.SysLogHandler"
+             #, "facility": "local7"
+             , "address":  "/dev/log"
+             , "formatter": "verbose"
+             , "level":    LEVEL_DEBUG
+        }
+    , "console": {
+            "class":     "logging.StreamHandler"
+           ,"formatter": "verbose" 
+      }
+    } 
+
+   , "loggers": {
+       "": {
+            "level": "DEBUG"
+          , "handlers": [ "file", "syslog", "console" ] 
+       }
+   }
+}
