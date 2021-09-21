@@ -58,6 +58,17 @@ tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
+
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+
+@receiver(user_logged_in)
+def on_login(sender, user, request, **kwargs):
+    logger = logging.getLogger(__name__)
+    logger.info(f" <LOGIN> User account {user} logged in.")
+
+
+
 class SignUpForm(UserCreationForm):
     username = forms.CharField( max_length =30
                               , required   = True
