@@ -1,5 +1,6 @@
 import typing
 from typing import Dict, List, NamedTuple
+from django.db.models.expressions import OrderBy
 from django.forms.widgets import FILE_INPUT_CONTRADICTION
 
 from django.http import HttpResponse, FileResponse, Http404
@@ -39,6 +40,10 @@ import logging
 #from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import django.core.paginator as dj_paginator 
 
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
+
+
 import bs4 
 import urllib
 import shlex 
@@ -58,9 +63,6 @@ tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
-
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.dispatch import receiver
 
 @receiver(user_logged_in)
 def on_login(sender, user, request, **kwargs):
@@ -1369,7 +1371,8 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
 class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
     def get(self, request: WSGIRequest, *args, **kwargs):
-        query = Tag2.objects.filter(owner = request.user)
+        query = Tag2.objects.filter(owner = request.user)\
+                    .order_by(Lower("name"))
         return queryset2Json(query, ["id", "name", "description"])
 
     def post(self, request: WSGIRequest, *args, **kwargs):

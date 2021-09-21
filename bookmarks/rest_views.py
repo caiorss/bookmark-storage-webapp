@@ -7,6 +7,7 @@ import rest_framework.response       as rf_resp
 import rest_framework.permissions    as rf_perm
 import rest_framework.pagination     as rf_pag 
 
+from django.db.models.functions import Lower
 # from django.core.paginator import Paginator 
 
 from bookmarks import models 
@@ -193,9 +194,12 @@ class RestTags(rf_gen.ListAPIView):
         if search: 
             return models.Tag2.objects\
                          .filter( owner = self.request.user
-                                 , name__contains = search )
+                                 , name__contains = search )\
+                          .order_by(Lower("name"))
+
+        # .order_by(Lower("name")) => Order by alphabetic order 
         return models.Tag2.objects.filter(owner = self.request.user)\
-                          .order_by("id").reverse()
+                          .order_by(Lower("name"))
 
 class RestTagsDetail(rf_gen.RetrieveUpdateDestroyAPIView):
     """Rest API endpoint for model class Tags2."""
