@@ -59,7 +59,7 @@ tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
 
-from django.contrib.auth.signals import user_logged_in
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 
 @receiver(user_logged_in)
@@ -67,6 +67,11 @@ def on_login(sender, user, request, **kwargs):
     logger = logging.getLogger(__name__)
     logger.info(f" <LOGIN> User account {user} logged in.")
 
+
+@receiver(user_logged_out)
+def on_logout(sender, user, request, **kwargs):
+    logger = logging.getLogger(__name__)
+    logger.info(f" <LOGOUT> User account {user} logged out.")
 
 
 class SignUpForm(UserCreationForm):
