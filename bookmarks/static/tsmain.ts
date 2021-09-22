@@ -6,7 +6,15 @@ import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
       , DialogForm, Dialog_Notify, Dialog_Datalist_Prompt
         } from "./dialogs.js";
 
-
+declare function Toastify(obj: any);
+    
+function toastNotification(message: string): Promise<void>
+{
+    // Delay in milliseconds 
+    const delayMs = 2000;
+    Toastify({ text: message, duration: delayMs }).showToast();
+    return new Promise( resolve => setTimeout(resolve, delayMs) );
+}
 
 // Boolean flag ('true' or 'false') stored in html5
 // local storage API. It is useful for storing non critical 
@@ -230,11 +238,15 @@ async function item_quick_rename(item_id: Number, old_item_title: string)
     
     // .ajax_request('/api2/items/' + item_id, token, "PATCH", payload)
     let data = await resp.json();
-    if( resp.is_status_success() ){
-        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1500);
+
+    if( resp.is_status_success() )
+    {
+        await toastNotification("Item renamed Ok.");
+        //let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 1500);
         dom.page_refresh(); 
     } else {
-        Dialog_Notify.notify("ERROR", "Error: " + data, 1500);
+        // await Dialog_Notify.notify("Error notification", "Error: " + data, 1500);
+        await toastNotification("Error: " + data);
     }    
 
 }
@@ -252,7 +264,8 @@ async function item_set_starred(checkbox)
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PATCH, `/api2/items/${item_id}`, token, payload);
     if( resp.is_status_success() ) 
     {
-        await Dialog_Notify.notify("OK", "Toggle starred settings Ok.", 500);
+        // await Dialog_Notify.notify("OK", "Toggle starred settings Ok.", 500);
+        await toastNotification("Toggle starred settings. Ok.");
         dom.page_refresh();
     } else {
         Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
@@ -352,10 +365,12 @@ async function tag_add(item_id: Number)
 
     if( resp.is_status_success() )
     {
-        await Dialog_Notify.notify_ok("Tag added successfully. Ok.", 500);
+        // await Dialog_Notify.notify_ok("Tag added successfully. Ok.", 500);
+        toastNotification("Tag added successfully. Ok.");
         dom.page_refresh();
     } else {
-        await Dialog_Notify.notify_error(resp["message"], 500);
+        // await Dialog_Notify.notify_error(resp["message"], 500);
+        toastNotification("Error: " + resp["message"]);
     }
 
 }
@@ -374,10 +389,13 @@ async function tag_delete_from_item(tag_id: Number, bookmark_id: Number)
 
     if( resp.is_status_success() ) 
     {
-        await Dialog_Notify.notify_ok("Tag removed from item. Ok.", 1000);
+        // await Dialog_Notify.notify_ok("Tag removed from item. Ok.", 1000);
+        toastNotification("Tag removed from item. Ok.");
         dom.page_refresh(); 
     } else {
-        await Dialog_Notify.notify_error(" [FAILURE] " + resp["message"], 1000);
+        // await Dialog_Notify.notify_error(" [FAILURE] " + resp["message"], 1000);
+        toastNotification("Error: " + resp["message"]);
+
     }
 }
 
@@ -404,10 +422,12 @@ async function tag_delete(tag_name: string, tag_id: Number)
 
     if( resp.is_status_success() )
     { 
-        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        // Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        toastNotification("Tag deleted Ok.");
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+        // Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+        toastNotification( "Error: Failed to delete tag.");
     }
 }
 
@@ -441,10 +461,12 @@ async function tag_update(tag_name: string, tag_id: Number, tag_desc: string)
 
     if( resp.is_status_success() )
     { 
-        Dialog_Notify.notify("Information", "Tag changed. Ok.")
+        // Dialog_Notify.notify("Information", "Tag changed. Ok.")
+        toastNotification("Tag updated Ok.");
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to change tag.");                  
+        // Dialog_Notify.notify("Error:", "Failed to change tag.");                  
+        toastNotification("Failed to update tag.");
     }    
 
 }
@@ -501,15 +523,16 @@ async function api_item_add(crfs_token: string)
 
         if( res.is_status_success() ) 
         {
-            let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
+            // let r = await Dialog_Notify.notify("Notification", "Bookmark added successfuly.", 2000);
+            await toastNotification("Bookmark added successfuly.");
             dom.page_refresh();
         } else if( res.is_domain_error() )
         {
             let msg = await res.json();
-            Dialog_Notify.notify("Error", msg["error"], 2000);
-
+            // await Dialog_Notify.notify("Error notification", msg["error"], 3000);
+            toastNotification("ERROR: Item with this URL already exists.")
             console.error("Error: bookmark already exists");
-            document.location.href = `/items?filter=search&query=${url}`;
+            // document.location.href = `/items?filter=search&query=${url}`;
         }
 
         return;
@@ -527,12 +550,15 @@ async function api_item_add(crfs_token: string)
 
     if( res.is_status_success() )
     { 
-        Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+        // Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+        toastNotification( "Bookmark added successfuly");
         location.reload();
     } else if( res.is_domain_error() )
     {
-        Dialog_Notify.notify("Domain Error", body["error"], 2000);
-        // document.location.href = `/items?filter=search&query=${url}`;
+        // Dialog_Notify.notify("Error notification", body["error"], 2000);
+        await toastNotification("Error: " + body["error"]);
+
+        document.location.href = `/items?filter=search&query=${url}`;
         console.trace(" [ERROR] Failed to send data.");
     }
 
@@ -555,10 +581,12 @@ async function item_delete(flag: boolean, item_id: Number, item_title: string)
 
     if( resp.is_status_success() )
     {
-       let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+       // let r = await Dialog_Notify.notify("User Notification", "Item Deleted Ok.", 500);
+       toastNotification( "Item Deleted Ok.");
        dom.page_refresh();
     } else {
-        Dialog_Notify.notify("ERROR", "Error: failed to delete item.");
+        // Dialog_Notify.notify("ERROR", "Error: failed to delete item.");
+        toastNotification( "Error: failed to delete item.");
     }    
 }
 
@@ -588,10 +616,12 @@ async function item_upload_file()
     if(res.status == 200 || res.status == 201)
     {
          // Show dialog and block for 1.5 seconds (15000 milliseconds.)
-         await Dialog_Notify.notify("Information", "Upload successful.", 1500);
+         // await Dialog_Notify.notify("Information", "Upload successful.", 1500);
+         toastNotification( "Upload successful.");
          dom.page_refresh();
     } else {
-         await Dialog_Notify.notify("Error", "Upload failure.", 1500);
+         // await Dialog_Notify.notify("Error", "Upload failure.", 1500);
+         toastNotification( "Upload failure.");
     }
     // dom.page_refresh();
 }
@@ -636,10 +666,13 @@ export async function item_snapshot_delete(item_id: Number)
     let resp = await tsutils.ajax_request(HttpMethod.HTTP_PUT, "/api/items", token, payload); 
  
     if (resp.is_status_success()) {
-        Dialog_Notify.notify("Information", "Snapshot file deleted successfully. Ok.")
+        // Dialog_Notify.notify("Information", "Snapshot file deleted successfully. Ok.")
+        toastNotification( "Snapshot file deleted successfully. Ok.");
+        
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to delete file snapshot.");
+        // Dialog_Notify.notify("Error:", "Failed to delete file snapshot.");
+        toastNotification("Failed to delete file snapshot.");
     }
 
 }
@@ -740,11 +773,14 @@ async function collection_create_new()
                                     , description: desc
                                 });
 
-    if (res["result"] == "OK") {
-        let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+    if (res["result"] == "OK") 
+    {
+        // let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+        toastNotification( "Collection created. Ok.");
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error", "Failed to create collection.");
+        // Dialog_Notify.notify("Error", "Failed to create collection.");
+        toastNotification( "Failed to create collection.");
     }
 
     // dialog.close();
@@ -781,10 +817,15 @@ async function collection_edit(collection_id, collection_title)
 
     if( res.is_status_success() )
     {
-        Dialog_Notify.notify("Bookmark added successfuly");
+        // Dialog_Notify.notify("Bookmark added successfuly");
+        toastNotification("Bookmark added successfuly");
         location.reload();
     } else {
-        Dialog_Notify.notify("Error: bookmark already exists");
+
+        // Dialog_Notify.notify("Error notification"
+        //                     ,"Error: bookmark already exists"
+        //                     , 3000);
+        toastNotification("Error: bookmark already exists");
     }
 }
 
@@ -805,10 +846,12 @@ async function collection_delete(collection_id, collection_title)
 
     if( resp.is_status_success() ) 
     { 
-        Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+        // Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+        toastNotification( "Collection deleted. Ok.");
         dom.page_refresh();
     } else {
-        Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+        // Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+        toastNotification( "Failed to delete collection.");
     }
 };
 
