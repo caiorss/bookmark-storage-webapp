@@ -213,6 +213,8 @@ class SiteBookmark(models.Model):
             icon_url = "https://cdn-static-1.medium.com/_/fp/icons/favicon-rebrand-medium.3Y6xpZ-0FSdWDnPM3hSBIA.ico"
         elif domain == "mobile.twitter.com" or domain == "twitter.com":
             icon_url = "https://abs.twimg.com/favicons/twitter.ico"
+        elif domain == "serverfault.com":
+            icon_url = "https://cdn.sstatic.net/Sites/serverfault/Img/favicon.ico?v=18e9cc4f2aea"
 
         #---- Github -------------------------------------#
         elif domain == "github.com":
