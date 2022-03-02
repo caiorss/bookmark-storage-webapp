@@ -276,7 +276,7 @@ class SiteBookmark(models.Model):
 
         #----- Web Development and Javascript reference ---#
         elif domain == "developer.mozilla.org":
-            icon_url = "https://developer.mozilla.org/static/img/favicon32.7f3da72dcea1.png"   
+            icon_url = "https://developer.mozilla.org/favicon-48x48.cbbd161b.png"   
         elif domain == "fonts.google.com":
             icon_url = "https://www.gstatic.com/images/branding/product/ico/google_fonts_blue_lodp.ico"       
 
