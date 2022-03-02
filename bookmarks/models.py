@@ -202,6 +202,9 @@ class SiteBookmark(models.Model):
         elif domain == "wiki.archlinux.org":
             icon_url = "https://wiki.archlinux.org/favicon.ico"
 
+        elif domain == "tools.ietf.org" or domain == "www.ietf.org":
+            icon_url = "https://www.ietf.org/lib/dt/7.46.0/ietf/images/apple-touch-icon.png"
+
         #---- Communities --------------------------------# 
         elif domain == "stackoverflow.com" or domain == "stackoverflow.blog":
             icon_url = "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico"   
@@ -215,6 +218,16 @@ class SiteBookmark(models.Model):
             icon_url = "https://abs.twimg.com/favicons/twitter.ico"
         elif domain == "serverfault.com":
             icon_url = "https://cdn.sstatic.net/Sites/serverfault/Img/favicon.ico?v=18e9cc4f2aea"
+        elif domain == "askubuntu.com":
+            icon_url = "https://cdn.sstatic.net/Sites/askubuntu/Img/favicon.ico?v=928dfb7c1990"
+        elif domain == "lobste.rs":
+            icon_url = "https://lobste.rs/favicon.ico"
+        elif domain == "www.gnu.org":
+            icon_url = "https://www.gnu.org/graphics/gnu-head-mini.png"
+        elif domain == "www.gnupg.org":
+            icon_url = "https://www.gnupg.org/favicon.ico"
+        elif "slashdot.org" in domain:
+            icon_url = "https://it.slashdot.org/favicon.ico" 
 
         #---- Github -------------------------------------#
         elif domain == "github.com":
@@ -279,6 +292,8 @@ class SiteBookmark(models.Model):
         #----- Web Development and Javascript reference ---#
         elif domain == "developer.mozilla.org":
             icon_url = "https://developer.mozilla.org/favicon-48x48.cbbd161b.png"   
+        elif domain == "hacks.mozilla.org":
+            icon_url = "https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/favicon.ico"
         elif domain == "fonts.google.com":
             icon_url = "https://www.gstatic.com/images/branding/product/ico/google_fonts_blue_lodp.ico"       
 
@@ -305,12 +320,48 @@ class SiteBookmark(models.Model):
             icon_url = "https://dzone.com/themes/dz20/images/favicon.png"
         elif domain == "blogs.microsoft.com":
             icon_url = "https://1gew6o3qn6vx9kp3s42ge0y1-wpengine.netdna-ssl.com/wp-content/uploads/sites/5/2017/08/favicon-599dd744b8cac.jpg"
+
+        #---- News Channel ----------------------#
+        elif domain == "www.cnbc.com":
+            icon_url = "https://www.cnbc.com/favicon.ico"
+        elif domain == "www.bbc.com" or domain == "www.bbc.co.uk":        
+            icon_url = "https://www.bbc.com/favicon.ico"
+        elif domain == "finance.yahoo.com" or domain == "finance.yahoo.com.br":
+            icon_url = "https://s.yimg.com/rz/l/favicon.ico"
+        elif domain == "cointelegraph.com":
+            icon_url = "https://cointelegraph.com/favicons/favicon.ico"
+        elif domain == "www.cmegroup.com":
+            icon_url = "https://www.cmegroup.com/favicon.ico"
+        elif domain == "www.theregister.com":
+            icon_url = "https://www.theregister.com/design_picker/4ee431b84ac2d23c13376f753522acd7ecbb9b47/graphics/favicons/favicon.ico"
+        elif domain == "www.reuters.com":
+            icon_url = "https://www.reuters.com/pf/resources/icons/favicon.ico?d=77"
+        elif domain == "apnews.com":
+            icon_url = "https://apnews.com/branding/favicon/32.png"
+        elif domain == "www.zdnet.com":
+            icon_url = "https://www.zdnet.com/favicon.ico"
+        elif domain == "www.tomshardware.com":
+            icon_url = "https://vanilla.futurecdn.net/tomshardware/422398/favicon.ico"
+        elif domain == "www.coindesk.com":
+            icon_url = "https://www.coindesk.com/pf/resources/favicons/production/favicon.svg?d=131"
+        elif domain == "www.thedrive.com":
+            icon_url = "https://www.thedrive.com/images/fav/favicon-16x16.png"
+        elif domain == "www.vice.com":
+            icon_url = "https://vice-web-statics-cdn.vice.com/favicons/vice/favicon-16x16.png"
+        elif domain == "therecord.media":
+            icon_url = "https://therecord.media/wp-content/uploads/2020/08/TheRecord-Favicon.ico"
+        elif domain == "www.theguardian.com":
+            icon_url = "https://static.guim.co.uk/images/favicon-32x32.ico"
+        elif domain == "arstechnica.com":
+            icon_url = "https://cdn.arstechnica.net/favicon.ico"
         
         # ---- Auditing -------------------------#
         elif domain == "mitre.org":
             icon_url = "https://www.mitre.org/sites/all/themes/mitre/favicon.ico"
         elif domain == "nvd.nist.gov":
             icon_url = "https://nvd.nist.gov/site-media/images/favicons/favicon.ico"
+        elif domain == "www.cisa.gov":
+            icon_url = "https://www.cisa.gov/sites/default/files/images/favicon.ico"
 
         elif domain == "docs.google.com":
             icon_url = "https://ssl.gstatic.com/docs/presentations/images/favicon5.ico"
