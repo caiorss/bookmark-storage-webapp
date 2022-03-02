@@ -63,6 +63,9 @@ tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
+# User agent for web scrapping 
+BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
+
 
 @receiver(user_logged_in)
 def on_login(sender, user, request, **kwargs):
@@ -160,7 +163,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         order: str = self.request.GET.get("order") or ORDER_BY_NEWEST
         print(" [TRACE] ORDER = ", order)
 
-        logging.debug(f" Order search results by {order}")
+        # logging.debug(f" Order search results by {order}")
 
         if order == ORDER_BY_NEWEST:
             ## print(" [TRACE] Order by newest")
@@ -398,7 +401,10 @@ def update_item_from_metadata(itemID: int) -> None:
     b: SiteBookmark = SiteBookmark.objects.get(id = itemID)    
     # URL with obfuscation removed 
     real_url: str = dutils.remove_url_obfuscation(b.url)
-    print(f" [TRACE] Called update_item_from_metadata() real_url = { real_url }")    
+
+
+    logger = logging.getLogger(__name__)
+    logger.debug(f"Real_url = { real_url }")    
     
     import urllib
     from urllib.parse import urlparse, ParseResult
@@ -432,7 +438,7 @@ def update_item_from_metadata(itemID: int) -> None:
               url_
             , data=None
             , headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+                'User-Agent':  BROWSER_USER_AGENT 
         })
         page = urllib.request.urlopen(req, timeout = 4)
         info = page.info()
@@ -461,7 +467,11 @@ def update_item_from_metadata(itemID: int) -> None:
 
 
         if not ("pdf" in info.get_content_type()):
+
+
             soup = bs4.BeautifulSoup(page, features = "lxml")
+
+            print(" [TRACE] page = ", soup)
 
             # title <- soup.find("title").text if soup is not None, otherwise
             # , it is set to "" (empty string)
