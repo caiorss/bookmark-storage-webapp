@@ -404,7 +404,6 @@ def update_item_from_metadata(itemID: int) -> None:
     # URL with obfuscation removed 
     real_url: str = dutils.remove_url_obfuscation(b.url)
 
-
     logger = logging.getLogger(__name__)
     logger.debug(f"Real_url = { real_url }")    
     
@@ -412,6 +411,8 @@ def update_item_from_metadata(itemID: int) -> None:
     from urllib.parse import urlparse, ParseResult
     url_obj: ParseResult = urlparse(real_url)
     domain  = url_obj.hostname
+
+    import httpx 
 
     if domain == "wikipedia.org" or domain == "en.m.wikipedia.org":
         import wikipedia
@@ -428,7 +429,6 @@ def update_item_from_metadata(itemID: int) -> None:
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
     
-    
     try:
         # Reference: https://stackoverflow.com/a/18269491
         url_ = urllib.parse.urlsplit(real_url)
@@ -436,18 +436,19 @@ def update_item_from_metadata(itemID: int) -> None:
         url_[2] = urllib.parse.quote(url_[2])
         url_ = urllib.parse.urlunsplit(url_)
 
-        req = urllib.request.Request(
-              url_
-            , data=None
-            , headers = {
-                'User-Agent':  BROWSER_USER_AGENT 
-        })
-        page = urllib.request.urlopen(req, timeout = 4)
-        info = page.info()
-        #page = urllib.request.urlopen(b.url)
+        req = httpx.get(url_, headers = {
+              'User-Agent':       BROWSER_USER_AGENT
+            , 'Host':             domain 
+            , 'Accept':          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            , 'Accept-Language': 'en-US,en;q=0.5'
+            , 'Cache-Control':   'no-cache' 
+        }) 
 
-        if "pdf" in info.get_content_type():
-            data = page.read() 
+        content_type = req.headers.get("Content-Type")
+
+        if "pdf" in content_type: 
+            # data = page.read() 
+            data = req.read()
             view = io.BytesIO(data)
             pdf  = PyPDF2.PdfFileReader(view)
             inf  = pdf.documentInfo
@@ -468,10 +469,9 @@ def update_item_from_metadata(itemID: int) -> None:
             return 
 
 
-        if not ("pdf" in info.get_content_type()):
-
-
-            soup = bs4.BeautifulSoup(page, features = "lxml")
+        if not ("pdf" in content_type):
+            # soup = bs4.BeautifulSoup(page, features = "lxml")
+            soup = bs4.BeautifulSoup(req.read(), features = "lxml")
 
             print(" [TRACE] page = ", soup)
 
@@ -520,7 +520,7 @@ def update_item_from_metadata(itemID: int) -> None:
             b.save()
 
     except (urllib.error.URLError, socket.timeout) as ex:          
-        print(" [FAULT] Exit codepath")
+        print(" [FAULT] Exit codepath => ", ex)
         # return 
     # print(" [TRACE] Test code path 2")
     return 
