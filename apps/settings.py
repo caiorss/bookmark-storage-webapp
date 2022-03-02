@@ -225,6 +225,7 @@ LOGGING = {
              , "address":  "/dev/log"
              , "formatter": "verbose"
              , "level":    LEVEL_DEBUG
+             , "facility": "local1"
         }
     , "console": {
             "class":     "logging.StreamHandler"
