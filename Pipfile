@@ -12,7 +12,7 @@ autopep8 = "*"
 
 [packages]
 bs4     = "*"
-Django  = "*"
+Django  = "==3.2.10"
 lxml    = "*"
 django-pdb = "*"
 pypdf2  = "*"
