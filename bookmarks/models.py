@@ -199,6 +199,9 @@ class SiteBookmark(models.Model):
         elif domain.startswith("www.amazon."):
             icon_url = "https://www.amazon.com/favicon.ico"
 
+        elif domain == "wiki.archlinux.org":
+            icon_url = "https://wiki.archlinux.org/favicon.ico"
+
         #---- Communities --------------------------------# 
         elif domain == "stackoverflow.com" or domain == "stackoverflow.blog":
             icon_url = "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico"   
