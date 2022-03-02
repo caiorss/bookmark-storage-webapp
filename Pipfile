@@ -23,6 +23,7 @@ wikipedia = "*"
 django-rest-framework = "*"
 django-filter = "*"
 django-rest-auth = "*"
+httpx = "*"
 
 [requires]
 python_version = "*"
