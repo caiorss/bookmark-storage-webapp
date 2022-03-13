@@ -292,6 +292,8 @@ class SiteBookmark(models.Model):
         #----- Web Development and Javascript reference ---#
         elif domain == "developer.mozilla.org":
             icon_url = "https://developer.mozilla.org/favicon-48x48.cbbd161b.png"   
+        elif domain == "addons.mozilla.org":
+            icon_url = "https://addons.mozilla.org/favicon.ico"
         elif domain == "hacks.mozilla.org":
             icon_url = "https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/favicon.ico"
         elif domain == "fonts.google.com":
