@@ -475,8 +475,8 @@ def update_item_from_metadata(itemID: int) -> None:
             # soup = bs4.BeautifulSoup(page, features = "lxml")
             soup = bs4.BeautifulSoup(req.read(), features = "lxml")
             
-            print(" [TRACE] request = ", req)
-            print(" [TRACE] page = ", soup)
+             ## print(" [TRACE] request = ", req)
+             ## print(" [TRACE] page = ", soup)
 
             # title <- soup.find("title").text if soup is not None, otherwise
             # , it is set to "" (empty string)
@@ -516,8 +516,12 @@ def update_item_from_metadata(itemID: int) -> None:
                     + "Channel URL = " + metadata["author_url"] + "\n" \
                     + brief
 
+            title_append = ""
+            if (("youtube.com" in url) or ("m.youtube.com" in url) and "playlist" in url):
+                title_append = "(playlist) "
+
             b.url   = real_url
-            b.title = title 
+            b.title = title_append + title  
             b.brief = brief 
             print(" [TRACE] URL = ", b.url)
             b.save()
