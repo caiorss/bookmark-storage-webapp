@@ -436,13 +436,15 @@ def update_item_from_metadata(itemID: int) -> None:
         url_[2] = urllib.parse.quote(url_[2])
         url_ = urllib.parse.urlunsplit(url_)
 
-        req = httpx.get(url_, headers = {
-              'User-Agent':       BROWSER_USER_AGENT
-            , 'Host':             domain 
-            , 'Accept':          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-            , 'Accept-Language': 'en-US,en;q=0.5'
-            , 'Cache-Control':   'no-cache' 
-        }) 
+        req = httpx.get(  url_
+                        , follow_redirects= True
+                        , headers = {
+                            'User-Agent':       BROWSER_USER_AGENT
+                            , 'Host':             domain 
+                            , 'Accept':          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                            , 'Accept-Language': 'en-US,en;q=0.5'
+                            , 'Cache-Control':   'no-cache' 
+                       }) 
 
         content_type = req.headers.get("Content-Type")
 
@@ -472,7 +474,8 @@ def update_item_from_metadata(itemID: int) -> None:
         if not ("pdf" in content_type):
             # soup = bs4.BeautifulSoup(page, features = "lxml")
             soup = bs4.BeautifulSoup(req.read(), features = "lxml")
-
+            
+            print(" [TRACE] request = ", req)
             print(" [TRACE] page = ", soup)
 
             # title <- soup.find("title").text if soup is not None, otherwise
