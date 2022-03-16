@@ -253,6 +253,14 @@
 
               <tr>
                 <th> 
+                  <a class="btn-sm btn-primary" href="#/" onclick='makeOrgModeUrl( "{{ bookmark.title }}", "{{ bookmark.url }}" ); '  title=""> 
+                    Emacs Org-mode URL
+                  </a>
+                </th>
+              </tr>
+
+              <tr>
+                <th> 
                   <!-- Button for extracting bookmark metadata -->
                   <a class="btn-sm btn-primary" title="Update bookmark metdata automatically" 
                      href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Update metadata</a>
@@ -392,5 +400,15 @@
     
 
 </div>
+
+<script>
+  function makeOrgModeUrl(title, url) 
+  {
+    let markup = `[[${url}][${title}]]`;
+    prompt("Type Ctrl+A and Ctr+C to copy the markdown for this URL", markup);
+  };
+
+  console.log(" [TRACE] Function makeOrgModeUrl loaded Ok.");
+</script>
 
 {% endblock %}
