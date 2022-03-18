@@ -491,6 +491,9 @@ def update_item_from_metadata(itemID: int) -> None:
                 m = soup.find("meta", attrs={'name': 'twitter:description'})         
                 brief: str = m["content"] if m is not None else ""        
 
+            # Limit brief to 900 characters
+            brief = brief[:900]
+
             # Extract title of RFC internet standard from IETF web page
             if domain == "datatracker.ietf.org":
                 print(" [TRACE] Found IETF domain RFC document")
@@ -522,7 +525,8 @@ def update_item_from_metadata(itemID: int) -> None:
 
             b.url   = real_url
             b.title = title_append + title  
-            b.brief = brief 
+            # Only first 50 lines 
+            b.brief = brief
             print(" [TRACE] URL = ", b.url)
             b.save()
 
