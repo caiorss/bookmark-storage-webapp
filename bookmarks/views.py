@@ -327,6 +327,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if not search or search == "":
             return self.filter_all()  
         words = shlex.split(search)
+
         lam = lambda x, y: x | y
         if  mode == "OR":
             lam = lambda x, y: x | y
@@ -335,9 +336,11 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # q = Q(title__contains =   search) | Q(url__contains =  search)       
         q1 = reduce(lam, [ Q(url__contains=w) for w in words])
         q2 = reduce(lam, [ Q(title__contains=w) for w in words])
+        q3 = reduce(lam, [ Q(brief__contains=w) for w in words])
+
         return self.model.objects\
             .filter(owner = self.request.user)\
-            .filter(q1 | q2).exclude( deleted = True )
+            .filter(q1 | q2 | q3).exclude( deleted = True )
 
     def filter_by_created_date(self):
         date: str = self.request.GET.get("A0")
