@@ -6,6 +6,7 @@ from typing import NamedTuple, Dict
 from functools import reduce 
 
 import os 
+import gzip 
 
 
 from urllib.parse import urlparse, unquote 
@@ -33,6 +34,18 @@ _HTTP_REQUEST_HEADER: Dict[str, str] = {
     , 'upgrade-insecure-requests': '1'
 }
 
+class TermColors: # You may need to change color settings
+    RED = '\033[31m'
+    ENDC = '\033[m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+
+
+def print_debug(text: str):
+    """Print debug information in terminal stdout (standard output)."""
+    print(TermColors.BLUE + " [DEBUG] " + text + TermColors.ENDC)
+
 
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
@@ -49,32 +62,49 @@ def download_file_from_http(url: str) -> DownloadedFile:
     import mimetypes
     import django.utils.text
 
-    headers = _HTTP_REQUEST_HEADER.copy()
-    headers["referer"] = url 
+    headers                    = _HTTP_REQUEST_HEADER.copy()
+    headers["referer"]         = url 
+    headers["Accept-Encoding"] = "gzip"
 
-    req = urllib.request.Request(
+    # Http response 
+    request = urllib.request.Request(
           url 
         , data = None 
         , headers = headers)
+
     # Ignore SSL verification for downloading file in any case 
     context = ssl._create_unverified_context()
 
-    u = urllib.request.urlopen(req, context = context)
+    response = urllib.request.urlopen(request, context = context)
     #req           = urllib.request.urlopen(url)
     # f_name: str   = unquote(os.path.basename(urlparse(url).path))    
 
-    f_data: bytes = u.read()
+    print_debug(f"info = {response.info()} ")
+
+    # The variable f_data stores the file contents (bytes)
+    if response.info().get('Content-Encoding') == 'gzip':
+        # f_data: bytes = gzip.decompress(response.read())
+        f   = gzip.GzipFile( fileobj = response )
+        f_data = f.read()
+        # print_debug(f" [TRACE] type(f_data) = { type(f_data) }")
+        # print_debug("download_file_from_http() => Branch executed ok =>> Decompressed GZIP ok. [2] ")
+    elif response.info().get('Content-Encoding') == 'deflate':
+        f_data: bytes = response.read()
+    elif response.info().get('Content-Encoding'):
+        raise RuntimeError("download_file_from_http() =>> Econding type unknown.")
+    else:
+        print_debug("Branch else executed ")
+        f_data: bytes = response.read()
+
     f_hash: str   = hashlib.md5(f_data).hexdigest()
-    f_mime        = u.getheader("Content-Type", "application/octet-stream")
-
-    header_disposion = u.getheader("Content-Disposition")
+    f_mime        = response.getheader("Content-Type", "application/octet-stream")
+    # print_debug(f" [TRACE] =>>> download_file_from_http => mime-type = {f_mime} ")
+    header_disposion = response.getheader("Content-Disposition")
     ext = mimetypes.guess_extension(f_mime)
-
     # Example: 
     # This block turns the URL https://www.appinf.com/download/PortableSystems.pdf
     # int the base name: PortableSystems 
     basename_ = os.path.splitext( os.path.basename( urlparse(url).path ) )[0]
-
     # Convert string in to a file name friendly string. 
     # See: https://docs.djangoproject.com/en/2.1/ref/utils/#django.utils.text.slugify
     basename  = django.utils.text.slugify(basename_)
@@ -85,10 +115,12 @@ def download_file_from_http(url: str) -> DownloadedFile:
         f_name: str = basename + ext 
     else:
         f_name: str = basename
+
     return DownloadedFile( fileName     = f_name
                          , fileMimeType = f_mime
                          , fileHash     = f_hash
                          , fileData     = f_data  )
+
 
 def download_file_from_ftp(url: str) -> DownloadedFile:
     """Download file from FTP server."""
