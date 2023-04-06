@@ -1122,12 +1122,18 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
     
     def download_file_snapshot(self, request: WSGIRequest, item_id):
         """Download file snapshot from URL to the file repository."""
-
         try:
             item = SiteBookmark.objects.get(id = item_id, owner = request.user)
         except SiteBookmark.DoesNotExist: 
             return JsonResponse({ 'result': 'ERROR', 'message': "Item does not exist"})
-
+        # print(" [TRACE] download_file_snapshot =>> Downloaded file = ", item)
+        # Remove previous Snapshot if it already exists 
+        sn: FileSnapshot = item.filesnapshot_set.first()
+        if sn is not None:
+            path = sn.getDirectoryPath()
+            # print(" [TRACE] File snapshot path = ", path)
+            item.filesnapshot_set.remove(sn)
+            sn.delete() 
         try:
             FileSnapshot.createSnapshot(item.id, item.url)
         except django.db.utils.IntegrityError as ex:
