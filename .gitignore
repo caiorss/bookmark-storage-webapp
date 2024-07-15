@@ -17,9 +17,3 @@ files/*
 *-back-*
 db.sqlite3-*
 data/*
-*.back*
-*.pex
-*.pid
-*.log
-*.bin
-*.js.map

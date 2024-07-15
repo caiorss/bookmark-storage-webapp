@@ -11,16 +11,13 @@ export  async function ajax_post(url, crfs_token, data)
 
     const resp = await fetch(url, {
           method:  'POST'
-        , credentials:  "same-origin"
         , headers: {    'Content-Type':     'application/json'
                       , 'X-Requested-With': 'XMLHttpRequest'
-                      , 'X-CSRFToken':       crfs_token 
-                      ,  dataType:          'json'
+                      , 'X-CSRFToken':      crfs_token 
                    }
         , body: payload
     });
-    console.log(" [TRACE] ajax_post = ", resp);
-    return resp;
+    return resp.json();
 }
 
 export async function ajax_get(url, crfs_token)
@@ -28,13 +25,21 @@ export async function ajax_get(url, crfs_token)
 
     const resp = await fetch(url, {
           method:  'GET'
-        , credentials: "same-origin"
         , headers: {    'Content-Type':     'application/json'
                       , 'X-Requested-With': 'XMLHttpRequest'
                       , 'X-CSRFToken':      crfs_token 
                    }});
     return resp.json();
 }
+
+// Http method for creating new resource
+export const HTTP_POST   = "POST";
+// Http method for updating an existing resource  
+export const HTTP_PUT    = "PUT";
+// Http method for getting a resource             
+export const HTTP_GET    = "GET";
+// Http method for deleting a resource 
+export const HTTP_DELETE = "DELETE";
 
 export async function ajax_request(url, crfs_token, method, data =  null)
 {
@@ -51,7 +56,7 @@ export async function ajax_request(url, crfs_token, method, data =  null)
     }
 
     const resp = await fetch(url, params);
-    return resp; 
+    return resp.json(); 
 }
 
 /** Event fired after content is loaded. */

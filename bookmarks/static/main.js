@@ -5,6 +5,150 @@ import { Dialog_Basic, Dialog2_Prompt, Dialog_YesNo
 import * as utils from "/static/utils.js";
 
 
+function DOM_select(selector)
+{
+    return document.querySelector(selector);
+}
+
+// Toggle DOM element 
+function DOM_toggle(m)
+{
+    if(m == null){ alert(" Error: element not found");  }
+    var d = m.style.display;
+    var v = window.getComputedStyle(m);
+
+    // if(m.style.visibility == "" || m.style.visibility == "visible")
+    if(v.visibility == "visible")
+    {
+        console.log(" [TRACE] => Hide element");
+        m.style.visibility = "hidden";
+        m.style.display = "none";
+    } else {
+        console.log(" [TRACE] => Show element");
+        m.style.visibility = "visible";
+        m.style.display = "block";
+    }        
+} /* -- End of - DOM_toggle() --- */
+
+
+// Set visibility of DOM element 
+function DOM_set_visibility(m, flag)
+{
+    if(m == null){ alert(" Error: element not found");  }
+    var d = m.style.display;
+    var v = window.getComputedStyle(m);
+    // if(m.style.visibility == "" || m.style.visibility == "visible")
+    if(flag == true)
+    {
+        console.log(" [TRACE] => Hide element");
+        m.style.visibility = "hidden";
+        m.style.display = "none";
+    } else {
+        console.log(" [TRACE] => Show element");
+        m.style.visibility = "visible";
+        m.style.display = "block";
+    }        
+} /* -- End of - DOM_toggle() --- */
+
+
+// Boolean flag ('true' or 'false') stored in html5
+// local storage API. It is useful for storing non critical 
+// user preference data on client-side. 
+class LocalStorageFlag {
+    constructor(name, value) {
+        this.name = name;
+        this._dummy = (function () {
+            var q = localStorage.getItem(name);
+            if (q == null || q == "undefined") {
+                localStorage.setItem(name, value);
+            }
+        } ());
+        this.get = () => {
+            var result = localStorage.getItem(this.name);
+            if (result == "undefined") {
+                this.set(false);
+                return false;
+            }
+            return JSON.parse(result) || false;
+        };
+        this.set = (value) => localStorage.setItem(this.name, value);
+        this.toggle = () => { this.set(!this.get()); return this.get(); };
+    }
+}
+;
+
+
+
+class LocalStorageString {
+    constructor(name, value) {
+        this.name = name;
+        this._dummy = (function () {
+            var q = localStorage.getItem(name);
+            if (q == null || q == "undefined") {
+                localStorage.setItem(name, value);
+            }
+        } ());
+        this.get = (default_value) => {
+            var result = localStorage.getItem(this.name);
+            if (result == "undefined") {
+                this.set(default_value);
+                return default_value;
+            }
+            return result;
+        };
+        this.set = (value) => localStorage.setItem(this.name, value);
+    }
+}
+;
+
+
+
+// ---- Executed after document (DOM objects) is loaded ---------- //
+
+let flagItemDetailsVisible = new LocalStorageFlag("itemsTableVisible", true);
+
+
+function set_theme(mode)
+{
+    var root = document.documentElement;
+
+    if(mode == "dark_mode")
+    {           
+        root.style.setProperty("--main-background-color", "#3c3c3c");
+        root.style.setProperty("--foreground-color",      "white");
+        root.style.setProperty("--item-background-color", "#2f2f2f");
+        root.style.setProperty("--hyperlink-color",       "lightskyblue");
+        
+        root.style.setProperty("--right-row-label-color", "black");
+        root.style.setProperty("--left-row-label-color", "#1b1b1b");
+
+        root.style.setProperty("--btn-primary-bgcolor", "#007bff");
+    }
+
+    if(mode == "light_mode")
+    {
+        root.style.setProperty("--main-background-color", "lightgray");
+        root.style.setProperty("--foreground-color",      "black");
+        root.style.setProperty("--item-background-color", "ligthblue");
+        root.style.setProperty("--hyperlink-color",       "darkblue");
+        
+        root.style.setProperty("--right-row-label-color", "#bdb3b3");
+        root.style.setProperty("--left-row-label-color", "#82c5bc");
+
+        root.style.setProperty("--btn-primary-bgcolor", "black");
+    }
+}
+
+
+let site_theme = new LocalStorageString("site_theme");
+
+function selection_changed(mode)
+{
+    var mode = this.value;
+    set_theme(mode);
+    site_theme.set(mode);
+}
+
 
 const ACTION_RESTORE     = "RESTORE";
 const ACTION_DELETE      = "DELETE";
@@ -275,7 +419,21 @@ utils.dom_onContentLoaded(() => {
     // ---------- Event handlers ----------------------------------// 
 
     // dialog_notify.notify("Page created Ok", 900);
-   
+
+    var flag = flagItemDetailsVisible.get();
+    var obs = document.querySelectorAll(".item-details");
+    obs.forEach(x => DOM_set_visibility(x, flag));    
+    
+
+    var theme_selection_box = document.querySelector("#theme-selector-box");
+    theme_selection_box.onchange = selection_changed;
+
+    var theme = site_theme.get("dark_mode");
+    set_theme(theme);
+
+    if(theme == "dark_mode") theme_selection_box.selectedIndex = 0;
+    if(theme == "light_mode") theme_selection_box.selectedIndex = 1;
+
     var body = document.body;
 
     var dialog = utils.dom_append_html(body, `
@@ -320,7 +478,7 @@ utils.dom_onContentLoaded(() => {
             selectbox.add(opt, -1);    
         }
         
-        // console.log(" [TRACE] collections = ", colls);
+        console.log(" [TRACE] collections = ", colls);
     });
 
     const ACTION_COLLECTION_ADD = "ADD";
@@ -331,8 +489,8 @@ utils.dom_onContentLoaded(() => {
         var selectionbox = document.querySelector("#selector-collection-add");
         var collectionID = selectionbox[selectionbox.selectedIndex]["value"];
 
-        // console.log(" items = ", items);
-        // console.log(" collection = ", collectionID);
+        console.log(" items = ", items);
+        console.log(" collection = ", collectionID);
 
         var payload = {
              items:        items
@@ -346,12 +504,208 @@ utils.dom_onContentLoaded(() => {
         });
     });
 
+    let dialog_collection_edit = new DialogForm();
+    dialog_collection_edit.detach_on_close(false);
+    dialog_collection_edit.setTitle("Create new collection");
+    dialog_collection_edit.setText("Enter the following informations:");
+    dialog_collection_edit.add_row_input("title", "Title:");
+    dialog_collection_edit.add_row_input("desc", "Description:");
 
 
+    async function collection_create_new()
+    {
+        // alert(" Clicked at create new collection Ok. ");
+        // dialog_collection_edit.show();
+
+        let sender = await dialog_collection_edit.onConfirm();
+        let title = sender.get_widget("title").value;
+        let desc  = sender.get_widget("desc").value;
+
+        console.log(" [INFO] Creating collection with title = ", title);
+
+        let res = await utils.ajax_request(  "/api/collections"
+                                           , window["generated_token"]
+                                           , utils.HTTP_POST
+                                           , {
+                                               title:       title 
+                                             , description: desc 
+                                          });
+
+        if(res["result"] == "OK")
+        {
+            let r = await Dialog_Notify.notify("Information", "Collection created. Ok.", 500);
+            utils.dom_page_refresh();
+        } else {
+            Dialog_Notify.notify("Error", "Failed to create collection.");
+        }
+    
+        dialog.close();
+    }
+
+
+    utils.dom_onClicked("#btn-create-new-collection", () => {         
+        collection_create_new();
+        console.log(" I was clicked OK. ");
+
+    });
+
+
+    window["collection_delete"] =  async (collection_id, collection_title) => {
+
+        let answer = await Dialog_YesNo.prompt(
+                      "Delete collection."
+                    , `Are you sure you want to delete the collection: '${collection_title}' ` );
+
+        if(!answer) { return; }
+
+        let resp = await utils.ajax_request("/api/collections"
+                                , window["generated_token"]
+                                , utils.HTTP_DELETE
+                                , { "collection_id": collection_id });
+
+
+        if(resp["result"] == "OK")
+        { 
+            Dialog_Notify.notify("Information", "Collection deleted. Ok.")
+            utils.dom_page_refresh();
+        } else {
+            Dialog_Notify.notify("Error:", "Failed to delete collection.");                  
+        }
+    };
+
+    async function collection_edit(collection_id, collection_title) 
+    {
+        dialog_collection_edit.setTitle("Edit Collection");
+        // alert(" Clicked at create new collection Ok. ");
+        dialog_collection_edit.show();
+
+        let entry_title = dialog_collection_edit.get_widget("title");
+        entry_title.value = collection_title;
+
+        let sender = await dialog_collection_edit.onConfirm();
+        let title  = sender.get_widget("title").value;
+
+        console.log(" Collection title = ", title);
+
+        //let desc  = sender.get_widget("desc").value;
+
+        console.log(" [INFO] Creating collection with title = ", title);
+
+        let res = await utils.ajax_request(  "/api/collections"
+                                           , window["generated_token"]
+                                           , utils.HTTP_PUT
+                                           , {
+                                                 id:    collection_id
+                                               , title: title 
+                                             //, description: desc 
+                                          });
+
+        if(res["result"] == "OK")
+        {
+            dialog_notify.notify("Bookmark added successfuly");
+            location.reload();
+        } else {
+            dialog_notify.notify("Error: bookmark already exists");
+        }
+    
+        dialog.close();        
+    }
+
+
+    window["collection_edit"] = (collection_id, collection_title) => {     
+        
+        collection_edit(collection_id, collection_title);
+    };
 
 
 
 }); // ---- End of DOMContentLoaded() envent handler  ------ //
+
+
+function toggle_sidebar()
+{
+    var s = DOM_select(".sidebar");
+    DOM_toggle(s);
+}
+
+// Allows accessing this variable from html templates 
+window["toggle_sidebar"] = toggle_sidebar;
+
+function toggle_items_table_info(table_info_id)
+{
+    // alert("Button toggle clicked ok.");
+    let obs = document.querySelector(table_info_id);
+    if(obs == null){ alert(`Error: object #${table_info_id} not found. `); }
+    console.assert(obs, "Table info supposed not null.");
+    DOM_toggle(obs);    
+}
+
+window["toggle_items_table_info"] = toggle_items_table_info;
+
+function toggle_action_menu(actionID)
+{
+    var elem = document.querySelector(actionID);
+    DOM_toggle(elem);
+}
+window["toggle_action_menu"] = toggle_action_menu;
+
+function open_url_newtab(url)
+{
+    var win = window.open(url, '_blank');
+    win.focus();
+}
+window["open_url_newtab"] = open_url_newtab;
+
+/** @description Add new bookmark to collection  */
+async function api_item_add(crfs_token)
+{
+        let url = await Dialog2_Prompt.prompt("Enter the new URL to be added", "");                            
+        console.log("User entered the URL: ", url);
+
+        var query_params = new URLSearchParams(window.location.search);
+        if(query_params.get("filter") == "collection")
+        {
+            console.trace(" [TRACE] Add item to collection")
+
+            var collection_id = query_params.get("A0");
+            var data = { url: url, collection_id: collection_id };
+
+            var token = window["generated_token"];
+
+            utils.ajax_post("/api/collections/add_item", token, data).then( async res => {
+                if(res["result"] == "OK"){
+                    let r = await Dialog_Notify.notify("INFORMATION", "Bookmark added successfuly.", 2000);
+                    utils.dom_page_refresh();
+                } else {
+                    Dialog_Notify.notify("Error", "Error 1: Bookmark already exists.", 2000);
+                    //dialog_notify.notify("Error: bookmark already exists", 2000);
+                    console.error("Error: bookmark already exists");
+                    document.location.href = `/items?filter=search&query=${url}`;
+                }
+        
+            }).catch(err => { 
+                console.log("Error: item already exists. [2]");
+                Dialog_Notify.notify("Error: " + err);                
+            });
+
+            return;
+        }
+
+        let starred = query_params.get("filter") == "starred";
+        var payload = {url: url, starred: starred};
+        utils.ajax_post("/api/items", crfs_token, payload).then( res => {
+            if(res["result"] == "OK"){
+                Dialog_Notify.notify("INFO", "Bookmark added successfuly", 2000);
+                location.reload();
+            } else {
+                Dialog_Notify.notify("ERROR",  "Error: bookmark already exists", 2000);
+                document.location.href = `/items?filter=search&query=${url}`;
+            }
+
+        });
+}
+
+window["api_item_add"] = api_item_add;
 
 async function collection_remove_item(collectionID, itemID)
 {
@@ -375,6 +729,316 @@ async function collection_remove_item(collectionID, itemID)
 
 window["collection_remove_item"] = collection_remove_item;
 
+async function item_quick_rename(item_id, old_item_title)
+{
+    let new_item_title = await Dialog2_Prompt.prompt("Change item title:", "", old_item_title);
+
+    console.log(` [TRACE] User provided title := ${new_item_title} ; id = ${item_id} `);
+
+    var payload = { action: "rename", id: item_id, title: new_item_title};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+        
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item renamed Ok.", 500);
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.", 500);
+    }    
+
+}
+
+window["item_quick_rename"] = item_quick_rename;
+
+
+
+async function item_set_starred(checkbox)
+{
+    let item_id = checkbox.getAttribute("value");
+    console.log(" [TRACE] item_set_starred() => Item_ID: ", item_id);
+
+    var payload = { action: "starred", id: item_id, value: checkbox.checked};    
+    var token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload)
+        
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item set as starred Ok.", 500);
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to set item as starred.");
+    }    
+
+}
+
+window["item_set_starred"] = item_set_starred;
+
+
+async function item_delete(flag, item_id, item_title) 
+{
+    
+    let dialog_title = flag ? "Permanently delete item (Irreversible)." : "Delete item (move to trash)";
+
+    let response = await Dialog_YesNo.prompt( dialog_title
+                                      , "Are you sure you want to delete item: " + item_title);
+
+    if(!response) return;
+    let mode = flag ? "hard" : "soft";
+    let payload = { id: item_id, mode: mode };    
+    let token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_DELETE, payload);
+
+    if(resp["result"] == "OK"){
+        let r = await Dialog_Notify.notify("OK", "Item Deleted Ok.", 500);
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("ERROR", "Error: failed to rename item.");
+    }    
+}
+
+window["item_delete"] = item_delete;
+
+async function item_snapshot(item_id)
+{
+    let dlg = new Dialog_Notify();
+    dlg.setTitle("Download");
+    dlg.setText("Downloading file snapshot. Wait a while ...");
+    dlg.show();
+
+    let token = window["generated_token"];
+    let payload = { action: "snapshot", id: item_id };
+    let resp = await utils.ajax_request("/api/items", token, utils.HTTP_PUT, payload);
+    
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        dlg.close();
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+        dlg.close();
+    }
+}
+
+window["item_snapshot"] = item_snapshot;
+
+
+async function tag_create()
+{
+    let tag_name = await Dialog2_Prompt.prompt("Enter new tag name:");
+    if(tag_name == "") return;
+    let token = window["generated_token"];
+    
+    let payload = { name: tag_name, description: "" };
+    let resp = await utils.ajax_request("/api/tags", token, utils.HTTP_POST, payload);
+    
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"]);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"]);
+    }
+}
+
+window["tag_create"] = tag_create;
+
+ 
+async function tag_add(item_id)
+{
+    let last_input = new LocalStorageString("tag-last-input", "");
+        
+    let dlg = new Dialog_Datalist_Prompt();
+    dlg.setTitle("Select a tag");    
+    dlg.setInputText(last_input.get());
+
+    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let token = window["generated_token"];
+    let all_tags = await utils.ajax_get("/api/tags", token);
+    console.log(all_tags);   
+    
+    for(let n in all_tags){
+        let row = all_tags[n];
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        dlg.add_option(row["name"], row["id"]);
+    }
+    
+    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
+    let answer = await dlg.prompt_selected();
+    console.log(" ANSWER = ", answer);
+
+    let resp = null;
+    last_input.set(answer["value"]);
+
+    if(answer["key"] == null)
+    {  
+        console.trace(" Create new TAG:");
+        // Create  new tag            
+        let payload = {   action:   "add_item_new_tag"
+                        , tag_name:  answer["value"]
+                        , item_id:   item_id 
+                      };
+        console.log(" Payload = ", payload);        
+        resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    // Add a new item to a given tag 
+    } else {
+        let payload = {   action: "add_item"
+                        , tag_id:  answer["key"]
+                        , item_id: item_id 
+        };
+        console.log(" Payload = ", payload);
+        resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    }
+
+    console.log(" Resp = ", resp);
+
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"], 500);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"], 500);
+    }
+
+}
+
+window["tag_add"] = tag_add;
+
+
+async function tag_remove(tag_id, bookmark_id)
+{    
+    let payload = {   action:   "remove_tag_item"
+                    , tag_id:    tag_id
+                    , item_id:  bookmark_id
+                };
+    console.log(" Payload = ", payload);
+    let token = window["generated_token"];
+    let resp = await utils.ajax_request("/api/tags", token, utils.HTTP_PUT, payload);
+
+    if(resp["result"] == "OK")
+    {
+        await Dialog_Notify.notify_ok(resp["message"], 500);
+        utils.dom_page_refresh();
+    } else {
+        await Dialog_Notify.notify_error(resp["message"], 500);
+    }
+}
+window["tag_remove"] = tag_remove;
+
+async function tag_delete(tag_name, tag_id)
+{
+    let answer = await Dialog_YesNo.prompt(
+                    "Delete tag."
+                , `Are you sure you want to delete this tag: '${tag_name}'. 
+                   Note: This action is irreversible. ` );
+
+    if(!answer) { return; }
+
+    let resp = await utils.ajax_request("/api/tags"
+                            , window["generated_token"]
+                            , utils.HTTP_PUT
+                            , { 
+                                  "tag_name": tag_name 
+                                , "tag_id":   tag_id
+                                , "action":   "delete_tag"
+                                });
+
+
+    if(resp["result"] == "OK")
+    { 
+        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+    }
+}
+window["tag_delete"] = tag_delete;
+
+async function tag_update(tag_name, tag_id, tag_desc)
+{
+    let dialog = new DialogForm();
+    //dialog_collection_edit.detach_on_close(false);
+    dialog.setTitle("Update tag");
+    dialog.setText("Enter the following informations:");
+    
+    let entry_name = dialog.add_row_input("name", "Tag Name:");
+    let entry_desc  = dialog.add_row_input("desc", "Tag Description:");
+
+    entry_name.value = tag_name;
+    entry_desc.value = tag_desc;
+    
+    // Wait user fill the dialog form information. 
+    let sender = await dialog.onConfirm();
+
+    let resp = await utils.ajax_request("/api/tags"
+                            , window["generated_token"]
+                            , utils.HTTP_PUT
+                            , { 
+                                  "action":         "update_tag"
+                                , "tag_name":        entry_name.value 
+                                , "tag_desc":        entry_desc.value 
+                                , "tag_id":          tag_id
+                                });
+
+    if(resp["result"] == "OK")
+    { 
+        Dialog_Notify.notify("Information", "Tag deleted. Ok.")
+        utils.dom_page_refresh();
+    } else {
+        Dialog_Notify.notify("Error:", "Failed to delete tag.");                  
+    }    
+
+}
+window["tag_update"] = tag_update;
+
+function search_bookmarks()
+{    
+    //console.trace(" [TRACE] I was called. ");
+    let search_box    = document.querySelector("#search-entry");
+    let query         = encodeURIComponent(search_box.value); 
+    let mode_selector = document.querySelector("#search-mode-selector");
+    let mode = mode_selector ? mode_selector.value : "AND";
+    let url        = `/items?filter=search&query=${query}&mode=${mode}`;    
+    //console.log("URL = ", url);
+    // Redirect to search route.
+    document.location = url;
+
+}
+
+window["search_bookmarks"] = search_bookmarks;
+
+async function tag_filter_window()
+{
+    let dlg = new Dialog_Datalist_Prompt();
+    dlg.setTitle("Select a tag");    
+    // dlg.setInputText(last_input.get());
+
+    // Returns a list of tags [ { id: "tag id", name: "name", description: "Tag description"} ]
+    let token = window["generated_token"];
+    let all_tags = await utils.ajax_get("/api/tags", token);
+    console.log(all_tags);   
+    
+    for(let n in all_tags){
+        let row = all_tags[n];
+        console.log(" row = ", row);
+        console.log(` name = ${row[name]} - id = ${row["id"]}`)
+        dlg.add_option(row["name"], row["id"]);
+    }    
+
+    // Returns an object like: {  value: "Selected-value-from-list-box", key: 12515 }
+    let answer = await dlg.prompt_selected();
+    console.log(" ANSWER = ", answer);
+
+    if(answer == null){ return; }
+
+    // Redirect URL 
+    document.location = `/items?filter=tag-name&A0=${answer["value"]}`;
+}
+
+window["tag_filter_window"] = tag_filter_window;
+
 
 function keypress_return_adapter(funct)
 {
@@ -387,6 +1051,17 @@ function keypress_return_adapter(funct)
 };
 
 window["keypress_return_adapter"] = keypress_return_adapter;
+
+function clear_entry_field(dom_element_id)
+{
+    let field = document.querySelector(dom_element_id);
+    console.assert(field != null, `Cannot find entry field to be cleared`);
+    field.value = "";
+    field.focus();
+}
+
+window["clear_entry_field"] = clear_entry_field;
+
 
 class YoutubeThumb extends HTMLElement {
     constructor() {

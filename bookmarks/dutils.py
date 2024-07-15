@@ -2,11 +2,10 @@ import bs4
 import urllib
 import shlex 
 
-from typing import NamedTuple, Dict
+from typing import NamedTuple
 from functools import reduce 
 
 import os 
-import gzip 
 
 
 from urllib.parse import urlparse, unquote 
@@ -23,29 +22,8 @@ import bs4
 from http.client import HTTPResponse 
 import base64
 
-# Http Request header for making http server believe that it is a 
-# a web browser. 
-_HTTP_REQUEST_HEADER: Dict[str, str] = {
-      'User-Agent':         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36' 
-    , 'accept':             'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
-    , 'accept-encoding':    'gzip, deflate, br'
-    , 'accept-language':    'en-US,en;q=0.9,fr;q=0.8,ro;q=0.7,ru;q=0.6,la;q=0.5,pt;q=0.4,de;q=0.3'
-    , 'cache-control':      'no-cache'
-    , 'upgrade-insecure-requests': '1'
-}
-
-class TermColors: # You may need to change color settings
-    RED = '\033[31m'
-    ENDC = '\033[m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-
-
-def print_debug(text: str):
-    """Print debug information in terminal stdout (standard output)."""
-    print(TermColors.BLUE + " [DEBUG] " + text + TermColors.ENDC)
-
+# Constant:
+DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
 
 # DownloadedFile = namedtuple("name", "mimetype", "hash", "data")
 class DownloadedFile(NamedTuple):
@@ -61,50 +39,30 @@ def download_file_from_http(url: str) -> DownloadedFile:
 
     import mimetypes
     import django.utils.text
-
-    headers                    = _HTTP_REQUEST_HEADER.copy()
-    headers["referer"]         = url 
-    headers["Accept-Encoding"] = "gzip"
-
-    # Http response 
-    request = urllib.request.Request(
-          url 
-        , data = None 
-        , headers = headers)
-
+    
+    req = urllib.request.Request(
+        url, 
+        data=None, 
+        headers={ 'User-Agent': DEFAULT_USER_AGENT })
     # Ignore SSL verification for downloading file in any case 
     context = ssl._create_unverified_context()
 
-    response = urllib.request.urlopen(request, context = context)
+    u = urllib.request.urlopen(req, context = context)
     #req           = urllib.request.urlopen(url)
     # f_name: str   = unquote(os.path.basename(urlparse(url).path))    
 
-    print_debug(f"info = {response.info()} ")
-
-    # The variable f_data stores the file contents (bytes)
-    if response.info().get('Content-Encoding') == 'gzip':
-        # f_data: bytes = gzip.decompress(response.read())
-        f   = gzip.GzipFile( fileobj = response )
-        f_data = f.read()
-        # print_debug(f" [TRACE] type(f_data) = { type(f_data) }")
-        # print_debug("download_file_from_http() => Branch executed ok =>> Decompressed GZIP ok. [2] ")
-    elif response.info().get('Content-Encoding') == 'deflate':
-        f_data: bytes = response.read()
-    elif response.info().get('Content-Encoding'):
-        raise RuntimeError("download_file_from_http() =>> Econding type unknown.")
-    else:
-        print_debug("Branch else executed ")
-        f_data: bytes = response.read()
-
+    f_data: bytes = u.read()
     f_hash: str   = hashlib.md5(f_data).hexdigest()
-    f_mime        = response.getheader("Content-Type", "application/octet-stream")
-    # print_debug(f" [TRACE] =>>> download_file_from_http => mime-type = {f_mime} ")
-    header_disposion = response.getheader("Content-Disposition")
+    f_mime        = u.getheader("Content-Type", "application/octet-stream")
+
+    header_disposion = u.getheader("Content-Disposition")
     ext = mimetypes.guess_extension(f_mime)
+
     # Example: 
     # This block turns the URL https://www.appinf.com/download/PortableSystems.pdf
     # int the base name: PortableSystems 
     basename_ = os.path.splitext( os.path.basename( urlparse(url).path ) )[0]
+
     # Convert string in to a file name friendly string. 
     # See: https://docs.djangoproject.com/en/2.1/ref/utils/#django.utils.text.slugify
     basename  = django.utils.text.slugify(basename_)
@@ -113,14 +71,12 @@ def download_file_from_http(url: str) -> DownloadedFile:
         f_name: str = header_disposion.split(";")[1].strip().strip("filename=").strip("\"")
     elif f_mime is not None and ext is not None:
         f_name: str = basename + ext 
-    else:
+    else: 
         f_name: str = basename
-
     return DownloadedFile( fileName     = f_name
                          , fileMimeType = f_mime
                          , fileHash     = f_hash
                          , fileData     = f_data  )
-
 
 def download_file_from_ftp(url: str) -> DownloadedFile:
     """Download file from FTP server."""
@@ -144,6 +100,9 @@ def download_file_from_ftp(url: str) -> DownloadedFile:
                          , fileMimeType = f_mime
                          , fileHash     = f_hash
                          , fileData     = f_data  )
+
+
+   
 
 def download_from_slideshare(url: str) -> DownloadedFile:
     #assert url.startswith("https://www.slideshare.net/")
@@ -195,74 +154,29 @@ def download_from_slideshare(url: str) -> DownloadedFile:
                          , fileHash     = f_hash
                          , fileData     = f_data  )
 
-def download_github_archive(user: str, repository: str) -> DownloadedFile:
-    """Download ZIP archive from master or main repository. """
-    _url_base = f"https://www.github.com/{user}/{repository}/archive/"
-    _url1 = _url_base + "master.zip"
-    _url2 = _url_base + "main.zip"
-    try:
-        print(f" [TRACE] Downloading from URL = {_url1}")
-        data = download_file_from_http(_url1)
-        return data 
-    except Exception as ex:
-        print(" [ERROR] Got exception => Retry => Ex: ", ex)
-        print(f" [TRACE] Downloading from URL = {_url2}")
-        data = download_file_from_http(_url2)
-        return data   
-    raise Exception("Edge case reached. => Not implemented yet.")
+
 
 def download_file(url: str) -> DownloadedFile:
-    print(f" [DEBUG] Downloading file from URL = {url}")
-
     if ".slideshare.net" in url:
         return download_from_slideshare(url)
         #raise Exception("Error: not implemented.")
-    
-    # Match URL for instance: http://github.com/USER/REPOSITORY 
-    # Download zip archive from repository: http://github.com/USER/REPOSITORY/archive/master.zip
-    url_parse: ParseResult = urlparse(url)
-    # import pdb; pdb.set_trace()
-    if (url_parse.hostname == "github.com" or url_parse.hostname == "www.github.com") \
-        and len(url_parse.path.split("/")) == 3:
-        p = url_parse.path.split("/")
-        return download_github_archive(user = p[1], repository = p[2])
+
     if url.startswith("http://") or url.startswith("https://"):
         return download_file_from_http(url)
     if url.startswith("ftp://"):
         return download_file_from_ftp(url)    
-    # if url.startswith("")
     raise Exception("There is no handle function for this type of URL.") 
 
 
-def remove_url_obfuscation(url: str) -> str:
+def remove_url_obfuscation(url: str):
     """Clean URLs obfuscated by search engines."""
 
-    from urllib.parse import ParseResult 
-    
     # Remove google search engine obfuscated URLs.
     if re.match(".*google.*/url?", url) != None: 
-        u: ParseResult = urllib.parse.urlparse(url)
+        u = urllib.parse.urlparse(url)
         q = urllib.parse.parse_qs(u.query) 
+        # print(f" q = {q}")
         if "url" in q: 
             return q["url"][0]
         return url 
-
-    if url.startswith("https://out.reddit.com"):
-        print(" [TRACE] Remove Reddit URL obfuscation(). ")
-        u: ParseResult = urllib.parse.urlparse(url)
-        q = urllib.parse.parse_qs(u.query) 
-        if "url" in q: 
-            print(" q = ", q["url"])
-            return q["url"][0]
-        return url
-
-    if url.startswith("https://redirect.viglink.com"):
-        print(" [TRACE] Remove Reddit URL obfuscation(). ")
-        u: ParseResult = urllib.parse.urlparse(url)
-        q = urllib.parse.parse_qs(u.query) 
-        if "u" in q: 
-            print(" q = ", q["u"])
-            return q["u"][0]
-        return url
- 
     return url 

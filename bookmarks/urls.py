@@ -1,9 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 import django.views.generic.base as dvgb
 
 from . import views
-
-from . import rest_views 
 
 app_name = 'bookmarks'
 
@@ -47,25 +45,14 @@ urlpatterns = [
 
   # ----------------- REST API ------------------------#
   ,path("api/items",                views.Ajax_Items.as_view())  
-  ,path("api/item_upload",          views.item_upload)
 
   ,path("api/item",                 views.rest_item)  
   ,path("api/bulk",                 views.rest_bulk_action)  
-  ,path("api/related",              views.Ajax_ItemRelated.as_view())  
   #,path("api/collections",     views.Ajax_Collection_List.as_view())  
   ,path("api/collections",          views.Ajax_Collections.as_view())  
   ,path("api/collections/items",    views.Ajax_Collection_List.as_view())  
 
   ,path("api/collections/add_item", views.Ajax_Collection_AddItem.as_view())  
   ,path("api/search",               views.Ajax_ItemSearch.as_view())
-  ,path("api/tags",                 views.Ajax_Tags.as_view()) 
-
-   # ======= Django-Rest Framework ============================#
-    # Authentication endpoint 
-  , path('api2/login',           include('rest_auth.urls')              )
-  , path('api2/items',           rest_views.RestItems.as_view()         )
-  , path('api2/items/<int:pk>',  rest_views.RestItemsDetail.as_view()  )
-  , path('api2/tags',            rest_views.RestTags.as_view()          )
-  , path('api2/tags/<int:pk>',   rest_views.RestTagsDetail.as_view()   )
-
+  ,path("api/tags",               views.Ajax_Tags.as_view())
 ]

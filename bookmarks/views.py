@@ -1,7 +1,5 @@
 import typing
 from typing import Dict, List, NamedTuple
-from django.db.models.expressions import OrderBy
-from django.forms.widgets import FILE_INPUT_CONTRADICTION
 
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.generic import TemplateView,ListView
@@ -35,14 +33,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.db.models import Count
-import logging
+
 #from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import django.core.paginator as dj_paginator 
-
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.dispatch import receiver
-
 
 import bs4 
 import urllib
@@ -63,24 +56,6 @@ tpl_main           = "bookmark_list.html"
 tpl_forms          = "bookmark_form.html"
 tpl_confirm_delete = "bookmark_confirm_delete.html"
 
-# User agent for web scrapping 
-## BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
-
-BROWSER_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0"
-
-
-@receiver(user_logged_in)
-def on_login(sender, user, request, **kwargs):
-    logger = logging.getLogger(__name__)
-    logger.info(f" <LOGIN> User account {user} logged in.")
-
-
-@receiver(user_logged_out)
-def on_logout(sender, user, request, **kwargs):
-    logger = logging.getLogger(__name__)
-    logger.info(f" <LOGOUT> User account {user} logged out.")
-
-
 class SignUpForm(UserCreationForm):
     username = forms.CharField( max_length =30
                               , required   = True
@@ -95,9 +70,6 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', )
 
 def signup(request):
-
-    logger = logging.getLogger(__name__)
-
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -110,8 +82,6 @@ def signup(request):
             return ds.redirect('/items')
     else:
         form = SignUpForm()
-
-    logger.info("User registered Ok.")
     return ds.render(request, 'registration.html', {'form': form})
 
 
@@ -121,8 +91,6 @@ class BookMarkFilter(NamedTuple):
     callback: typing.Any 
 
 class BookmarksList(LoginRequiredMixin, ListView):
-
-    logger = logging.getLogger(__name__)
 
     # --- overriden variables --------
     model         = SiteBookmark
@@ -141,85 +109,49 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         # ---------- Set callbacks ------------#   
     def start(self):
-        self.add_filter("id",           "Select single item by ID",        self.filter_by_id)
-        self.add_filter("all",          "Listing all items",               self.filter_all)
-        self.add_filter("starred",      "Starred items",                   self.filter_starred)
-        self.add_filter("removed",      "Removed items",                   self.filter_removed)
-        self.add_filter("doctype",      "Items fitered by type",           self.filter_doctype)
-        self.add_filter("search",       "Search results",                  self.filter_search)
-        self.add_filter("domain",       "Items filtered by domain",        self.filter_domain)
-        self.add_filter("collection",   "Collection items",                self.filter_collection)
-        self.add_filter("tag-name",     "Filter tag by name",              self.filter_by_tag_name)
-        self.add_filter("created-date", "Filter by created date",          self.filter_by_created_date)
-        self.add_filter("upload",       "File uploads",                    self.filter_uploads)
-        self.add_filter("snapshot",     "Items with snapshots",            self.filter_has_snapshot)
+        self.add_filter("id",         "Select single item by ID",        self.filter_by_id)
+        self.add_filter("latest",     "Listing items by newest added",   self.filter_latest)
+        self.add_filter("oldest",     "Listing items by oldest added",   self.filter_oldest)
+        self.add_filter("starred",    "Starred items",                   self.filter_starred)
+        self.add_filter("removed",    "Removed items",                   self.filter_removed)
+        self.add_filter("doctype",    "Items fitered by type",           self.filter_doctype)
+        self.add_filter("search",     "Search results",                  self.filter_search)
+        self.add_filter("domain",     "Items filtered by domain",        self.filter_domain)
+        self.add_filter("collection", "Collection items",                self.filter_collection)
+        self.add_filter("tag-name",   "Filter tag by name",              self.filter_by_tag_name)
+        self.add_filter("created-date", "Filter by created date",        self.filter_by_created_date)
         return self 
 
     def add_filter(self, view: str, title: str, callback):
         self.filter_dispatch[view] = BookMarkFilter(view = view, title = title, callback = callback)
 
-    def order_query(self, query: QuerySet) -> QuerySet:
-        ORDER_BY_NEWEST = "new"       # Order items by newest added (by id)
-        ORDER_BY_OLDEST = "old"       # Order items by oldest added (by id)
-        ORDER_BY_UPDATE = "updated"   # Order items by last updated 
-        order: str = self.request.GET.get("order") or ORDER_BY_NEWEST
-        print(" [TRACE] ORDER = ", order)
-
-        # logging.debug(f" Order search results by {order}")
-
-        if order == ORDER_BY_NEWEST:
-            ## print(" [TRACE] Order by newest")
-            return query.order_by("id").reverse()
-        elif order == ORDER_BY_OLDEST:
-            ## print(" [TRACE] Order by oldest")
-            return query.order_by("id")
-        elif order == ORDER_BY_UPDATE:
-            ## print(" [TRACE] Order by last update")
-            return query.order_by("updated").reverse()
-        else:
-            # Default: ORDER_BY_NEWEST
-            return query.order_by("id").reverse()
-
-    # Determines the query => Called before get_context_data()
-    def get_queryset(self) -> QuerySet:
-        ## print(" [TRACE] get_queryset() called. Ok. ")
+    # Determines the query 
+    def get_queryset(self):
         filter_: str = self.request.GET.get("filter", "")                
-        query: QuerySet = self.empty_query
         if filter_ in self.filter_dispatch.keys():            
-            query = self.filter_dispatch[filter_].callback() 
-        else:                    
-            query = self.filter_all()
-        return self.order_query( query )
+            return self.filter_dispatch[filter_].callback()                     
+        return self.filter_latest()
 
     # Return context data dictionary to the rendered template 
     def get_context_data(self, **kwargs):        
-        print(" [TRACE] get_context_data() called. Ok. ")
         # Context variable is a dictionary which contains the variables
         # visible in the Django template files 
         context = super(BookmarksList, self).get_context_data(**kwargs)
         assert context is not None 
-        ## print(f" Trace = { self.context_object_name }")
+        print(f" Trace = { self.context_object_name }")
         query: QuerySet = context[self.context_object_name]
         assert query is not None 
-
-        narrow = self.request.GET.get("narrow") or "off"
-        search = self.request.GET.get("search") or ""
-
-        if narrow != "off":
-            query = query.filter( title__contains = search) 
-            pass 
        
-        url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}&order={order}"\
-            .format(  filter = self.request.GET.get("filter") or ""
-                    , A0     = self.request.GET.get("A0")   or ""
-                    , query  = urllib.parse.quote(self.request.GET.get("query") or "")
-                    , mode   = self.request.GET.get("mode") or ""
-                    , order  = self.request.GET.get("order") or ""
+        url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}"\
+            .format( filter = self.request.GET.get("filter") or ""
+                    ,A0     = self.request.GET.get("A0")   or ""
+                    ,query  = urllib.parse.quote(self.request.GET.get("query") or "")
+                    ,mode   = self.request.GET.get("mode") or ""
                     )   
-        ## print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
+        print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
         
         view = self.request.GET.get("filter") or "null"
-        ## print(f" [TRACE] get_context_data() =>> view = {view}")
+        print(f" [TRACE] get_context_data() =>> view = {view}")
 
         title = (self.filter_dispatch.get(view) or self.null_view).title 
         
@@ -238,13 +170,6 @@ class BookmarksList(LoginRequiredMixin, ListView):
 
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
-       
-        order = self.request.GET.get("order") or "new" 
-        
-        if   order == "new": context["item_sorting"] = "Newest items"
-        elif order == "old": context["item_sorting"] = "Oldest items"
-        elif order == "updated": context["item_sorting"] = "Latest updated items"
-
         return context
 
     #---------- Utility methods  -------------------------------#
@@ -266,25 +191,38 @@ class BookmarksList(LoginRequiredMixin, ListView):
         return self.model.objects.exclude(deleted = True)\
             .filter( owner = user, id = A0)
 
-    def filter_all(self):
+    def filter_latest(self):
         user: AbstractBaseUser = self.request.user         
-        order: str = self.request.GET.get("order") or "last"  
-        query = self.model.objects\
-            .filter(owner = self.request.user)\
-            .exclude(deleted = True)
-        return query 
+        if user.is_anonymous:
+            return self.model.objects.exclude(deleted = True)\
+                       .order_by("id").reverse()
 
+        return self.model.objects.exclude(deleted = True)\
+                   .filter(owner = self.request.user).order_by("id").reverse()
+
+    def filter_oldest(self):
+        return self.model.objects.filter(owner = self.request.user, deleted = False).order_by("id")
 
     # Select only user marked (starred, favourite) bookmarks
     def filter_starred(self):
-        query: QuerySet = self.model.objects.filter(starred = True).exclude(deleted = True)\
+        query = self.model.objects.filter(starred = True).exclude(deleted = True)\
             .filter(owner = self.request.user)
         order: str = self.request.GET.get("order") or "last"        
-        return  query
+
+        if order == "first":
+            return query.order_by("id")
+        
+        if order == "last":
+            return query.order_by("id").reverse()  
+        
+        if order == "last-modified":
+            return query.order_by("-updated").reverse()
+
+        return  query.order_by("id").reverse()  
     
     def filter_removed(self):        
-        return self.model.objects.filter(deleted = True or deleted == None ) \
-            .filter(owner = self.request.user)
+        return self.model.objects.filter(deleted = True)\
+            .filter(owner = self.request.user).order_by("id").reverse()    
 
     # Url example: /items?filter=domain&A0=www.reddit.com
     def filter_domain(self):
@@ -294,6 +232,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         d = A0.strip("www.").strip("m.").strip("old.").strip("mobile.")
         return self.model.objects.filter(url__contains = d)\
                    .exclude(deleted = True).filter(owner = self.request.user)\
+                   .order_by("id").reverse()
 
     # Url example: /items?filter=tag-name&A0=tag1,tag2,...,tagn
     def filter_by_tag_name(self):
@@ -312,22 +251,20 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if not A0: return self.empty_query
         return self.model.objects.filter(doctype = A0)\
                    .exclude(deleted = True)\
-                   .filter(owner = self.request.user)
+                   .filter(owner = self.request.user).order_by("id").reverse()
 
     def filter_collection(self):
         coll_id: int = self.query_param_as_int("A0")
         c: Collection = ds.get_object_or_404(Collection, id = coll_id)
-        return c.item.all()        
+        return c.item.all().order_by("id").reverse() 
+        #.order_by("link_to_items").reverse()
 
     def filter_search(self):
-        search: str = self.request.GET.get('query').strip()
-        search: str = dutils.remove_url_obfuscation(search)
-
+        search = self.request.GET.get('query')
         mode   = self.request.GET.get('mode', "")
-        if not search or search == "":
-            return self.filter_all()  
+        if not search:
+            return self.filter_latest()        
         words = shlex.split(search)
-
         lam = lambda x, y: x | y
         if  mode == "OR":
             lam = lambda x, y: x | y
@@ -336,36 +273,15 @@ class BookmarksList(LoginRequiredMixin, ListView):
         # q = Q(title__contains =   search) | Q(url__contains =  search)       
         q1 = reduce(lam, [ Q(url__contains=w) for w in words])
         q2 = reduce(lam, [ Q(title__contains=w) for w in words])
-        q3 = reduce(lam, [ Q(brief__contains=w) for w in words])
-
-        return self.model.objects\
-            .filter(owner = self.request.user)\
-            .filter(q1 | q2 | q3).exclude( deleted = True )
+        return self.model.objects.filter(owner = self.request.user)\
+            .filter(q1 | q2).exclude( deleted = True ).order_by("id").reverse()
 
     def filter_by_created_date(self):
-        date: str = self.request.GET.get("A0")
-        year, month, day = date.split("-")
+        created_date: str = self.request.GET.get("A0")
         filter_type:  str = self.request.GET.get("filter")
         assert filter_type == "created-date"
-
-        return self.model.objects.filter( owner = self.request.user
-                                        , created__year = year
-                                        , created__month = month
-                                        , created__day = day     )\
-            .exclude( deleted = True )
-
-      #  return self.model.objects.filter(owner = self.request.user, created = created_date)\
-      #      .exclude(deleted = True )
-            
-
-    def filter_has_snapshot(self) -> QuerySet:
-        """Filter items that has snapshot attachment files."""
-        return SiteBookmark.objects.annotate( c = Count("filesnapshot") )\
-            .filter( owner = self.request.user, deleted = False, c__gte = 1 )
-
-    def filter_uploads(self):
-        """Filter items that have uploaded files (snapshot file)."""
-        return self.model.objects.filter(owner = self.request.user, is_upload = True).exclude(deleted = True)
+        return self.model.objects.filter(owner = self.request.user, created = created_date)\
+            .exclude(deleted = True ).order_by("id").reverse()
 
 # URL route for adding item through bookmarklet 
 @login_required 
@@ -406,32 +322,10 @@ def update_item_from_metadata(itemID: int) -> None:
     b: SiteBookmark = SiteBookmark.objects.get(id = itemID)    
     # URL with obfuscation removed 
     real_url: str = dutils.remove_url_obfuscation(b.url)
-
-    logger = logging.getLogger(__name__)
-    logger.debug(f"Real_url = { real_url }")    
-    
-    import urllib
-    from urllib.parse import urlparse, ParseResult
-    url_obj: ParseResult = urlparse(real_url)
-    domain  = url_obj.hostname
-
-    import httpx 
-
-    if domain == "wikipedia.org" or domain == "en.m.wikipedia.org":
-        import wikipedia
-        try:
-            guess_title = url_obj.path.strip("/wiki")
-            page: wikipedia.wikipedia.WikipediaPage = wikipedia.page(guess_title)
-            b.title = page.original_title
-            b.brief = page.summary
-            b.save()            
-            return 
-        except wikipedia.exceptions.PageError:
-            pass        
+    print(f" [TRACE] real_url = { real_url }")    
 
     if b is None:
         return django.http.HttpResponseBadRequest("Error: invalid item ID, item does not exist.")            
-    
     try:
         # Reference: https://stackoverflow.com/a/18269491
         url_ = urllib.parse.urlsplit(real_url)
@@ -439,105 +333,61 @@ def update_item_from_metadata(itemID: int) -> None:
         url_[2] = urllib.parse.quote(url_[2])
         url_ = urllib.parse.urlunsplit(url_)
 
-        req = httpx.get(  url_
-                        , follow_redirects= True
-                        , headers = {
-                            'User-Agent':       BROWSER_USER_AGENT
-                            , 'Host':             domain 
-                            , 'Accept':          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-                            , 'Accept-Language': 'en-US,en;q=0.5'
-                            , 'Cache-Control':   'no-cache' 
-                       }) 
-
-        content_type = req.headers.get("Content-Type")
-
-        if "pdf" in content_type: 
-            # data = page.read() 
-            data = req.read()
-            view = io.BytesIO(data)
-            pdf  = PyPDF2.PdfFileReader(view)
-            inf  = pdf.documentInfo
-            assert(inf is not None)
-
-            if inf.author is None:
-                b.title = (inf.title or inf.subject or real_url) + " [PDF] "
-            else:
-                b.title = (inf.title or inf.subject or real_url) + " [PDF] / " + inf.author 
-            
-            if inf.subject is None:
-                text_len_max = 400 
-                text = pdf.getPage(0).extractText() 
-                b.brief = (text[:text_len_max] + " ... ") if len(text) > text_len_max else text 
-            else: 
-                b.brief = inf.subject or "" 
-            b.save()
-            return 
-
-
-        if not ("pdf" in content_type):
-            # soup = bs4.BeautifulSoup(page, features = "lxml")
-            soup = bs4.BeautifulSoup(req.read(), features = "lxml")
-            
-             ## print(" [TRACE] request = ", req)
-             ## print(" [TRACE] page = ", soup)
-
-            # title <- soup.find("title").text if soup is not None, otherwise
-            # , it is set to "" (empty string)
-            title: str = getattr( soup.find("title"), "text", "")
-            
-            # Extract tag <meta name='description' content="Website description here ...." />
-            m = soup.find("meta", attrs={'name': 'description'})             
-            brief: str = m.get("content") if m is not None else ""
-
-            url: str = b.url
-            if "stackoverflow.com/questions" in url:
-                m = soup.find("meta", attrs={'name': 'twitter:description'})         
-                brief: str = m["content"] if m is not None else ""        
-
-            # Limit brief to 900 characters
-            brief = brief[:900]
-
-            # Extract title of RFC internet standard from IETF web page
-            if domain == "datatracker.ietf.org":
-                print(" [TRACE] Found IETF domain RFC document")
-                m = soup.find("span", attrs={'class': 'h1'})         
-
-                if "https://datatracker.ietf.org/doc/html/rfc" in url:
-                    rfc: str = real_url.strip("https://datatracker.ietf.org/doc/html/").upper()
-                    title = "IETF - RFC" + rfc + " /  " + getattr( m, "text", "" )
-                else:
-                    title = "IETF - " + getattr( m, "text", "" )
-
-            # Extract JSON metadata from youtube video such as Author and Channel URL
-            if ("playlist" not in url) and (("youtube.com" in url) or ("m.youtube.com" in url)):
-                print(" [TRACE] Site is Youtube.")
-                import urllib.request
-                import http.client
-                import json
-                turl: str = f"https://www.youtube.com/oembed?url={url}&format=json"
-                resp: http.client.HTTPResponse = urllib.request.urlopen(turl)
-                metadata = json.loads(resp.read())
-                title = "( {0} ) {1}".format(  metadata["author_name"], title) 
-                brief = "Author name = " + metadata["author_name"] + "\n" \
-                    + "Channel URL = " + metadata["author_url"] + "\n" \
-                    + brief
-
-            title_append = ""
-            if (("youtube.com" in url) or ("m.youtube.com" in url) and "playlist" in url):
-                title_append = "(playlist) "
-
-            b.url   = real_url
-            b.title = title_append + title  
-            # Only first 50 lines 
-            b.brief = brief
-            print(" [TRACE] URL = ", b.url)
-            b.save()
-
+        req = urllib.request.Request(
+              url_
+            , data=None
+            , headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        })
+        page = urllib.request.urlopen(req, timeout = 4)
+        #page = urllib.request.urlopen(b.url)
     except (urllib.error.URLError, socket.timeout) as ex:          
-        print(" [FAULT] Exit codepath => ", ex)
-        # return 
-    # print(" [TRACE] Test code path 2")
-    return 
+        return django.http.HttpResponseBadRequest("Error: Exception = {}".format(ex))        
+    
+    info = page.info()
+
+    if "pdf" in info.get_content_type():
+        data = page.read() 
+        view = io.BytesIO(data)
+        pdf  = PyPDF2.PdfFileReader(view)
+        inf  = pdf.documentInfo
+        assert(inf is not None)
+
+        if inf.author is None:
+            b.title = (inf.title or inf.subject or real_url) + " [PDF] "
+        else:
+            b.title = (inf.title or inf.subject or real_url) + " [PDF] / " + inf.author 
+        
+        if inf.subject is None:
+            text_len_max = 400 
+            text = pdf.getPage(0).extractText() 
+            b.brief = (text[:text_len_max] + " ... ") if len(text) > text_len_max else text 
+        else: 
+            b.brief = inf.subject or "" 
+        b.save()
+        return 
+
+    if not ("pdf" in info.get_content_type()):
+        soup = bs4.BeautifulSoup(page, features = "lxml")
+
+        # title <- soup.find("title").text if soup is not None, otherwise
+        # , it is set to "" (empty string)
+        title: str = getattr( soup.find("title"), "text", "")
+        
+        # Extract tag <meta name='description' content="Website description here ...." />
+        m = soup.find("meta", attrs={'name': 'description'})             
+        brief: str = m.get("content") if m is not None else ""
+
+        url: str = b.url
+        if "stackoverflow.com/questions" in url:
+            m = soup.find("meta", attrs={'name': 'twitter:description'})         
+            brief: str = m["content"] if m is not None else ""        
+
+        b.url   = real_url
+        b.title = title 
+        b.brief = brief 
+        b.save()
+        return 
 
 @login_required
 def extract_metadata(request: WSGIRequest):
@@ -559,9 +409,7 @@ from urllib.parse import urlparse
 
 @login_required
 def fetch_itemsnapshot(request: WSGIRequest):
-    """ Download file snaphot from bookmark URL and store file in file cache.
-    
-    """
+    """ Download file snaphot from bookmark URL and store file in cache."""
     redirect_url: str = request.GET.get("url")
     if redirect_url is None or redirect_url == "":
         return django.http.HttpResponseBadRequest("Error: invalid redirection URL.")
@@ -601,23 +449,12 @@ def get_snapshot_file(request: WSGIRequest, fileID, fileName):
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileID)
 
     title = urllib.parse.quote(request.GET.get("title") or "archive")
-    
     try:
         with open(sn.getFilePath(), 'rb') as fp:
             res       = HttpResponse(fp, content_type = sn.fileMimeType)
             extension = os.path.splitext(sn.getFilePath())[1]
-            # Truncate title to 60 characters 
-            title     = request.GET.get("title")
-            title     = title[:60] if len(title) > 60 else title 
-            # Create a suitable file name out of an arbitrary string 
-            fname     = slugify(title)
-
-            if extension.startswith("."):
-                _fname = fname + extension
-            else:
-                _fname = fname + "." + extension
-            
-            res["Content-Disposition"] = f"inline; filename = {_fname}"
+            fname     = slugify(request.GET.get("title"))
+            res["Content-Disposition"] = f"inline; filename = {fname}.{extension}"
             return res 
     except FileNotFoundError as err:
         raise Http404("Error: file not found => {err}".format(err = err))
@@ -691,13 +528,9 @@ def rest_item_create(request: WSGIRequest):
     except SiteBookmark.DoesNotExist:
         pass         
 
-    logger = logging.getLogger(__name__)
-
     item = SiteBookmark.objects.create(url = url_, owner = user)
     item.save()
     update_item_from_metadata(item.id)
-
-    logger.debug(f"Add bookmark: f{url_} ")
     return  JsonResponse({ "result": "OK" })
 
 
@@ -763,41 +596,26 @@ def pdf2hml(request: WSGIRequest, fileUUID: str, fileName: str):
     """ Converts PDF (Portable Document) to html by using the pf2htmlEx application. 
     
     """
-
-    logger = logging.getLogger(__name__)
-    logger.info(f" Converting PDF to HTML =>> UUID = f{fileUUID} ; file name = {fileName}  ")
-
     import subprocess
     sn: FileSnapshot = ds.get_object_or_404(FileSnapshot, id = fileUUID)
     data_dir:   str = os.path.join(django.conf.settings.BASE_DIR, "data")
     cache_dir:  str = os.path.join(data_dir,"pdf2html-cache")
     if not os.path.exists(cache_dir): os.makedirs(cache_dir)    
-    pdf2html_bin: str = os.getenv("ENV_PDF2HTML_PATH") or os.path.join(data_dir, "pdf2htmlEx.bin")
-    assert os.path.exists(pdf2html_bin), f"pdf2html executable supposed to be in ${data_dir}"    
+    pdf2hml_bin: str = os.getenv("ENV_PDF2HTML_PATH") or os.path.join(data_dir, "pdf2htmlEx.bin")
+    assert os.path.exists(pdf2hml_bin), f"pdf2html executable supposed to be in ${data_dir}"    
     
     # File generated by pdf2htmlEx utility 
     html_file: str = os.path.join(cache_dir, f"{fileUUID}.html")
     print(f" [TRACE] html_file = {html_file} \n file = {sn.getFilePath()}")
 
-    if not os.getenv("ENV_PDF2HTML_PATH"):
-        args = [ pdf2html_bin, sn.getFilePath(), os.path.basename(html_file)
-                 , "--dest-dir=" + cache_dir
-               ]
-    else:
-        args =  [ pdf2html_bin, sn.getFilePath(), os.path.basename(html_file)
-                  , "--dest-dir=" + cache_dir
-                  , "--data-dir=/opt/usr/local/share/pdf2htmlEx"
-                  , "--poppler-data-dir=/opt/usr/local/share/pdf2htmlEX/poppler"
-                  , "--debug=1"
-                ]
-
-    print(" [DEBUG] args = ", args)
-    
     if not os.path.exists( html_file ):
         print(f" [TRACE] HTML snapshot of file: ${fileUUID} does not exist yet ")
         print(" [TRACE] Creating file snapshot with pdf2html")
 
-        proc = subprocess.run( args )
+        proc = subprocess.run([   pdf2hml_bin
+                                , sn.getFilePath()
+                                , os.path.basename(html_file)
+                                , "--dest-dir=" + cache_dir])
         #print(" Type(proc) ", type(proc))
         #status = proc.wait()
         #if status != 0:
@@ -820,8 +638,6 @@ def document_thumbnail(request: WSGIRequest, fileUUID: str):
     data_dir:   str = os.path.join(django.conf.settings.BASE_DIR, "data")
     cache_dir:  str = os.path.join(data_dir,"thumbnail-cache")    
 
-
-
     print(f" [TRACE] cache_dir = {cache_dir} ")
     print(f" [TRACE]  data_dir = {data_dir} ")
     
@@ -833,10 +649,8 @@ def document_thumbnail(request: WSGIRequest, fileUUID: str):
     # Thumbnail file 
     thumb_file: str = os.path.join(cache_dir, f"{fileUUID}.png")
 
-    logger = logging.getLogger(__name__)
-
     if not os.path.exists( thumb_file ):
-        logger.info(f" Generating thumbinail of document =>> file = ${sn.fileName} ; uuid = {fileUUID}  ")
+
         proc = subprocess.run( [  # 'convert' => Utility from ImageMagick suite 
                                   "convert"
                                 , "-density",    "300"
@@ -879,7 +693,7 @@ class BookmarkCreate(LoginRequiredMixin, CreateView):
 class BookmarkUpdate(LoginRequiredMixin, UpdateView):
     template_name = tpl_forms
     model = SiteBookmark
-    fields = ['url', 'title', 'starred', 'brief', 'doctype', 'is_upload', 'deleted' ]
+    fields = ['url', 'title', 'starred', 'brief', 'doctype' ]
     success_url = "/items" #reverse_lazy('bookmarks:bookmark_list')
 
     # Override UpdateView.get_success_url()
@@ -967,68 +781,6 @@ def querylist2Json(querylist, columns: List[str]) -> JsonResponse:
     list_of_dicts = list(map(lambda x: dict(x), kv_pairs))
     return JsonResponse(list_of_dicts, safe =False)    
 
-@login_required
-def item_upload(request: WSGIRequest):
-    from django.core.files.uploadhandler import InMemoryUploadedFile
-    from functools import partial
-    import base64 
-    import hashlib
-    import mimetypes
-    import os     
-    # name of the form-upload field in the HTML template 
-    UPLOAD_FORM_FIELD = "upload-file"
-    media_dir: str = django.conf.settings.MEDIA_ROOT 
-
-    # Reference: https://gist.github.com/Alir3z4/725297248a59cae05a50b15dd79fb4d0
-    def hash_file(file, block_size=65536):
-        hasher = hashlib.md5()
-        for buf in iter(partial(file.read, block_size), b''):
-            hasher.update(buf)
-        return hasher.hexdigest()
-
-    if request.method != "POST":
-        return Http404("Error: invalid method. Only POST allowed")
-    print(f" Request = ${request} ")
-
-    uploaded_files: List[InMemoryUploadedFile] = request.FILES.getlist(UPLOAD_FORM_FIELD)
-
-    if len(uploaded_files) == 0:
-        return JsonResponse({"status": "ERROR", 'message': 'Error: zero file uploaded.'})
-
-    fdata: InMemoryUploadedFile = uploaded_files[0]
-
-    print(f" Uploaded file = {fdata.name}           " )
-    print(f" Uploaded size = {fdata.size}           " )
-    print(f" Content type  = {fdata.content_type}   " )
-    sn = FileSnapshot(  fileName     = fdata.name 
-                      , fileHash     = hash_file(fdata)
-                      , fileMimeType = fdata.content_type )
-
-    print(" [TRACE] sn = ", sn)
-    sn.save()
-
-    # Create associated file directory at path: 
-    #  ${MEDIA_ROOT}/<FILE UUID>/<FILE_NAME>
-    file_dir = os.path.join(media_dir, str(sn.id))
-    file_path = os.path.join(file_dir, sn.fileName)
-    os.mkdir(file_dir)
-
-    with open( file_path, 'wb') as fd:
-        for chunk in fdata.chunks(): fd.write(chunk)
-
-    # Create corresponding bookmark to uploaded file 
-    item_url = "snapshot/file/" + str(sn.id) + "/" + urllib.parse.quote(sn.fileName)
-    item: SiteBookmark = SiteBookmark.objects.create(url = item_url, owner = request.user)
-    item.title         = " [UPLOAD] " + sn.fileName
-    item.is_upload     = True
-    ## item.starred = body.get("starred") or False 
-    item.save()
-    # Associate file entry and internal bookmark
-    sn.item.add(item)
-    sn.save()
-    print(" [TRACE] Finished Ok.")
-    return JsonResponse({"status": "OK"})
-
 
 class Ajax_Items(LoginRequiredMixin, django.views.View):
 
@@ -1039,31 +791,22 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         """Create new bookmark entry in the database."""
         body_unicode = request.body.decode("utf-8")
         body         = json.loads(body_unicode)
-        action = body["action"]
+        url:  str    = body["url"]
+        url_: str    = dutils.remove_url_obfuscation(url)            
+        assert url_ is not None 
+        # Current logged user 
         user: AbstractBaseUser = request.user
-        print(" [TRACE] Request received ")
-
-        if action == "item_new":
-            url:  str    = body["url"]
-            url_: str    = dutils.remove_url_obfuscation(url)            
-            assert url_ is not None 
-            # Current logged user             
-            try:
-                # Check whether URL already exists in the database         
-                it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
-                return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
-            except SiteBookmark.DoesNotExist:
-                pass         
-
-            item = SiteBookmark.objects.create(url = url_, owner = user)
-            item.starred = body.get("starred") or False 
-            item.save()
-            update_item_from_metadata(item.id)
-            return  JsonResponse({ "result": "OK" })
-
+        try:
+            # Check whether URL already exists in the database         
+            it  = SiteBookmark.objects.filter(owner = user).get(url = url)        
+            return JsonResponse({ "result": "FAILURE", "reason": "URL already exists" })
+        except SiteBookmark.DoesNotExist:
+            pass         
+        item = SiteBookmark.objects.create(url = url_, owner = user)
+        item.starred = body.get("starred") or False 
+        item.save()
+        update_item_from_metadata(item.id)
         return  JsonResponse({ "result": "OK" })
-
-
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
         body_unicode  = request.body.decode("utf-8")
@@ -1072,9 +815,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         mode:   str = body["mode"]      
         item = SiteBookmark.objects.get(id = item_id, owner = request.user)
         if mode == "soft": item.delete() 
-        if mode == "hard": 
-            self.delete_file_snapshot(request, item_id)
-            item.hard_delete()
+        if mode == "hard": item.hard_delete()
         return  JsonResponse({ "result": "OK" })
 
     # Backend REST-like API 
@@ -1097,7 +838,7 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
             return Http404("Error: invalid request")
         
         try:
-            item = SiteBookmark.objects.get(id = item_id, owner  = request.user)    
+            item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = False)    
         except SiteBookmark.DoesNotExist:
             item = SiteBookmark.objects.get(id = item_id, owner  = request.user, deleted = None)    
         
@@ -1112,28 +853,19 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
         if action == "snapshot":       
             print(" [INFO] Downloading file snapshot. Ok.")     
             return self.download_file_snapshot(request, item_id)
-
-        if action == "snapshot-delete":
-            return self.delete_file_snapshot(request, item_id)
-
+            
         item.save()
         return JsonResponse({ "result": "OK" }, safe = False)
 
     
     def download_file_snapshot(self, request: WSGIRequest, item_id):
         """Download file snapshot from URL to the file repository."""
+
         try:
             item = SiteBookmark.objects.get(id = item_id, owner = request.user)
         except SiteBookmark.DoesNotExist: 
             return JsonResponse({ 'result': 'ERROR', 'message': "Item does not exist"})
-        # print(" [TRACE] download_file_snapshot =>> Downloaded file = ", item)
-        # Remove previous Snapshot if it already exists 
-        sn: FileSnapshot = item.filesnapshot_set.first()
-        if sn is not None:
-            path = sn.getDirectoryPath()
-            # print(" [TRACE] File snapshot path = ", path)
-            item.filesnapshot_set.remove(sn)
-            sn.delete() 
+
         try:
             FileSnapshot.createSnapshot(item.id, item.url)
         except django.db.utils.IntegrityError as ex:
@@ -1148,19 +880,6 @@ class Ajax_Items(LoginRequiredMixin, django.views.View):
                     ,"message": "Error: urrlib Exception = {ex}".format(ex = ex)
                    })
         return JsonResponse({'result': "OK", "message": "File downloaded Ok."})
-
-    def delete_file_snapshot(self, request: WSGIRequest, item_id):
-        try:
-            item = SiteBookmark.objects.get(id = item_id, owner = request.user)
-        except SiteBookmark.DoesNotExist: 
-            return JsonResponse({ 'result': 'ERROR', 'message': "Item does not exist"})
-
-        sn: FileSnapshot = item.filesnapshot_set.first()
-        path = sn.getDirectoryPath()
-        print(" [TRACE] File snapshot path = ", path)
-        item.filesnapshot_set.remove(sn)
-        sn.delete() 
-        return JsonResponse({'result': "OK", "message": "File snapshot deleted Ok."})
 
 # Endpoints: /api/collection 
 class Ajax_Collection_List(LoginRequiredMixin, django.views.View):
@@ -1364,7 +1083,6 @@ class ViewPaginatorMixin(object):
         return data
 
 
-
 class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View):
 
     def get(self, request: WSGIRequest, *args, **kwargs):
@@ -1402,9 +1120,9 @@ class Ajax_ItemSearch(LoginRequiredMixin, ViewPaginatorMixin, django.views.View)
 
 class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
+
     def get(self, request: WSGIRequest, *args, **kwargs):
-        query = Tag2.objects.filter(owner = request.user)\
-                    .order_by(Lower("name"))
+        query = Tag2.objects.filter(owner = request.user)
         return queryset2Json(query, ["id", "name", "description"])
 
     def post(self, request: WSGIRequest, *args, **kwargs):
@@ -1418,8 +1136,7 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
         new_tag.save()        
         return JsonResponse({ "result": "OK", "message": f"Created tag: ${new_tag.name} / id = ${new_tag.id} " }, safe = False)        
 
-    def put(self, request: WSGIRequest, *args, **kwargs):    
-        from datetime import datetime 
+    def put(self, request: WSGIRequest, *args, **kwargs):            
         req: WSGIRequest = self.request
         body    = json.loads(req.body.decode("utf-8"))        
         tag_id  = body.get("tag_id") or ""       
@@ -1430,8 +1147,6 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             tag_name = body["tag_name"]
             tag: Tag = Tag2.objects.create(name = tag_name, description = "", owner = request.user)
             item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
-            item.updated = datetime.now()
-            item.save()
             tag.save()
             tag.item.add(item)
             tag.save()
@@ -1443,8 +1158,6 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             item_id = body["item_id"]
             tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)        
             item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
-            item.updated = datetime.now()
-            item.save()
             tag.item.add(item)
             tag.save()
             #print(" Tag  = " + tag)
@@ -1456,8 +1169,6 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
             tag_id  = body["tag_id"]
             tag: Tag = Tag2.objects.get(id = tag_id, owner = request.user)        
             item: SiteBookmark = SiteBookmark.objects.get(id = item_id, owner = request.user)
-            item.updated = datetime.now()
-            item.save()            
             tag.item.remove(item)
             tag.save()
             return JsonResponse({ "result": "OK", "message": "Item removed from tag. Ok." }, safe = False)       
@@ -1485,28 +1196,3 @@ class Ajax_Tags(LoginRequiredMixin, django.views.View):
 
     def delete(self, request: WSGIRequest, *args, **kwargs):
         return JsonResponse({ "result": "OK" }, safe = False)        
-
-
-
-class Ajax_ItemRelated(LoginRequiredMixin, django.views.View):
-
-
-    def post(self, request: WSGIRequest, *args, **kwargs):
-        """ Create new collection """
-        assert( request.method == "POST" and request.is_ajax() )
-        req: WSGIRequest = self.request
-        body        = json.loads(req.body.decode("utf-8"))        
-        item_id      = body["item_id"]
-        related_ids  = body["related_ids"]
-
-        item    = SiteBookmark.objects.get(id = item_id, owner = request.user)
-
-        for rid in related_ids:
-            if rid == item_id: continue 
-            related = SiteBookmark.objects.get(id = rid, owner = request.user)
-            item.related.add(related)
-            related.related.add(item)
-            related.save()
-        item.save()
-
-        return JsonResponse({ "result": "OK",  "message": "Item added Ok." })

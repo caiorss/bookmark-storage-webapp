@@ -11,11 +11,7 @@
 
     {% for collection in object_list %}
         
-        <div class="well item div-collection-container"
-             data-id    = "{{ collection.id    }}"
-             data-title = "{{ collection.title }}"
-             data-desc  = "{{ collection.description }}"
-            >   
+        <div class = "well item ">   
 
             <a  href="/items?filter=collection&A0={{ collection.id }}" 
                 title="{{ collection.description }}"> 
@@ -27,11 +23,11 @@
             </br>
             <p> {{ collection.description }} </p>
   
-            <a class="btn btn-info btn-collection-edit" 
-               title="Edit current collection.">Edit</a>            
+            <a class="btn btn-info" href="javascript:collection_edit({{collection.id}}, '{{ collection.title }}' )"  
+                                    title="Edit current collection.">Edit</a>            
 
-            <a class="btn btn-info btn-collection-delete"                 
-                title="Delete current collection.">Delete</a>
+            <a class="btn btn-info" href="javascript:collection_delete({{collection.id}}, '{{ collection.title }}' )"  
+                                    title="Delete current collection.">Delete</a>
         </div>                            
     {% endfor %}
     

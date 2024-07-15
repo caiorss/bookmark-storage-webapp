@@ -1,14 +1,5 @@
 PYTHON=python
 
-# Install dependencies for running this application.
-setup:
-	@# Install pipenv 
-	pip3 install --user pipenv
-	@# Install the dependencies 
-	pipenv setup 
-	@# Install image magick policy
-        sudo image-magic-policy.xml /etc/ImageMagick-6/policy.xml 	
-
 # Run application
 run:
 	# ${PYTHON} manage.py runserver 0.0.0.0:8000
@@ -44,18 +35,12 @@ db-reset:
 docker-build:
 	docker build . -t django-bookmark-server
 
-# Command for testing the docker image
-docker-test:
-	docker run -it --rm  \
-		-p 9045:9000 \
-		django-bookmark-server
-
 # Run docker Image container
 # The server URL will be the URL: http://localhost:9000/
 docker-run1:
 	docker volume create django-server-volume
 	docker run --detach  \
-		-p 9045:9000 \
+		-p 9000:9000 \
 		-v django-server-volume:/app/data \
 		--name django-server \
 		django-bookmark-server
@@ -70,6 +55,7 @@ docker-run2:
 		--name django-server \
 		--restart=always \
 		django-bookmark-server
+
 
 # Stop docker image container
 docker-stop:
