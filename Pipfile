@@ -7,15 +7,23 @@ verify_ssl = true
 pylint = "*"
 pylint-django = "*"
 mypy = "*"
+rope = "*"
+autopep8 = "*"
 
 [packages]
 bs4     = "*"
-Django  = "*"
+Django  = "==3.2.10"
 lxml    = "*"
 django-pdb = "*"
 pypdf2  = "*"
 djangorestframework = "*"
 pylint-django = "*"
+uwsgi = "*"
+wikipedia = "*"
+django-rest-framework = "*"
+django-filter = "*"
+django-rest-auth = "*"
+httpx = "*"
 
 [requires]
 python_version = "*"

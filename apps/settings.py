@@ -21,6 +21,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'data', "files")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
+# 100 megabytes => WARNING: It may be vulnerable to DOS (Denial-Of-Service) attacks
+# if this value is too high. 
+# @TODO: Find a way to upload large files without loading everything to memory.
+### DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 100
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '0ux_%=7!81&z=^uj5iw@tue#7zkfn9lk)=*d147(g+$5t$l9nz'
 
@@ -42,10 +47,14 @@ INSTALLED_APPS = [
     , 'django.contrib.staticfiles'
 
     , 'rest_framework'
+    , 'rest_framework.authtoken'
+    , 'rest_auth'
+
 
     # Main app 
     , 'bookmarks'
-    
+
+
     # DJango-pdb: note - require installing
     # $ pip install django-pdb
     # Reference: https://github.com/HassenPy/django-pdb
@@ -53,20 +62,42 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+      'django.middleware.security.SecurityMiddleware'
+    , 'django.contrib.sessions.middleware.SessionMiddleware'
+    , 'django.middleware.common.CommonMiddleware'
+    , 'django.middleware.csrf.CsrfViewMiddleware'
+    , 'django.contrib.auth.middleware.AuthenticationMiddleware'
+    , 'django.contrib.messages.middleware.MessageMiddleware'
+    , 'django.middleware.clickjacking.XFrameOptionsMiddleware'
 
     # DJango-pdb: note - require installing
     # $ pip install django-pdb
     # Reference: https://github.com/HassenPy/django-pdb
-    'django_pdb.middleware.PdbMiddleware',
+    , 'django_pdb.middleware.PdbMiddleware'
 
 ]
+
+REST_FRAMEWORK = {
+
+      'PAGE_SIZE': 15
+    , 'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination'
+
+    , 'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.TokenAuthentication',
+    ]
+
+    , 'DEFAULT_PERMISSION_CLASSES': [
+         # =>> For no authentication 
+         # 'rest_framework.permissions.AllowAny',
+
+         # =>> For authentication via tokens 
+           'rest_framework.authentication.TokenAuthentication'  
+
+         # =>> For authentication via session cookies 
+          , 'rest_framework.authentication.SessionAuthentication'
+    ]
+}
+
 
 # Call Pdb() on exception =>> See: https://github.com/HassenPy/django-pdb
 POST_MORTEN = True 
@@ -90,6 +121,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'apps.wsgi.application'
+
+
+  # ======== SECTION:  DATABASE ===================================//
 
 
 # Database
@@ -137,6 +171,7 @@ USE_TZ = True
 # Allow connection from any hosts
 ALLOWED_HOSTS = [ "*"]
 
+  # ======== SECTION: STATIC FILES ===================================//
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -149,8 +184,59 @@ STATICFILES_DIRS = [
 
 ]
 
+
+  # ======== SECTION: AUTHENTICATION ===================================//
+
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 AUTH_USER_MODEL = "bookmarks.Account"
+
+
+  # ======== SECTION: LOGGING ===================================//
+
+# --- Constants -----# 
+LEVEl_INFO = "INFO"
+LEVEL_DEBUG = "DEBUG"
+
+LOGGING = {
+      "version": 1
+    , "disable_existing_loggers": False
+
+    , 'formatters': {
+        'verbose': {
+            'format': '%(levelname)s - [%(asctime)s] - %(name)s.%(funcName)s:%(lineno)s - %(message)s'
+        }
+    }
+
+    , "handlers": {
+        "file": {
+              "class":     "logging.FileHandler"
+            , "filename":  "server.log"
+            , "formatter": "verbose"
+            , "level":     LEVEl_INFO
+            
+        }
+
+    , "syslog": {
+               "class":    "logging.handlers.SysLogHandler"
+             #, "facility": "local7"
+             , "address":  "/dev/log"
+             , "formatter": "verbose"
+             , "level":    LEVEL_DEBUG
+             , "facility": "local1"
+        }
+    , "console": {
+            "class":     "logging.StreamHandler"
+           ,"formatter": "verbose" 
+      }
+    } 
+
+   , "loggers": {
+       "": {
+            "level": "DEBUG"
+          , "handlers": [ "file", "syslog", "console" ] 
+       }
+   }
+}

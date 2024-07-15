@@ -116,7 +116,8 @@ export class Dialog_Basic extends HTMLElement
 
     run() 
     {
-        this.show();
+        // this.show();
+        this.node.open = true;
         let p = new Promise( (resolve, reject) => {
             this._promise_callback = (flag) => {
                 resolve(flag);

@@ -2,14 +2,68 @@
 
 {% block content %}
 
-<h3> {{ page_title }} </h3>
+<h3 id="page-title-header" class="centered-title"> {{ page_title }} </h3>
 
-<div id="div-additional-buttons"> </div>
 
 <div id="bookmark-list" class="container">   
 
+
+<div id="div-additional-buttons">
+  Order by:  {{ item_sorting }} <br/>
+
+  <button id="btn-order-newest"  class="btn-sm btn-primary btn-toggle-details">Newest</button>
+  <button id="btn-order-oldest"  class="btn-sm btn-primary btn-toggle-details">Oldest</button>
+  <button id="btn-order-updated" class="btn-sm btn-primary btn-toggle-details">Last updated</button>
+</div>
+
+
+  Quick actions: 
+  <br/>
+  <button id="btn-table-add-bookmark"  
+          class="btn-sm btn-primary btn-toggle-details">Add bookmark</button>
+
+  <button id="btn-tag-filter"  
+          class="btn-sm btn-primary btn-toggle-details">Filter tag</button>
+
+  <br/>
+
+   <span style="font-weight:bold">
+        Found {{count}} results / Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    <br>
+
+    <!-- Buttons for browsing next page (next set of results) -->
+    {% if page_obj.has_previous %}
+        <a id="page-prev-button" class="btn-page-listing" title="Pagination / List previous items" class="topbar-svg-button" href="/items?page={{ page_obj.previous_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg>
+        </a>
+    {% else %}
+        <!-- <li class="btn btn-primary disabled"><span>&laquo;</span></li>  -->
+        <span class=" btn-page-listing"  > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"/></svg> </span>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+        <a id="page-next-button" class="btn-page-listing" title="Pagination / List next items" class="topbar-svg-button" href="/items?page={{ page_obj.next_page_number }}&{{url_state}}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </a>
+    {% else %}
+        <span class="btn-page-listing">
+            <svg xmlns="http://www.w3.org/2000/svg"  class="btn-page-listing" viewBox="0 0 24 24" width="24" height="24"><path class="heroicon-ui" d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/></svg>
+        </span>
+        <!-- <li class="btn btn-primary disabled"><span>&raquo;</span></li>  -->
+    {% endif %}            
+
+
+
     {% for bookmark in object_list %}
-        <div class = "well item item_div" value="{{ bookmark.id}}">   
+        <div class = "well item item_div div-item-container" 
+             data-id="{{ bookmark.id}}"
+             data-title="{{ bookmark.title }}"
+             data-url="{{ bookmark.url }}"
+             data-brief="{{ bookmark.brief }}"
+             data-hostname="{{ bookmark.hostname }}"
+             >   
            
             <h5>  
 
@@ -29,59 +83,87 @@
                  <!-- Bookmark that selects only this item. -->
                  <a href="/items?filter=id&A0={{ bookmark.id }}">( {{ bookmark.id }} )</a>
 
+                  <!-- Icon that identifies bookmark type -->
+                  {%if bookmark.icon %} 
+                    <img src="{{ bookmark.icon }}"></img>
+                  {%endif%}
+
                   <!-- Favicon - Icon related to the website. -->
                   {{  bookmark.favicon | safe }}
 
                   <!-- Bookmark main link -->
+                  
                   <a  class="item-bookmark-link"
                       target='_blank' 
-                      title="{{bookmark.brief}}" 
-                      href="{{ bookmark.url }}" >                       
+                      title="{{bookmark.brief}}"
 
-                      {{ bookmark.modified_title | default:bookmark.url }}                                                                        
-                  </a>                  
+                      {%if bookmark.is_upload %}
+                           href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}"
+                      {% else %}
+                           href="{{ bookmark.url }}"
+                      {% endif %}
+                    >                       
+                        {{ bookmark.modified_title | default:bookmark.url }}                                                                        
+                  </a>    
+
             </h5>
+      
+           <details class="details-item">
             
             <ul>
               <li>                  
-                  <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
+                  Domain: <a href="items?filter=domain&A0={{ bookmark.hostname }}" 
                     title="Filter by domain {{ bookmark.hostname }}" > {{ bookmark.hostname }} </a>
               </li>
               <li>
+                Update time: {{ bookmark.updated }}
+              </li>
+              <li>
+                Created time: <a href="items?filter=created-date&A0={{ bookmark.created | date:'Y-m-d' }}" 
+                                 title="Filter bookmarks by this created data">{{ bookmark.created }}</a> 
+              </li>
+              <li>
+
                   Starred: 
 
                    {%if bookmark.starred %}
                       <input  type="checkbox" 
                               class="checkbox-starred" 
-                              onchange="item_set_starred(this);"
+                              onchange="tsmain.item_set_starred(this);"
                               value="{{ bookmark.id }}"                               
                               checked/> 
                    {% else %}
                       <input type="checkbox" 
                             class="checkbox-starred" 
-                             onchange="item_set_starred(this);"
+                             onchange="tsmain.item_set_starred(this);"
                              value="{{ bookmark.id }}"/> 
                    {% endif %}
               </li>
             </ul>
 
+           
+
             <div class="item-additional-buttons"></div>
-              <a class="btn-sm btn-primary" 
+              <a class="btn-sm btn-primary btn-toggle-action-table" 
                 title="Actions for current bookmark" 
-                href="javascript:toggle_action_menu('#action-menu-{{ bookmark.id }}')">Actions</a>
+                href="#/">Actions</a>
 
-                <a class="btn-sm btn-primary btn-toggle-details" 
-                    href="javascript:toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" 
-                    >Details</a>
+                <!-- Button for toggling details -->
+                <a class="btn-sm btn-primary btn-toggle-details" href="#/">Details</a>
+                <!-- href="javascript:tsmain.toggle_items_table_info( '#item-detail-{{ bookmark.id }}' );" -->
+                
+                <!-- Button for adding new tags -->
+                <a href="#/" class="btn-sm btn-primary  btn-bookmark-tag-add" >Add tag</a>
 
-              
-                <a class="btn-sm btn-primary btn-toggle-details" 
-                    href="javascript:tag_add( {{ bookmark.id }} );" 
-                    >Add tag</a>
+                <!--- Button for edding -->
+                <a href="{% url 'bookmarks:bookmark_edit' bookmark.id %}?url={{  request.get_full_path | urlencode }}"
+                   title="Edit current bookmark." >
+                    <img src="static/images/icon-edit.png">
+                </a>
 
                {%if bookmark.isDocumentFile %}
                    <a target="_blank" href="{{ bookmark.modifiedURL }}" title="View document in Google Driver viewer" > 
-                     <img src="/static/gdriver.png"> 
+                     <img src="static/images/gdriver.png"> 
                    </a>    
                {% endif %}
 
@@ -89,59 +171,99 @@
                <a target="_blank" title="Open snapshot file" 
                   href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}"
                 >
-                <img src="/static/folder-icon.png"> 
+                <img src="/static/images/folder-icon.png"> 
               </a>                                                             
              {% endif %}          
              
-             {% if  bookmark.snapshot_is_pdf %}
+            {% if  bookmark.snapshot_is_pdf %}
               <a target="_blank" title="View PDF in the web browser" 
                   href="/pdf2html/{{ bookmark.snapshot_file }}"
                 >            
-                <img src="/static/icon-download-item.png"> 
+                <img src="/static/images/icon-download-item.png"> 
               </a>                                                             
-           {% endif %} 
+            {% endif %} 
 
+        
             <br/></br>
-
+            
+            <!-- =================== I T E M - T A G S ================== -->
             <strong>Tags:</strong>
 
             <lu>
                 {% for tag in bookmark.tag2_set.all %}
                 <li>
                     <!-- Button for removing tag from element. -->
-                    <a class="tag-remove-button" 
-                        href="javascript:tag_remove( {{ tag.id }} , {{ bookmark.id}}  );"
+                    <a class="btn-bookmark-tag-delete"
+                        data-bookmark-id="{{ bookmark.id }}"
+                        data-tag-id="{{ tag.id }}" 
+                        href="#/"
                         title="Remove tag '{{ tag.name }}' from bookmark."
                     >[X]</a>
 
-                  <!-- Button for Editing tag -->
-                  <a class="tag-remove-button" 
-                        href="javascript:tag_update( '{{ tag.name | escapejs }}', {{ tag.id }}, '{{ tag.description | escapejs }}' );"
+                  <!-- Button for Editing tag tag -->
+                  <a class="btn-bookmark-tag-edit"
+                        href="#/"
+                        data-id="{{ tag.id }}"
+                        data-name="{{ tag.name }}" 
+                        data-desc="{{ tag.description }}"
+
+
                         title="Update/Edit tag '{{ tag.name }}' from bookmark."
                     >[E]</a>
 
                     <!-- Button for filtering all bookmarks with this tag. -->
-                    <a class="tag-hyperlink" title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
+                    <a class="tag-hyperlink"  title="{{ tag.description }}" href="/items?filter=tag-name&A0={{ tag.name }}" >{{ tag.name }}</a>
                 </li>
                 {% endfor %}
             </lu>            
 
-            <table class="action-menu-table" 
+
+            <!-- =================== I T E M - R E L A T E D ================== -->
+            <br/>
+            <strong>Related:</strong>
+            
+            <a class="btn-bookmark-add-related" 
+                href="#/"
+                title="Add related item to current bookmark."
+            >[+]</a>
+
+
+            <lu>
+                {% for entry in bookmark.related.all %}
+                <li>
+                    <!-- Button for filtering all bookmarks with this tag. -->
+                   <label>( {{ entry.id }} )</label>   <a class="tag-hyperlink" title="{{ entry.title }}" href="/items?filter=id&A0={{ entry.id }}" >{{ entry.title }}</a>
+                </li>
+                {% endfor %}
+            </lu>            
+
+            <!-- ==========  I T E M - A C T I O N - M E N U =================== -->
+
+            <table class="table-buttons  action-menu-table " 
                    id="action-menu-{{ bookmark.id }}" 
                    value="{{ bookmark.id}}"
                    style="visibility: hidden; display: none;"  >              
 
              <tr>
-                <th> 
-                  <a class="btn-sm btn-primary" title="Quick rename item" 
-                      href='javascript:item_quick_rename({{ bookmark.id }}, "{{ bookmark.title | escape }}" )'>Rename</a>
+                <th>
+                  <!-- Button for renaming current bookmark --> 
+                  <a href="#/" class="btn-sm btn-primary btn-bookmark-rename" title="Quick rename item">Rename</a>
                 </th>
               </tr>
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" title="Fetch bookmark metdata automatically" 
-                     href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Get metadata</a>
+                  <a class="btn-sm btn-primary" href="#/" onclick='makeOrgModeUrl( "{{ bookmark.title }}", "{{ bookmark.url }}" ); '  title=""> 
+                    Emacs Org-mode URL
+                  </a>
+                </th>
+              </tr>
+
+              <tr>
+                <th> 
+                  <!-- Button for extracting bookmark metadata -->
+                  <a class="btn-sm btn-primary" title="Update bookmark metdata automatically" 
+                     href="/items/extract_metadata?id={{ bookmark.id }}&url={{ request.get_full_path | urlencode }}">Update metadata</a>
                 </th>
               </tr>
 
@@ -166,7 +288,7 @@
 
               <tr>
                 <th> 
-                  <a class="btn-sm btn-primary" href="#" onclick="open_url_newtab('http://{{ bookmark.hostname }}')" 
+                  <a class="btn-sm btn-primary btn-bookmark-open-domain" href="#" 
                       title="Open this domain URL in a new tab: {{ bookmark.hostname }} "> 
                     Open domain URL 
                   </a>
@@ -180,28 +302,18 @@
                 </th>
               </tr>
 
-
-              <tr>
-                <th> 
-                  {% if  bookmark.snapshot_exists %}
-                    <a class="btn-sm btn-primary" target="_blank" title="Open snapshot file" 
-                       href="/snapshot/file/{{ bookmark.snapshot_file }}?title={{ bookmark.title }}">Open snapshot</a>                                                             
-                  {% endif %}                      
-                </th>
-              </tr>
-
               {% if  bookmark.snapshot_exists %}
                 <tr>
                   <th>
-                    <a class="btn-sm btn-primary" target="_blank" title="Open file snapshot file" 
-                      href="/items/view/{{ bookmark.id}}"> View snapshot </a>                                            
+                    <a class="btn-sm btn-primary btn-snapshot-delete" 
+                       title="Delete snapshot file"> Delete snapshot </a>     
                   </th>
                 </tr>             
-              {% endif %}
+             {% endif %}
               
               <tr>
                 <th>
-                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
+                   <a class="btn-sm btn-primary" title="Archive snapshot" href="javascript:tsmain.item_snapshot( {{ bookmark.id }} );" >Archive</a>                           
                 </th>
               </tr>
 
@@ -215,9 +327,9 @@
                 
                 <tr>
                   <th> 
-                    <a  class="btn-sm btn-primary" 
+                    <a  class="btn-sm btn-primary btn-bookmark-delete" 
                         title="Delete current item" 
-                        href="javascript:item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
+                        href="javascript:tsmain.item_delete( '{{ bookmark.deleted }}' == 'True', {{ bookmark.id }}, '{{ bookmark.modified_title | escapejs }}' ); "
                      >Delete</a>                                                 
                   </th>
                 </tr>
@@ -263,17 +375,23 @@
                   </tr>
             </table>                        
 
-            <p class = ""> {{ bookmark.brief|default:"" }} </p>
+            <p class=""> {{ bookmark.brief|default:"" }} </p>
 
             {% if bookmark.is_youtube_video %}
               <youtube-thumb video="{{ bookmark.youtube_id }}"></youtube-thumb>              
             {% endif %}
 
+            {% if  bookmark.snapshot_is_image %}
+              <br/>
+              <img class="img-snapshot-image" src="/snapshot/file/{{ bookmark.snapshot_file }}?title=" >            
+            {% endif %} 
+
+  
 
             {% if  bookmark.snapshot_is_pdf %}
                 <img src="/thumbnail/{{ bookmark.snapshot_id }}" >            
             {% endif %} 
-
+        </details>
         </div>        
         
         
@@ -282,5 +400,15 @@
     
 
 </div>
+
+<script>
+  function makeOrgModeUrl(title, url) 
+  {
+    let markup = `[[${url}][${title}]]`;
+    prompt("Type Ctrl+A and Ctr+C to copy the markdown for this URL", markup);
+  };
+
+  console.log(" [TRACE] Function makeOrgModeUrl loaded Ok.");
+</script>
 
 {% endblock %}

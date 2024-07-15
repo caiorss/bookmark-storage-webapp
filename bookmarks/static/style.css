@@ -1,15 +1,31 @@
 @font-face {
     font-family: medieval_old_english;
     /* src: url(/static/OldeEnglish.ttf); */
-    src: url(/static/SktMedieval.ttf);
+    src: url(/static/fonts/SktMedieval.ttf);
    
   }
 
  @font-face {
     font-family: unknown_font;
-    src: url(/static/CoolFont.woff);
+    src: url(/static/fonts/CoolFont.woff);
    
   }
+
+ @font-face {
+    font-family: font_stencil;
+    src: url(/static/fonts/BlackOpsOne-Regular.ttf);
+  }
+
+ @font-face {
+    font-family: font_wunderbach;
+    src: url(/static/fonts/WC_Wunderbach.otf);
+  }
+
+ @font-face {
+    font-family: font_major_shift;
+    src: url(/static/fonts/major_shift.ttf);
+  }
+
 
 /*  Change global style with 
  * 
@@ -18,6 +34,7 @@
  *  
  */  
 :root {
+    --title-font: font_stencil;
     --main-background-color:  #3c3c3c; 
     --foreground-color:       white;
     --item-background-color:  #2f2f2f;
@@ -58,6 +75,7 @@ body {
      * (for instance ,android browsers)
      */
     overscroll-behavior-y: contain;
+
 }
 
 a { color: var(--hyperlink-color); }
@@ -72,25 +90,44 @@ p {
     font-size: 10pt;
     font-weight: 400;
     line-height: 1.5;
+
+    width:     90%;
+    word-wrap: break-word;
+  
 }
 
 h1 { 
     color: white; 
-    font-family: medieval_old_english; 
+    font-family: var(--title-font);
+    font-size: 3.0em;
+    padding: 10px;
 }
 
-h2 { color: white; 
-    font-family: medieval_old_english; 
+h2 { 
+    color: white; 
+    font-family: var(--title-font); 
+    font-size: 3.0em;    
 }
 
 h3 { 
-    
-    color:      rgb(221, 89, 89); 
-    font-family:  medieval_old_english;
-    margin-left:  20px;
+    color: white; 
+    font-family: var(--title-font); 
+    font-size: 1.5em; 
+    margin-top: 10px;   
 }
 
-h4 { color: white }
+.centered-title { 
+    
+    color:      rgb(221, 89, 89); 
+    font-family:  var(--title-font);
+
+    margin:     18px;
+    font-size:  2.5em;
+    text-align: center;
+}
+
+
+
 h5 { color: white }
 
 .item { 
@@ -104,7 +141,18 @@ h5 { color: white }
     /* background-color: #3f3f3f; */
     /* border-color: black; */
     border: 1px solid #607D8B;
-    padding: 2%                
+   
+    font-size: medium;
+    padding: 5px;
+}
+
+.item-bookmark-link {
+    margin: 10px;
+    width:     90%;
+    word-wrap: break-word;
+   /* display:inline-block; */
+   font-size: medium;
+   
 }
 
 .container {
@@ -116,6 +164,13 @@ h5 { color: white }
    /*  background: red; */
    /*  position: relative; */
 }
+
+#page-title-header {
+    margin-bottom: -50px;
+    margin-top: 40px;
+}
+
+
 
 .item-table-info {
     font-size: 10pt;
@@ -155,8 +210,9 @@ h5 { color: white }
     background:  #2b2b2d;
     position:      fixed;
     z-index:       1000;
-    width:         600px;
-    padding-left:  10px; 
+    min-width:     800px;
+    padding-left:  10px;
+    margin-left:  -10px;   
   /*   border-radius: 10px; 
     padding-bottom: 50px;  */    
 }
@@ -248,6 +304,40 @@ h5 { color: white }
    /*  display: block; */
 }
 
+
+
+.btn-page-listing {
+    background-color: #005aff;
+    margin-left: 10px;
+    padding: 6px;
+    border-radius: 20px;
+ }
+
+
+.details-controls {
+    border: 2px solid #aaa;
+    background: #1a8894;
+    border-radius: 10px;
+    padding: .5em .5em 0;
+}
+
+.details-controls > summary {
+  padding: 4px;
+  width: 200px;
+  color:            white;
+  background-color: var(--btn-primary-bgcolor);
+  border: none;
+  box-shadow: 1px 1px 2px #bbbbbb;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.details-controls-div {
+    background: #025c66;
+    border: 1px solid rgb(30, 255, 0); 
+    border-radius: 15px;
+}
+
 /** --------- Action Menu Table Style  -----------*/
 
 .action-menu-table {
@@ -274,9 +364,85 @@ h5 { color: white }
   background-color: #1b1b1b;
 }
 
+.div-form-search {
+    border-radius: 20px;
+    border: 20p;
+    padding: 10px;
+}
+
+/* --- Buttons for chaning  settings ----------- */
+
+.table-buttons {
+    width: 300px;
+    padding: 10px;
+    margin: 10px; 
+    border-radius: 15px;
+    background-color: #616365;
+    display: block;
+    
+}
+
+.table-buttons th {
+    border: 0;
+    width: 200px;
+    display: block;
+    padding: 8px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    color: white; 
+    background-color: var(--btn-primary-bgcolor);
+}
+
+.table-buttons th:hover {
+    background-color: #565858;
+}
+
+.table-buttons th a {
+    color:white;
+    
+}
+
+.table-buttons select {
+    display: block;
+    background-color: #565858;
+    width: 100%;
+    border-radius: 5px;
+    color: white;
+}
+
+.div-file-upload {
+    margin: 10px;
+    background-color: gray;
+    width: 90%;
+    border-radius: 25px;
+    padding: 10px;
+   
+}
+
+.div-file-upload input[type=file] {
+     background-color: #323235;
+     border-radius: 10px;
+}
+
+ .div-form-search input[type=text] {
+    width: 100%;
+}
+
+
+.img-snapshot-image {
+    max-width: 90%;
+    /* max-height: px; */
+    /* margin-top: -30px; */
+}
+
   /** =============== Mobile-specific Style ================ */
   @media only screen and (max-width: 960px) 
   {
+    body {
+        max-width: 100%;
+        padding: 5px;
+    }
+
     #top-panel {
         margin-top: 50px;
     }
@@ -285,12 +451,29 @@ h5 { color: white }
         margin-top: 30px;
     }
 
+    .details-controls {
+        max-width:  100%;
+    }
+
+    #page-title-header {
+        margin-bottom: 10px;
+    }
+
+    img {
+        max-width: 95%;
+    }
+
   }
 
-   /** =============== Desktop-specific Style ================ */
+   /** =============== Desktop - specific Style ================ */
    @media only screen and (min-width: 960px) {
 
     html { width: 800px; }
+
+    body {
+        margin: 10px;
+        padding: 10px;
+    }
 
     .header {
        font-size: 12pt;
@@ -305,7 +488,7 @@ h5 { color: white }
 
     #top-panel{
         visibility:   visible;
-        width:         60%;
+        width:         90%;
         position:      relative;
         display:       block;    
         margin-top:    60px;           
@@ -316,9 +499,19 @@ h5 { color: white }
        /*  top: 0; */
     }
 
+    .details-controls {
+        width: 90%;
+        max-width:  90%;
+    }
+
     #bookmark-list{
         margin-top: 160px;
         position: relative;
+    }
+
+    #page-title-header {
+        margin-bottom: -50px;
+        margin-top: 40px;
     }
 
 
