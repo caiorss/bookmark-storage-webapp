@@ -62,7 +62,7 @@ urlpatterns = [
 
    # ======= Django-Rest Framework ============================#
     # Authentication endpoint 
-  , path('api2/login',           include('rest_auth.urls')              )
+#  , path('api2/login',           include('rest_auth.urls')              )
   , path('api2/items',           rest_views.RestItems.as_view()         )
   , path('api2/items/<int:pk>',  rest_views.RestItemsDetail.as_view()  )
   , path('api2/tags',            rest_views.RestTags.as_view()          )
