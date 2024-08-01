@@ -201,21 +201,17 @@ class BookmarksList(LoginRequiredMixin, ListView):
         ## print(f" Trace = { self.context_object_name }")
         query: QuerySet = context[self.context_object_name]
         assert query is not None 
-
         narrow = self.request.GET.get("narrow") or "off"
         search = self.request.GET.get("search") or ""
-
         if narrow != "off":
             query = query.filter( title__contains = search) 
             pass 
-
         rFilter = self.request.GET.get("filter") or ""
         rA0     = self.request.GET.get("A0") or ""
         # rQuery  = self.request.get("query")
         rQuery  = urllib.parse.quote(self.request.GET.get("query") or "")
         rMode   = self.request.GET.get("mode")   or ""
         rOrder  = self.request.GET.get("order")  or ""
-       
         url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}&order={order}"\
             .format(  filter = rFilter 
                     , A0     = rA0 
@@ -224,34 +220,24 @@ class BookmarksList(LoginRequiredMixin, ListView):
                     , order  = rOrder 
                     )   
         ## print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
-        
         view = self.request.GET.get("filter") or "null"
         ## print(f" [TRACE] get_context_data() =>> view = {view}")
-
         title = (self.filter_dispatch.get(view) or self.null_view).title 
-        
         if view == "doctype":
             title = title + ": " + (self.request.GET.get("A0") or "")
-
-        if view == "collection":
+        elif view == "collection":
             coll_id = self.request.GET.get("A0")
             coll = Collection.objects.get(id = coll_id, owner = self.request.user)
             title = title + " : " + coll.title 
-
-        if view == "tag-name":
+        elif view == "tag-name":
             title = title + " : " + self.request.GET.get("A0")
-
         context["page_title"] = title 
-
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
-       
         order = self.request.GET.get("order") or "new" 
-        
         if   order == "new": context["item_sorting"] = "Newest items"
         elif order == "old": context["item_sorting"] = "Oldest items"
         elif order == "updated": context["item_sorting"] = "Latest updated items"
-
         return context
 
     #---------- Utility methods  -------------------------------#
