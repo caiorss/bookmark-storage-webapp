@@ -208,13 +208,20 @@ class BookmarksList(LoginRequiredMixin, ListView):
         if narrow != "off":
             query = query.filter( title__contains = search) 
             pass 
+
+        rFilter = self.request.GET.get("filter") or ""
+        rA0     = self.request.GET.get("A0") or ""
+        # rQuery  = self.request.get("query")
+        rQuery  = urllib.parse.quote(self.request.GET.get("query") or "")
+        rMode   = self.request.GET.get("mode")   or ""
+        rOrder  = self.request.GET.get("order")  or ""
        
         url_state = "filter={filter}&A0={A0}&mode={mode}&query={query}&order={order}"\
-            .format(  filter = self.request.GET.get("filter") or ""
-                    , A0     = self.request.GET.get("A0")   or ""
-                    , query  = urllib.parse.quote(self.request.GET.get("query") or "")
-                    , mode   = self.request.GET.get("mode") or ""
-                    , order  = self.request.GET.get("order") or ""
+            .format(  filter = rFilter 
+                    , A0     = rA0 
+                    , query  = rQuery
+                    , mode   = rMode 
+                    , order  = rOrder 
                     )   
         ## print(f" [TRACE] get_context_data() =>> url_state = {url_state}") 
         
