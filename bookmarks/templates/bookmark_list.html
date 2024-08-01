@@ -4,9 +4,13 @@
 
 <h3 id="page-title-header" class="centered-title"> {{ page_title }} </h3>
 
+<div>
+    <br/> <br/> 
+    <p>{{ tag_description }}</p> 
+</div>
+
 
 <div id="bookmark-list" class="container">   
-
 
 <div id="div-additional-buttons">
   Order by:  {{ item_sorting }} <br/>
@@ -15,7 +19,6 @@
   <button id="btn-order-oldest"  class="btn-sm btn-primary btn-toggle-details">Oldest</button>
   <button id="btn-order-updated" class="btn-sm btn-primary btn-toggle-details">Last updated</button>
 </div>
-
 
   Quick actions: 
   <br/>
@@ -32,6 +35,7 @@
     </span>
 
     <br>
+
 
     <!-- Buttons for browsing next page (next set of results) -->
     {% if page_obj.has_previous %}
@@ -103,7 +107,7 @@
                            href="{{ bookmark.url }}"
                       {% endif %}
                     >                       
-                        {{ bookmark.modified_title | default:bookmark.url }}                                                                        
+                        {{ bookmark.modified_title | default:bookmark.url  | default:""  }}                                                                        
                   </a>    
 
             </h5>

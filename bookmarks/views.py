@@ -223,6 +223,7 @@ class BookmarksList(LoginRequiredMixin, ListView):
         view = self.request.GET.get("filter") or "null"
         ## print(f" [TRACE] get_context_data() =>> view = {view}")
         title = (self.filter_dispatch.get(view) or self.null_view).title 
+        tag_description = ""
         if view == "doctype":
             title = title + ": " + (self.request.GET.get("A0") or "")
         elif view == "collection":
@@ -230,10 +231,14 @@ class BookmarksList(LoginRequiredMixin, ListView):
             coll = Collection.objects.get(id = coll_id, owner = self.request.user)
             title = title + " : " + coll.title 
         elif view == "tag-name":
-            title = title + " : " + self.request.GET.get("A0")
+            title = title + " : " + rA0 
+            tag: Tag2 = Tag2.objects.get(name = rA0, owner = self.request.user)
+            tag_description = tag.description
+            ## tag_description = self.
         context["page_title"] = title 
         context['count'] = self.get_queryset().count()
         context["url_state"] = url_state
+        context["tag_description"] = tag_description
         order = self.request.GET.get("order") or "new" 
         if   order == "new": context["item_sorting"] = "Newest items"
         elif order == "old": context["item_sorting"] = "Oldest items"
